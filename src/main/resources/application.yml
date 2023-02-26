@@ -1,0 +1,23 @@
+spring:
+  profiles:
+    active: mock
+  graphql:
+    websocket:
+      path: /subscription
+    schema:
+      printer:
+        enabled: true
+    path: /graphql
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info
+
+logging:
+  level:
+    org.springframework.web: debug
+    org.springframework.http: debug
+    org.springframework.graphql: debug
+    reactor.netty: debug
