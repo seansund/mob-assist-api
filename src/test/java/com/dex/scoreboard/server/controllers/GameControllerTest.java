@@ -1,8 +1,5 @@
 package com.dex.scoreboard.server.controllers;
 
-import com.dex.mobassist.server.model.Game;
-import com.dex.mobassist.server.model.Team;
-import com.dex.mobassist.server.repository.GameRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

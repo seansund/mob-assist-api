@@ -1,63 +1,25 @@
 type Query {
-    getGameClock: GameClock
-    getGame: Game
-    getCurrentScore: GameScore
+    listMembers: [Member]
+    getMemberByPhone(phone: String!): Member
 }
 
 type Mutation {
-    startClock: GameClock
-    stopClock: GameClock
-    resetClock: GameClock
-    periodAdd: GameClock
-    periodSubtract: GameClock
-    periodSet(period: Int!): GameClock
-    timeMinuteAdd: GameClock
-    timeMinuteSubtract: GameClock
-    timeSecondAdd: GameClock
-    timeSecondSubtract: GameClock
-    timeSet(minute: Int!, second: Int!): GameClock
-    addScore(team: String): GameScore
-    addScoreTwo(team: String): GameScore
-    addScoreThree(team: String): GameScore
-    subtractScore(team: String): GameScore
-    subtractScoreTwo(team: String): GameScore
-    subtractScoreThree(team: String): GameScore
-    scoreSet(team: String, score: Int!): GameScore
-    addFoul(team: String): GameScore
-    subtractFoul(team: String): GameScore
-    foulsSet(team: String, fouls: Int!): GameScore
+    addUpdateMember(phone: String!, firstName: String!, lastName: String!, email: String, preferredContact: String): Member
+    removeMember(phone: String!): SimpleResult
 }
 
 type Subscription {
-    gameClock: GameClock
-    gameScore: GameScore
+    members: [Member]
 }
 
-
-type Game {
-    home: Team!
-    away: Team!
-    title: String!
+type Member {
+    phone: String!
+    firstName: String!
+    lastName: String!
+    email: String
+    preferredContact: String
 }
 
-type GameClock {
-    time: Int!
-    period: Int!
-    running: Boolean!
-}
-
-type GameScore {
-    home: TeamScore!
-    away: TeamScore!
-}
-
-type Team {
-    name: String!
-    color: String!
-    logoUrl: String
-}
-
-type TeamScore {
-    score: Int!
-    fouls: Int!
+type SimpleResult {
+    result: Boolean!
 }
