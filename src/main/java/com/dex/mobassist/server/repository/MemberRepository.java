@@ -6,14 +6,5 @@ import lombok.NonNull;
 
 import java.util.List;
 
-public interface MemberRepository {
-    List<Member> list();
-
-    Member getById(String phone);
-
-    Member addUpdate(@NonNull Member newMember);
-
-    boolean delete(@NonNull String phone);
-
-    Observable<List<Member>> observable();
+public interface MemberRepository extends BaseRepository<Member> {
 }

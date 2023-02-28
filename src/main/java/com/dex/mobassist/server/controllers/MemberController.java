@@ -36,7 +36,7 @@ public class MemberController {
 
     @MutationMapping
     public Member addUpdateMember(@Argument("phone") String phone, @Argument("firstName") String firstName, @Argument("lastName") String lastName, @Argument("email") String email, @Argument("preferredContact") String preferredContact) {
-        final Member member = Member.create(
+        final Member member = Member.createMember(
                 phone,
                 firstName,
                 lastName,

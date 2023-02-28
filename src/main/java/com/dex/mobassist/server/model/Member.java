@@ -7,20 +7,27 @@ import lombok.NonNull;
 import java.util.stream.Stream;
 
 @Data
-@NoArgsConstructor
-public class Member implements Comparable<Member> {
+public class Member extends MemberRef implements Comparable<Member> {
     @NonNull private String firstName;
     @NonNull private String lastName;
     @NonNull private String phone;
     private String email;
     private String preferredContact;
 
-    public static Member create(String phone, String firstName, String lastName) {
-        return create(phone, firstName, lastName, "", "");
+    public Member() {
+        this("");
     }
 
-    public static Member create(String phone, String firstName, String lastName, String email, String preferredContact) {
-        final Member member = new Member();
+    public Member(String id) {
+        super(id);
+    }
+
+    public static Member createMember(String phone, String firstName, String lastName) {
+        return createMember(phone, firstName, lastName, "", "");
+    }
+
+    public static Member createMember(String phone, String firstName, String lastName, String email, String preferredContact) {
+        final Member member = new Member(phone);
 
         member.phone = phone;
         member.lastName = lastName;

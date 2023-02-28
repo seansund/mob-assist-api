@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: mock
+    active: mock,initialize
   graphql:
     websocket:
       path: /subscription

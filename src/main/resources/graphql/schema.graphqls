@@ -1,25 +1,70 @@
 type Query {
     listMembers: [Member]
-    getMemberByPhone(phone: String!): Member
+    getMemberByPhone(phone: ID!): Member
+    listSignups(scope: String = "upcoming"): [Signup]
+    getSignupById(id: ID!): Signup
 }
 
 type Mutation {
-    addUpdateMember(phone: String!, firstName: String!, lastName: String!, email: String, preferredContact: String): Member
-    removeMember(phone: String!): SimpleResult
+    addUpdateMember(phone: ID!, firstName: String!, lastName: String!, email: String, preferredContact: String): Member
+    removeMember(phone: ID!): SimpleResult
+    addUpdateSignup(id: ID, date: String!, title: String!, assignmentSetId: String!, optionSetId: String!): Signup
+    removeSignup(id: ID!): SimpleResult
 }
 
 type Subscription {
     members: [Member]
+    signups: [Signup]
 }
 
 type Member {
-    phone: String!
+    phone: ID!
     firstName: String!
     lastName: String!
     email: String
     preferredContact: String
 }
 
+type Signup {
+    id: ID!
+    date: Date!
+    title: String!
+    assignmentSet: AssignmentSet
+    options: SignupOptionSet
+    responses: [SignupOptionResponse]
+}
+
+type AssignmentSet {
+    id: ID!
+    name: String!
+    assignments: [Assignment]
+}
+
+type Assignment {
+    group: String!
+    name: String!
+}
+
+type SignupOptionSet {
+    id: ID!
+    name: String!
+    options: [SignupOption]
+}
+
+type SignupOption {
+    id: ID!
+    value: String!
+    declineOption: Boolean
+}
+
+type SignupOptionResponse {
+    option: SignupOption!
+    count: Int!
+    assignments: Int!
+}
+
 type SimpleResult {
     result: Boolean!
 }
+
+scalar Date
