@@ -11,7 +11,7 @@ import java.util.List;
 public class MemberRepositoryMock extends AbstractRepositoryMock<Member> implements MemberRepository {
 
     @Override
-    protected Member generateIdForValue(Member value) {
+    protected Member updateValueWithId(Member value, int id) {
         return value;
     }
 

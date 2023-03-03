@@ -16,7 +16,11 @@ public class SignupOptionRef implements ModelRef {
         this.id = id;
     }
 
-    public static SignupOptionRef createSignupOptionRef(@NonNull String id) {
+    public static SignupOptionRef createSignupOptionRef(String id) {
+        if (id == null) {
+            return null;
+        }
+
         return new SignupOptionRef(id);
     }
 }

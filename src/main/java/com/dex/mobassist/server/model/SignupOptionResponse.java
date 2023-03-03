@@ -5,15 +5,15 @@ import lombok.NonNull;
 
 @Data
 public class SignupOptionResponse {
-    private SignupOption option;
+    private SignupOptionRef option;
     private int count;
     private int assignments;
 
-    public static SignupOptionResponse createSignupOptionResponse(@NonNull SignupOption option) {
+    public static SignupOptionResponse createSignupOptionResponse(SignupOptionRef option) {
         return createSignupOptionResponse(option, 0, 0);
     }
 
-    public static SignupOptionResponse createSignupOptionResponse(@NonNull SignupOption option, int count, int assignments) {
+    public static SignupOptionResponse createSignupOptionResponse(SignupOptionRef option, int count, int assignments) {
         final SignupOptionResponse response = new SignupOptionResponse();
 
         response.option = option;
@@ -21,5 +21,25 @@ public class SignupOptionResponse {
         response.assignments = assignments;
 
         return response;
+    }
+
+    public SignupOptionResponse addCount() {
+        return addCount(1);
+    }
+
+    public SignupOptionResponse addCount(int amount) {
+        count = count + amount;
+
+        return this;
+    }
+
+    public SignupOptionResponse addAssignment() {
+        return addAssignment(1);
+    }
+
+    public SignupOptionResponse addAssignment(int amount) {
+        assignments = assignments + amount;
+
+        return this;
     }
 }

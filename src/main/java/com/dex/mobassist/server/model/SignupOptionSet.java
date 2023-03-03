@@ -35,6 +35,14 @@ public class SignupOptionSet extends SignupOptionSetRef {
         return set;
     }
 
+    public void setId(@NonNull String id) {
+        super.setId(id);
+
+        options.forEach((SignupOption option) -> {
+            option.setId(id + "-" + option.getValue());
+        });
+    }
+
     public SignupOptionSet withId(@NonNull String id) {
         this.setId(id);
 

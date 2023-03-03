@@ -17,6 +17,10 @@ public class SignupOption extends SignupOptionRef {
         super(id);
     }
 
+    public static SignupOption createSignupOption(@NonNull String value) {
+        return createSignupOption("", value);
+    }
+
     public static SignupOption createSignupOption(int id, @NonNull String value) {
         return createSignupOption(String.valueOf(id), value);
     }
@@ -29,6 +33,10 @@ public class SignupOption extends SignupOptionRef {
         return createSignupOption(String.valueOf(id), value, declineOption);
     }
 
+    public static SignupOption createSignupOption(@NonNull String value, boolean declineOption) {
+        return createSignupOption("", value, declineOption);
+    }
+
     public static SignupOption createSignupOption(@NonNull String id, String value, boolean declineOption) {
         final SignupOption signupOption = new SignupOption(id);
 
@@ -36,6 +44,16 @@ public class SignupOption extends SignupOptionRef {
         signupOption.declineOption = declineOption;
 
         return signupOption;
+    }
+
+    public SignupOption withId(int id) {
+        return withId(String.valueOf(id));
+    }
+
+    public SignupOption withId(String id) {
+        this.setId(id);
+
+        return this;
     }
 }
 

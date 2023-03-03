@@ -1,6 +1,5 @@
 package com.dex.mobassist.server.repository;
 
-import com.dex.mobassist.server.model.SignupOptionSet;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import lombok.NonNull;
@@ -14,6 +13,8 @@ import static java.util.stream.Stream.of;
 
 public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
     private final BehaviorSubject<List<T>> subject;
+
+    private int nextId = 1;
 
     protected AbstractRepositoryMock() {
         subject = BehaviorSubject.createDefault(List.of());
@@ -37,16 +38,16 @@ public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
     public T addUpdate(@NonNull T newValue) {
         final List<T> values = subject.getValue();
 
-        final Predicate<T> isExisting = compareById(getId(newValue));
+        final Predicate<T> matchExisting = compareById(getId(newValue));
 
         final Optional<T> existingValue = values
                 .stream()
-                .filter(isExisting)
+                .filter(matchExisting)
                 .findFirst();
 
         final List<T> updatedValues = existingValue.isPresent()
-                ? values.stream().map((T val) -> isExisting.test(val) ? generateIdForValue(newValue) : val).toList()
-                : concat(values.stream(), of(newValue)).toList();
+                ? values.stream().map((T val) -> matchExisting.test(val) ? newValue : val).toList()
+                : concat(values.stream(), of(updateValueWithId(newValue, nextId++))).toList();
 
         onNext(updatedValues);
 
@@ -87,8 +88,7 @@ public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
         return value;
     }
 
-    protected abstract T generateIdForValue(T value);
-
+    protected abstract T updateValueWithId(T value, int id);
 
     protected abstract String getId(T value);
 }

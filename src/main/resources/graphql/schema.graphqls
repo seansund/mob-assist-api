@@ -1,20 +1,35 @@
 type Query {
     listMembers: [Member]
     getMemberByPhone(phone: ID!): Member
+
     listSignups(scope: String = "upcoming"): [Signup]
     getSignupById(id: ID!): Signup
+
+    listSignupResponses: [MemberSignupResponse]
+    listSignupResponsesByUser(phone: ID!): [MemberSignupResponse]
+    listSignupResponsesBySignup(id: ID!): [MemberSignupResponse]
+    getSignupResponseById(id: ID!): MemberSignupResponse
 }
 
 type Mutation {
     addUpdateMember(phone: ID!, firstName: String!, lastName: String!, email: String, preferredContact: String): Member
     removeMember(phone: ID!): SimpleResult
+
     addUpdateSignup(id: ID, date: String!, title: String!, assignmentSetId: String!, optionSetId: String!): Signup
     removeSignup(id: ID!): SimpleResult
+
+    addUpdateSignupResponse(id: ID, signupId: ID!, memberPhone: ID!, selectedOptionId: ID, assignmentIds: [String], message: String): MemberSignupResponse
+    removeSignupResponse(id: ID!): SimpleResult
 }
 
 type Subscription {
     members: [Member]
+
     signups: [Signup]
+
+    signupResponses: [MemberSignupResponse]
+    signupResponsesByUser: [MemberSignupResponse]
+    signupResponsesBySignup: [MemberSignupResponse]
 }
 
 type Member {
@@ -41,8 +56,10 @@ type AssignmentSet {
 }
 
 type Assignment {
+    id: ID!
     group: String!
     name: String!
+    row: Int!
 }
 
 type SignupOptionSet {
@@ -58,9 +75,19 @@ type SignupOption {
 }
 
 type SignupOptionResponse {
-    option: SignupOption!
+    option: SignupOption
     count: Int!
     assignments: Int!
+}
+
+type MemberSignupResponse {
+    id: ID!
+    signup: Signup!
+    member: Member!
+
+    selectedOption: SignupOption
+    assignments: [Assignment]
+    message: String
 }
 
 type SimpleResult {

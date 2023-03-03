@@ -14,11 +14,9 @@ import java.util.function.Predicate;
 @Profile("mock")
 public class SignupRepositoryMock extends AbstractRepositoryMock<Signup> implements SignupRepository {
 
-    private int nextId = 1;
-
     @Override
-    protected Signup generateIdForValue(Signup value) {
-        return value.withId(nextId++);
+    protected Signup updateValueWithId(Signup value, int id) {
+        return value.withId(id);
     }
 
     @Override

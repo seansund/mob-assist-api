@@ -16,7 +16,11 @@ public class SignupRef implements ModelRef {
         this.id = id;
     }
 
-    public static SignupRef createSignupRef(@NonNull String id) {
+    public static SignupRef createSignupRef(String id) {
+        if (id == null) {
+            return null;
+        }
+
         return new SignupRef(id);
     }
 }

@@ -16,7 +16,11 @@ public class MemberRef implements ModelRef {
         this.id = id;
     }
 
-    public static MemberRef createMemberRef(@NonNull String id) {
+    public static MemberRef createMemberRef(String id) {
+        if (id == null) {
+            return null;
+        }
+
         return new MemberRef(id);
     }
 }
