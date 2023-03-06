@@ -85,6 +85,16 @@ public class MemberSignupResponseController {
         return new SimpleResult(repository.delete(id));
     }
 
+    @MutationMapping
+    public MemberSignupResponse checkIn(@Argument("id") String id) {
+        return repository.checkIn(id);
+    }
+
+    @MutationMapping
+    public MemberSignupResponse removeCheckIn(@Argument("id") String id) {
+        return repository.removeCheckIn(id);
+    }
+
     @SubscriptionMapping
     public Flux<List<MemberSignupResponse>> signupResponses() {
         return RxJava3Adapter.observableToFlux(repository.observable(), BackpressureStrategy.LATEST);

@@ -5,6 +5,7 @@ import com.dex.mobassist.server.model.MemberSignupResponse;
 import com.dex.mobassist.server.model.Signup;
 import com.dex.mobassist.server.model.SignupQueryScope;
 import io.reactivex.rxjava3.core.Observable;
+import lombok.NonNull;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -105,5 +106,23 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
         onNext(listBySignup(id));
 
         return observable();
+    }
+
+    @Override
+    public MemberSignupResponse checkIn(@NonNull String id) {
+        final MemberSignupResponse response = getById(id);
+
+        response.setCheckedIn(true);
+
+        return response;
+    }
+
+    @Override
+    public MemberSignupResponse removeCheckIn(@NonNull String id) {
+        final MemberSignupResponse response = getById(id);
+
+        response.setCheckedIn(false);
+
+        return response;
     }
 }

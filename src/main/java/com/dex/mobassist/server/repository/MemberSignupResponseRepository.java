@@ -13,4 +13,7 @@ public interface MemberSignupResponseRepository extends BaseRepository<MemberSig
     Observable<List<MemberSignupResponse>> observableOfUserResponses(String phone);
 
     Observable<List<MemberSignupResponse>> observableOfSignupResponses(String id);
+
+    MemberSignupResponse checkIn(String id);
+    MemberSignupResponse removeCheckIn(String id);
 }

@@ -20,6 +20,9 @@ type Mutation {
 
     addUpdateSignupResponse(id: ID, signupId: ID!, memberPhone: ID!, selectedOptionId: ID, assignmentIds: [String], message: String): MemberSignupResponse
     removeSignupResponse(id: ID!): SimpleResult
+
+    checkIn(id: ID!): MemberSignupResponse
+    removeCheckIn(id: ID!): MemberSignupResponse
 }
 
 type Subscription {
@@ -88,6 +91,7 @@ type MemberSignupResponse {
     selectedOption: SignupOption
     assignments: [Assignment]
     message: String
+    checkedIn: Boolean
 }
 
 type SimpleResult {

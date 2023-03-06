@@ -16,6 +16,7 @@ public class MemberSignupResponse extends MemberSignupResponseRef {
     private SignupOptionRef selectedOption;
     private List<? extends AssignmentRef> assignments = new ArrayList<>();
     private String message;
+    private boolean checkedIn = false;
 
     public MemberSignupResponse() {
         this("");
