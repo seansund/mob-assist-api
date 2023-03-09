@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class SimpleResult {
-    @NonNull
     private boolean result;
+
+    public SimpleResult(boolean result) {
+        this.result = result;
+    }
 }

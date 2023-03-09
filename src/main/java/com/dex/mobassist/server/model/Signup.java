@@ -2,6 +2,7 @@ package com.dex.mobassist.server.model;
 
 import graphql.com.google.common.base.Strings;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
 import java.text.DateFormat;
@@ -11,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Signup extends SignupRef {
     private static final DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 

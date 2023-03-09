@@ -1,11 +1,13 @@
 package com.dex.mobassist.server.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class AssignmentSet extends AssignmentSetRef {
     private String name;
     private List<Assignment> assignments;

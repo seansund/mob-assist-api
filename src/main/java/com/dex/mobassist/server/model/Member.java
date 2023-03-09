@@ -1,12 +1,14 @@
 package com.dex.mobassist.server.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.util.stream.Stream;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Member extends MemberRef implements Comparable<Member> {
     @NonNull private String firstName;
     @NonNull private String lastName;

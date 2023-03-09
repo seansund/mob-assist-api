@@ -1,9 +1,11 @@
 package com.dex.mobassist.server.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class SignupOption extends SignupOptionRef {
     @NonNull
     private String value;
