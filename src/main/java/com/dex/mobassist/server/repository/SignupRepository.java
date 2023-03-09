@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface SignupRepository extends BaseRepository<Signup> {
     List<Signup> list(SignupQueryScope scope);
+
+    Signup getCurrent();
 }

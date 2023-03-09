@@ -61,7 +61,13 @@ public class MemberSignupResponse extends MemberSignupResponseRef {
     }
 
     public MemberSignupResponse withId(@NonNull String id) {
-        this.setId(id);
+        setId(id);
+
+        return this;
+    }
+
+    public MemberSignupResponse withSelectedOption(SignupOption option) {
+        setSelectedOption(option);
 
         return this;
     }

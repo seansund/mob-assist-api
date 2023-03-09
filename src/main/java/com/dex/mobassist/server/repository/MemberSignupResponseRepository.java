@@ -1,6 +1,9 @@
 package com.dex.mobassist.server.repository;
 
+import com.dex.mobassist.server.model.Member;
 import com.dex.mobassist.server.model.MemberSignupResponse;
+import com.dex.mobassist.server.model.Signup;
+import com.dex.mobassist.server.model.SignupOption;
 import io.reactivex.rxjava3.core.Observable;
 
 import java.util.List;
@@ -16,4 +19,6 @@ public interface MemberSignupResponseRepository extends BaseRepository<MemberSig
 
     MemberSignupResponse checkIn(String id);
     MemberSignupResponse removeCheckIn(String id);
+
+    MemberSignupResponse signUp(Signup signup, Member member, SignupOption option);
 }

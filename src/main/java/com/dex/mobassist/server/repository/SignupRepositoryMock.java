@@ -40,6 +40,14 @@ public class SignupRepositoryMock extends AbstractRepositoryMock<Signup> impleme
                 .toList();
     }
 
+    @Override
+    public Signup getCurrent() {
+        return list(SignupQueryScope.upcoming)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Current signup not found"));
+    }
+
     protected Predicate<Signup> getPredicate(SignupQueryScope scope) {
         final Date today = new Date();
         final Calendar upcoming = Calendar.getInstance();

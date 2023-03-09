@@ -1,15 +1,13 @@
 package com.dex.mobassist.server.repository;
 
-import com.dex.mobassist.server.model.Member;
-import com.dex.mobassist.server.model.MemberSignupResponse;
-import com.dex.mobassist.server.model.Signup;
-import com.dex.mobassist.server.model.SignupQueryScope;
+import com.dex.mobassist.server.model.*;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -30,6 +28,8 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
 
     @Override
     protected MemberSignupResponse updateValueWithId(MemberSignupResponse value, int id) {
+        System.out.println("Setting id: " + id);
+
         return value.withId(id);
     }
 
@@ -40,6 +40,10 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
 
     @Override
     public List<MemberSignupResponse> listByUser(String phone) {
+        return listByUser(phone, true);
+    }
+
+    public List<MemberSignupResponse> listByUser(String phone, boolean fill) {
         final Member member = memberRepository.getById(phone);
         final List<Signup> signups = signupRepository.list(SignupQueryScope.future);
 
@@ -54,10 +58,14 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
             return signupIds.noneMatch((id) -> id.equals(signup.getId()));
         };
 
+        if (!fill) {
+            return memberResponses;
+        }
+
         final List<MemberSignupResponse> memberNoResponse = signups
                 .stream()
                 .filter(signupNoResponse)
-                .map((signup) -> createMemberSignupResponse("", signup, member))
+                .map((signup) -> createMemberSignupResponse(signup.getId() + "-" + member.getId(), signup, member))
                 .toList();
 
         return concat(memberResponses.stream(), memberNoResponse.stream()).toList();
@@ -124,5 +132,25 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
         response.setCheckedIn(false);
 
         return response;
+    }
+
+    @Override
+    public MemberSignupResponse signUp(@NonNull Signup signup, @NonNull Member member, @NonNull SignupOption option) {
+        final List<MemberSignupResponse> responses = listByUser(member.getPhone(), false);
+
+        final Optional<MemberSignupResponse> response = responses
+                .stream()
+                .filter((resp) -> signup.getId().equals(resp.getSignup().getId()))
+                .findFirst();
+
+        return response
+                .map((resp) -> {
+                    System.out.println("Setting selected option: " + option);
+                    return resp.withSelectedOption(option);
+                })
+                .orElseGet(() -> {
+                    System.out.println("Adding new response");
+                    return addUpdate(createMemberSignupResponse("", signup, member, option));
+                });
     }
 }
