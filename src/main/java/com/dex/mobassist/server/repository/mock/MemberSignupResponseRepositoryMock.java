@@ -1,6 +1,9 @@
-package com.dex.mobassist.server.repository;
+package com.dex.mobassist.server.repository.mock;
 
 import com.dex.mobassist.server.model.*;
+import com.dex.mobassist.server.repository.MemberRepository;
+import com.dex.mobassist.server.repository.MemberSignupResponseRepository;
+import com.dex.mobassist.server.repository.SignupRepository;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
 import org.springframework.context.annotation.Profile;

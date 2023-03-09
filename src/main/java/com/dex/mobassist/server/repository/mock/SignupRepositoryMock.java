@@ -1,7 +1,8 @@
-package com.dex.mobassist.server.repository;
+package com.dex.mobassist.server.repository.mock;
 
 import com.dex.mobassist.server.model.Signup;
 import com.dex.mobassist.server.model.SignupQueryScope;
+import com.dex.mobassist.server.repository.SignupRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 

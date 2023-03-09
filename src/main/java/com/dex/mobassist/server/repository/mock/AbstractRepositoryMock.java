@@ -1,5 +1,6 @@
-package com.dex.mobassist.server.repository;
+package com.dex.mobassist.server.repository.mock;
 
+import com.dex.mobassist.server.repository.BaseRepository;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import lombok.NonNull;

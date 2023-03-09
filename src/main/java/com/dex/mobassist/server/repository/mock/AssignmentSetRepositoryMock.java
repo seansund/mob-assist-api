@@ -1,6 +1,7 @@
-package com.dex.mobassist.server.repository;
+package com.dex.mobassist.server.repository.mock;
 
 import com.dex.mobassist.server.model.AssignmentSet;
+import com.dex.mobassist.server.repository.AssignmentSetRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
