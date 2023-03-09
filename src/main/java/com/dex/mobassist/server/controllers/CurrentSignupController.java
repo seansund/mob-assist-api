@@ -1,7 +1,7 @@
 package com.dex.mobassist.server.controllers;
 
 import com.dex.mobassist.server.model.*;
-import com.dex.mobassist.server.repository.*;
+import com.dex.mobassist.server.service.*;
 import lombok.NonNull;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,51 +12,51 @@ import java.util.Optional;
 @CrossOrigin
 @RequestMapping("/signup")
 public class CurrentSignupController {
-    private final SignupRepository repository;
-    private final SignupOptionSetRepository optionSetRepository;
-    private final MemberSignupResponseRepository memberSignupResponseRepository;
-    private final MemberRepository memberRepository;
-    private final AssignmentSetRepository assignmentSetRepository;
+    private final SignupService service;
+    private final SignupOptionSetService optionSetService;
+    private final MemberSignupResponseService memberSignupResponseService;
+    private final MemberService memberService;
+    private final AssignmentSetService assignmentSetService;
 
     public CurrentSignupController(
-            SignupRepository repository,
-            SignupOptionSetRepository optionSetRepository,
-            MemberSignupResponseRepository memberSignupResponseRepository,
-            MemberRepository memberRepository,
-            AssignmentSetRepository assignmentSetRepository
+            SignupService service,
+            SignupOptionSetService optionSetService,
+            MemberSignupResponseService memberSignupResponseService,
+            MemberService memberService,
+            AssignmentSetService assignmentSetService
     ) {
-        this.repository = repository;
-        this.optionSetRepository = optionSetRepository;
-        this.memberSignupResponseRepository = memberSignupResponseRepository;
-        this.memberRepository = memberRepository;
-        this.assignmentSetRepository = assignmentSetRepository;
+        this.service = service;
+        this.optionSetService = optionSetService;
+        this.memberSignupResponseService = memberSignupResponseService;
+        this.memberService = memberService;
+        this.assignmentSetService = assignmentSetService;
     }
 
     @GetMapping("/current")
     public Signup getCurrentSignup() {
-        return repository.getCurrent();
+        return service.getCurrent();
     }
 
     @GetMapping("/current/options")
     public List<SignupOption> getCurrentSignupOptions() {
-        return getSignupOptions(repository.getCurrent());
+        return getSignupOptions(service.getCurrent());
     }
 
     @GetMapping("/current/assignments")
     public List<Assignment> getCurrentSignupAssignments() {
-        return getAssignments(repository.getCurrent());
+        return getAssignments(service.getCurrent());
     }
 
     @GetMapping("/current/responses")
     public List<MemberSignupResponse> getCurrentResponses() {
-        final Signup signup = repository.getCurrent();
+        final Signup signup = service.getCurrent();
 
-        return memberSignupResponseRepository.listBySignup(signup.getId());
+        return memberSignupResponseService.listBySignup(signup.getId());
     }
 
     @GetMapping("/current/respond")
     public MemberSignupResponse respondToCurrent(@RequestParam @NonNull String phone, @RequestParam("option") @NonNull String optionValue) {
-        final Signup signup = repository.getCurrent();
+        final Signup signup = service.getCurrent();
         final List<SignupOption> options = getSignupOptions(signup);
 
         final Optional<SignupOption> selectedOption = options
@@ -68,9 +68,9 @@ public class CurrentSignupController {
             throw new RuntimeException("Unable to find signup option: " + optionValue);
         }
 
-        final Member member = memberRepository.getById(phone);
+        final Member member = memberService.getById(phone);
 
-        return memberSignupResponseRepository.signUp(signup, member, selectedOption.get());
+        return memberSignupResponseService.signUp(signup, member, selectedOption.get());
     }
 
     protected List<SignupOption> getSignupOptions(@NonNull Signup signup) {
@@ -79,7 +79,7 @@ public class CurrentSignupController {
             return ((SignupOptionSet)optionSetRef).getOptions();
         }
 
-        final SignupOptionSet optionSet = optionSetRepository.getById(optionSetRef.getId());
+        final SignupOptionSet optionSet = optionSetService.getById(optionSetRef.getId());
 
         return optionSet.getOptions();
     }
@@ -90,7 +90,7 @@ public class CurrentSignupController {
             return ((AssignmentSet)assignmentSetRef).getAssignments();
         }
 
-        final AssignmentSet assignmentSet = assignmentSetRepository.getById(assignmentSetRef.getId());
+        final AssignmentSet assignmentSet = assignmentSetService.getById(assignmentSetRef.getId());
 
         return assignmentSet.getAssignments();
     }

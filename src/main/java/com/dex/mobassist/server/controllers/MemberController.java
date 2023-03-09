@@ -2,7 +2,7 @@ package com.dex.mobassist.server.controllers;
 
 import com.dex.mobassist.server.model.Member;
 import com.dex.mobassist.server.model.SimpleResult;
-import com.dex.mobassist.server.repository.MemberRepository;
+import com.dex.mobassist.server.service.MemberService;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -18,20 +18,20 @@ import java.util.List;
 @Controller
 @CrossOrigin
 public class MemberController {
-    private final MemberRepository repository;
+    private final MemberService service;
 
-    public MemberController(MemberRepository repository) {
-        this.repository = repository;
+    public MemberController(MemberService service) {
+        this.service = service;
     }
 
     @QueryMapping
     public List<Member> listMembers() {
-        return repository.list();
+        return service.list();
     }
 
     @QueryMapping
     public Member getMemberByPhone(@Argument("phone") String phone) {
-        return repository.getById(phone);
+        return service.getById(phone);
     }
 
     @MutationMapping
@@ -45,16 +45,16 @@ public class MemberController {
         );
 
         System.out.println("Updating member: " + member);
-        return repository.addUpdate(member);
+        return service.addUpdate(member);
     }
 
     @MutationMapping
     public SimpleResult removeMember(@Argument("phone") String phone) {
-        return new SimpleResult(repository.delete(phone));
+        return new SimpleResult(service.delete(phone));
     }
 
     @SubscriptionMapping
     public Flux<List<Member>> members() {
-        return RxJava3Adapter.observableToFlux(repository.observable(), BackpressureStrategy.LATEST);
+        return RxJava3Adapter.observableToFlux(service.observable(), BackpressureStrategy.LATEST);
     }
 }

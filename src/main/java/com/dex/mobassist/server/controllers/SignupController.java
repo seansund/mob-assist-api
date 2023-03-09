@@ -1,10 +1,10 @@
 package com.dex.mobassist.server.controllers;
 
 import com.dex.mobassist.server.model.*;
-import com.dex.mobassist.server.repository.AssignmentSetRepository;
-import com.dex.mobassist.server.repository.MemberSignupResponseRepository;
-import com.dex.mobassist.server.repository.SignupOptionSetRepository;
-import com.dex.mobassist.server.repository.SignupRepository;
+import com.dex.mobassist.server.service.AssignmentSetService;
+import com.dex.mobassist.server.service.MemberSignupResponseService;
+import com.dex.mobassist.server.service.SignupOptionSetService;
+import com.dex.mobassist.server.service.SignupService;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import lombok.NonNull;
 import org.springframework.graphql.data.method.annotation.*;
@@ -25,21 +25,21 @@ import static java.util.stream.Stream.of;
 @Controller
 @CrossOrigin
 public class SignupController {
-    private final SignupRepository repository;
-    private final AssignmentSetRepository assignmentSetRepository;
-    private final SignupOptionSetRepository signupOptionSetRepository;
-    private final MemberSignupResponseRepository memberSignupResponseRepository;
+    private final SignupService service;
+    private final AssignmentSetService assignmentSetService;
+    private final SignupOptionSetService signupOptionSetService;
+    private final MemberSignupResponseService memberSignupResponseService;
 
     public SignupController(
-            SignupRepository repository,
-            AssignmentSetRepository assignmentSetRepository,
-            SignupOptionSetRepository signupOptionSetRepository,
-            MemberSignupResponseRepository memberSignupResponseRepository
+            SignupService service,
+            AssignmentSetService assignmentSetService,
+            SignupOptionSetService signupOptionSetService,
+            MemberSignupResponseService memberSignupResponseService
     ) {
-        this.repository = repository;
-        this.assignmentSetRepository = assignmentSetRepository;
-        this.signupOptionSetRepository = signupOptionSetRepository;
-        this.memberSignupResponseRepository = memberSignupResponseRepository;
+        this.service = service;
+        this.assignmentSetService = assignmentSetService;
+        this.signupOptionSetService = signupOptionSetService;
+        this.memberSignupResponseService = memberSignupResponseService;
     }
 
     @SchemaMapping(typeName="Signup", field="assignmentSet")
@@ -48,7 +48,7 @@ public class SignupController {
             return (AssignmentSet) signup.getAssignments();
         }
 
-        return assignmentSetRepository.getById(signup.getAssignments().getId());
+        return assignmentSetService.getById(signup.getAssignments().getId());
     }
 
     @SchemaMapping(typeName="Signup", field="options")
@@ -57,7 +57,7 @@ public class SignupController {
             return (SignupOptionSet) signup.getOptions();
         }
 
-        return signupOptionSetRepository.getById(signup.getOptions().getId());
+        return signupOptionSetService.getById(signup.getOptions().getId());
     }
 
     protected boolean isNullOrEmpty(List<? extends Object> list) {
@@ -66,14 +66,14 @@ public class SignupController {
 
     @SchemaMapping(typeName="Signup", field="responses")
     public List<SignupOptionResponse> loadSignupOptionResponses(final Signup signup) {
-        final SignupOptionSet optionSet = signupOptionSetRepository.getById(signup.getOptions().getId());
+        final SignupOptionSet optionSet = signupOptionSetService.getById(signup.getOptions().getId());
 
         final List<SignupOptionResponse> initialResponses = optionSet.getOptions()
                 .stream()
                 .map(SignupOptionResponse::createSignupOptionResponse)
                 .toList();
 
-        final List<MemberSignupResponse> responses = memberSignupResponseRepository.listBySignup(signup.getId());
+        final List<MemberSignupResponse> responses = memberSignupResponseService.listBySignup(signup.getId());
 
         final Function<MemberSignupResponse, Predicate<SignupOptionResponse>> matchSignupOption = (MemberSignupResponse memberSignupResponse) -> {
             final SignupOptionRef a = memberSignupResponse != null ? memberSignupResponse.getSelectedOption() : null;
@@ -130,31 +130,31 @@ public class SignupController {
     public List<Signup> listSignups(@Argument("scope") String scopeString) {
         final SignupQueryScope scope = SignupQueryScope.lookup(scopeString);
 
-        return repository.list(scope);
+        return service.list(scope);
     }
 
     @QueryMapping
     public Signup getSignupById(@Argument("id") String id) {
-        return repository.getById(id);
+        return service.getById(id);
     }
 
     @MutationMapping
     public Signup addUpdateSignup(@Argument("id") String id, @Argument("date") String date, @Argument("title") String title, @Argument("assignmentSetId") String assignmentSetId, @Argument("optionSetId") String optionSetId) {
-        final AssignmentSet assignmentSet = assignmentSetRepository.getById(assignmentSetId);
-        final SignupOptionSet signupOptionSet = signupOptionSetRepository.getById(optionSetId);
+        final AssignmentSet assignmentSet = assignmentSetService.getById(assignmentSetId);
+        final SignupOptionSet signupOptionSet = signupOptionSetService.getById(optionSetId);
 
         final Signup signup = Signup.createSignup(id, date, title, assignmentSet, signupOptionSet);
 
-        return repository.addUpdate(signup);
+        return service.addUpdate(signup);
     }
 
     @MutationMapping
     public SimpleResult removeSignup(@Argument("id") String id) {
-        return new SimpleResult(repository.delete(id));
+        return new SimpleResult(service.delete(id));
     }
 
     @SubscriptionMapping
     public Flux<List<Signup>> signups() {
-        return RxJava3Adapter.observableToFlux(repository.observable(), BackpressureStrategy.LATEST);
+        return RxJava3Adapter.observableToFlux(service.observable(), BackpressureStrategy.LATEST);
     }
 }

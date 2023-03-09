@@ -1,7 +1,7 @@
 package com.dex.mobassist.server.controllers;
 
 import com.dex.mobassist.server.model.*;
-import com.dex.mobassist.server.repository.*;
+import com.dex.mobassist.server.service.*;
 import graphql.com.google.common.base.Strings;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import org.springframework.graphql.data.method.annotation.*;
@@ -20,41 +20,41 @@ import static com.dex.mobassist.server.model.SignupRef.createSignupRef;
 @Controller
 @CrossOrigin
 public class MemberSignupResponseController {
-    private final MemberSignupResponseRepository repository;
+    private final MemberSignupResponseService service;
 
-    private final SignupRepository signupRepository;
-    private final MemberRepository memberRepository;
-    private final SignupOptionRepository signupOptionRepository;
-    private final AssignmentRepository assignmentRepository;
+    private final SignupService signupService;
+    private final MemberService memberService;
+    private final SignupOptionService signupOptionService;
+    private final AssignmentService assignmentService;
 
     public MemberSignupResponseController(
-            MemberSignupResponseRepository repository,
-            SignupRepository signupRepository,
-            MemberRepository memberRepository,
-            SignupOptionRepository signupOptionRepository,
-            AssignmentRepository assignmentRepository
+            MemberSignupResponseService service,
+            SignupService signupService,
+            MemberService memberService,
+            SignupOptionService signupOptionService,
+            AssignmentService assignmentService
     ) {
-        this.repository = repository;
+        this.service = service;
 
-        this.signupRepository = signupRepository;
-        this.memberRepository = memberRepository;
-        this.signupOptionRepository = signupOptionRepository;
-        this.assignmentRepository = assignmentRepository;
+        this.signupService = signupService;
+        this.memberService = memberService;
+        this.signupOptionService = signupOptionService;
+        this.assignmentService = assignmentService;
     }
 
     @QueryMapping
     public List<MemberSignupResponse> listSignupResponses() {
-        return repository.list();
+        return service.list();
     }
 
     @QueryMapping
     public List<MemberSignupResponse> listSignupResponsesByUser(@Argument("phone") String phone) {
-        return repository.listByUser(phone);
+        return service.listByUser(phone);
     }
 
     @QueryMapping
     public List<MemberSignupResponse> listSignupResponsesBySignup(@Argument("id") String id) {
-        final List<MemberSignupResponse> responses = repository.listBySignup(id);
+        final List<MemberSignupResponse> responses = service.listBySignup(id);
 
         System.out.println("Got responses for signup: " + responses.stream().map((res) -> res.getMember().getId() + "-" + res.getSelectedOption()).toList());
 
@@ -63,7 +63,7 @@ public class MemberSignupResponseController {
 
     @QueryMapping
     public MemberSignupResponse getSignupResponseById(@Argument("id") String id) {
-        return repository.getById(id);
+        return service.getById(id);
     }
 
     @MutationMapping
@@ -77,37 +77,37 @@ public class MemberSignupResponseController {
                 message
         );
 
-        return repository.addUpdate(response);
+        return service.addUpdate(response);
     }
 
     @MutationMapping
     public SimpleResult removeSignupResponse(@Argument("id") String id) {
-        return new SimpleResult(repository.delete(id));
+        return new SimpleResult(service.delete(id));
     }
 
     @MutationMapping
     public MemberSignupResponse checkIn(@Argument("id") String id) {
-        return repository.checkIn(id);
+        return service.checkIn(id);
     }
 
     @MutationMapping
     public MemberSignupResponse removeCheckIn(@Argument("id") String id) {
-        return repository.removeCheckIn(id);
+        return service.removeCheckIn(id);
     }
 
     @SubscriptionMapping
     public Flux<List<MemberSignupResponse>> signupResponses() {
-        return RxJava3Adapter.observableToFlux(repository.observable(), BackpressureStrategy.LATEST);
+        return RxJava3Adapter.observableToFlux(service.observable(), BackpressureStrategy.LATEST);
     }
 
     @SubscriptionMapping
     public Flux<List<MemberSignupResponse>> signupResponsesByUser(@Argument("phone") String phone) {
-        return RxJava3Adapter.observableToFlux(repository.observableOfUserResponses(phone), BackpressureStrategy.LATEST);
+        return RxJava3Adapter.observableToFlux(service.observableOfUserResponses(phone), BackpressureStrategy.LATEST);
     }
 
     @SubscriptionMapping
     public Flux<List<MemberSignupResponse>> signupResponsesBySignup(@Argument("id") String id) {
-        return RxJava3Adapter.observableToFlux(repository.observableOfSignupResponses(id), BackpressureStrategy.LATEST);
+        return RxJava3Adapter.observableToFlux(service.observableOfSignupResponses(id), BackpressureStrategy.LATEST);
     }
 
     @SchemaMapping(typeName="MemberSignupResponse", field="signup")
@@ -116,7 +116,7 @@ public class MemberSignupResponseController {
             return (Signup)response.getSignup();
         }
 
-        return signupRepository.getById(response.getSignup().getId());
+        return signupService.getById(response.getSignup().getId());
     }
 
     @SchemaMapping(typeName="MemberSignupResponse", field="member")
@@ -127,7 +127,7 @@ public class MemberSignupResponseController {
             return (Member)response.getMember();
         }
 
-        return memberRepository.getById(response.getMember().getId());
+        return memberService.getById(response.getMember().getId());
     }
 
     @SchemaMapping(typeName="MemberSignupResponse", field="selectedOption")
@@ -140,7 +140,7 @@ public class MemberSignupResponseController {
             return (SignupOption)response.getSelectedOption();
         }
 
-        return signupOptionRepository.getById(response.getSelectedOption().getId());
+        return signupOptionService.getById(response.getSelectedOption().getId());
     }
 
     @SchemaMapping(typeName="MemberSignupResponse", field="assignments")
@@ -155,7 +155,7 @@ public class MemberSignupResponseController {
                     .toList();
         }
 
-        return assignmentRepository.getByIds(response.getAssignments()
+        return assignmentService.getByIds(response.getAssignments()
                 .stream()
                 .map(AssignmentRef::getId)
                 .toList());
