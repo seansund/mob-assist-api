@@ -6,7 +6,7 @@ import com.dex.mobassist.server.model.SignupQueryScope;
 import java.util.List;
 
 public interface SignupService extends BaseService<Signup> {
-    List<Signup> list(SignupQueryScope scope);
+    List<? extends Signup> list(SignupQueryScope scope);
 
     Signup getCurrent();
 }

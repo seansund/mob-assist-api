@@ -1,45 +1,15 @@
 package com.dex.mobassist.server.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+public interface Assignment extends AssignmentRef {
+    String getGroup();
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class Assignment extends AssignmentRef {
-    private String group;
-    private String name;
-    private int row;
+    String getName();
 
-    public Assignment() {
-        this("");
-    }
+    int getRow();
 
-    public Assignment(String id) {
-        super(id);
-    }
+    void setGroup(String group);
 
-    public static Assignment createAssignment(@NonNull String group, @NonNull String name, int row) {
-        return createAssignment(group + "-" + name, group, name, row);
-    }
+    void setName(String name);
 
-    public static Assignment createAssignment(@NonNull String id, @NonNull String group, @NonNull String name, int row) {
-        final Assignment assignment = new Assignment(id);
-
-        assignment.group = group;
-        assignment.name = name;
-        assignment.row = row;
-
-        return assignment;
-    }
-
-    public Assignment withId(String id) {
-        setId(id);
-
-        return this;
-    }
-
-    public Assignment withId(int id) {
-        return withId(String.valueOf(id));
-    }
+    void setRow(int row);
 }

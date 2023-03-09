@@ -13,7 +13,7 @@ import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 
 public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
-    private final BehaviorSubject<List<T>> subject;
+    private final BehaviorSubject<List<? extends T>> subject;
 
     private int nextId = 1;
 
@@ -22,13 +22,13 @@ public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
     }
 
     @Override
-    public List<T> list() {
+    public List<? extends T> list() {
         return subject.getValue();
     }
 
     @Override
-    public T getById(@NonNull String id) {
-        return subject.getValue()
+    public <A extends T> A getById(@NonNull String id) {
+        return (A) subject.getValue()
                 .stream()
                 .filter(compareById(id))
                 .findFirst()
@@ -36,17 +36,17 @@ public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
     }
 
     @Override
-    public T addUpdate(@NonNull T newValue) {
-        final List<T> values = subject.getValue();
+    public <A extends T> A addUpdate(@NonNull A newValue) {
+        final List<? extends T> values = subject.getValue();
 
-        final Predicate<T> matchExisting = compareById(getId(newValue));
+        final Predicate<? super T> matchExisting = compareById(getId(newValue));
 
-        final Optional<T> existingValue = values
+        final Optional<? extends T> existingValue = values
                 .stream()
                 .filter(matchExisting)
                 .findFirst();
 
-        final List<T> updatedValues = existingValue.isPresent()
+        final List<? extends T> updatedValues = existingValue.isPresent()
                 ? values.stream().map((T val) -> matchExisting.test(val) ? newValue : val).toList()
                 : concat(values.stream(), of(updateValueWithId(newValue, nextId++))).toList();
 
@@ -57,9 +57,9 @@ public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
 
     @Override
     public boolean delete(@NonNull String id) {
-        final List<T> values = subject.getValue();
+        final List<? extends T> values = subject.getValue();
 
-        final List<T> result = values
+        final List<? extends T> result = values
                 .stream()
                 .filter(compareById(id))
                 .toList();
@@ -73,23 +73,23 @@ public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
     }
 
     @Override
-    public Observable<List<T>> observable() {
+    public Observable<List<? extends T>> observable() {
         return subject;
     }
 
-    protected void onNext(List<T> value) {
+    protected void onNext(List<? extends T> value) {
         subject.onNext(preOnList(value));
     }
 
-    protected Predicate<T> compareById(@NonNull String id) {
-        return (T set) -> id.equals(getId(set));
+    protected <A extends T> Predicate<A> compareById(@NonNull String id) {
+        return  (A set) -> id.equals(getId(set));
     }
 
-    protected List<T> preOnList(List<T> value) {
+    protected List<? extends T> preOnList(List<? extends T> value) {
         return value;
     }
 
-    protected abstract T updateValueWithId(T value, int id);
+    protected abstract <A extends T> A updateValueWithId(A value, int id);
 
-    protected abstract String getId(T value);
+    protected abstract <A extends T> String getId(A value);
 }

@@ -1,80 +1,27 @@
 package com.dex.mobassist.server.model;
 
-import graphql.com.google.common.base.Strings;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+public interface Signup extends SignupRef {
+    java.util.Date getDate();
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+    String getTitle();
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class Signup extends SignupRef {
-    private static final DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    String getDescription();
 
-    public Signup() {
-        this("");
-    }
-    public Signup(@NonNull String id) {
-        super(id);
-    }
+    java.util.List<? extends SignupOptionResponse> getResponses();
 
-    private Date date;
-    private String title;
-    private String description;
-    private List<SignupOptionResponse> responses;
-    private AssignmentSetRef assignments;
-    private SignupOptionSetRef options;
+    AssignmentSetRef getAssignments();
 
-    public static Signup createSignup(@NonNull String dateString, @NonNull String title, @NonNull AssignmentSet assignments, @NonNull SignupOptionSet options) {
-        return createSignup("", dateString, title, assignments, options);
-    }
+    SignupOptionSetRef getOptions();
 
-    public static Signup createSignup(int id, @NonNull String dateString, @NonNull String title, @NonNull AssignmentSet assignments, @NonNull SignupOptionSet options) {
-        return createSignup(String.valueOf(id), dateString, title, assignments, options);
-    }
+    void setDate(java.util.Date date);
 
-    public static Signup createSignup(@NonNull String id, @NonNull String dateString, @NonNull String title, @NonNull AssignmentSet assignments, @NonNull SignupOptionSet options) {
-        try {
-            final Date date = dateFormat.parse(dateString);
+    void setTitle(String title);
 
-            return createSignup(id, date, title, assignments, options);
-        } catch (ParseException ex) {
-            throw new RuntimeException("Unable to parse date: " + dateString);
-        }
-    }
+    void setDescription(String description);
 
-    public static Signup createSignup(@NonNull Date date, @NonNull String title, @NonNull AssignmentSet assignments, @NonNull SignupOptionSet options) {
-        return createSignup("", date, title, assignments, options);
-    }
+    void setResponses(java.util.List<? extends SignupOptionResponse> responses);
 
-    public static Signup createSignup(int id, @NonNull Date date, @NonNull String title, @NonNull AssignmentSet assignments, @NonNull SignupOptionSet options) {
-        return createSignup(String.valueOf(id), date, title, assignments, options);
-    }
+    void setAssignments(AssignmentSetRef assignments);
 
-    public static Signup createSignup(@NonNull String id, @NonNull Date date, @NonNull String title, @NonNull AssignmentSet assignments, @NonNull SignupOptionSet options) {
-        final Signup signup = new Signup(!Strings.isNullOrEmpty(id) ? id : date + "-" + title);
-
-        signup.date = date;
-        signup.title = title;
-        signup.description = title + " signup";
-        signup.assignments = assignments;
-        signup.options = options;
-
-        return signup;
-    }
-
-    public Signup withId(String id) {
-        this.setId(id);
-
-        return this;
-    }
-
-    public Signup withId(int id) {
-        return withId(String.valueOf(id));
-    }
+    void setOptions(SignupOptionSetRef options);
 }

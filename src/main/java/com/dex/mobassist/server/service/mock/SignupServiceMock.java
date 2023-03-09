@@ -9,10 +9,7 @@ import lombok.NonNull;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.function.Predicate;
 
 @Service("SignupService")
 @Profile("mock")
@@ -24,7 +21,7 @@ public class SignupServiceMock implements SignupService {
     }
 
     @Override
-    public List<Signup> list() {
+    public List<? extends Signup> list() {
         return repository.list();
     }
 
@@ -44,12 +41,12 @@ public class SignupServiceMock implements SignupService {
     }
 
     @Override
-    public Observable<List<Signup>> observable() {
+    public Observable<List<? extends Signup>> observable() {
         return repository.observable();
     }
 
     @Override
-    public List<Signup> list(SignupQueryScope scope) {
+    public List<?extends Signup> list(SignupQueryScope scope) {
         return repository.list(scope);
     }
 

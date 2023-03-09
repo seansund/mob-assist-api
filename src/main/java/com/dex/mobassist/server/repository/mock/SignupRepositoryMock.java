@@ -26,14 +26,14 @@ public class SignupRepositoryMock extends AbstractRepositoryMock<Signup> impleme
     }
 
     @Override
-    public List<Signup> list() {
+    public List<? extends Signup> list() {
         return list(SignupQueryScope.upcoming);
     }
 
     @Override
-    public List<Signup> list(SignupQueryScope scope) {
+    public List<? extends Signup> list(SignupQueryScope scope) {
 
-        final Predicate<Signup> predicate = getPredicate(scope);
+        final Predicate<? super Signup> predicate = getPredicate(scope);
 
         return super.list()
                 .stream()

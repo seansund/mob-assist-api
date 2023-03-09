@@ -6,7 +6,7 @@ import lombok.NonNull;
 import java.util.List;
 
 public interface BaseService<T> {
-    List<T> list();
+    List<? extends T> list();
 
     T getById(String id);
 
@@ -14,5 +14,5 @@ public interface BaseService<T> {
 
     boolean delete(@NonNull String id);
 
-    Observable<List<T>> observable();
+    Observable<List<? extends T>> observable();
 }

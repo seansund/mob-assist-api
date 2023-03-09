@@ -6,7 +6,6 @@ import com.dex.mobassist.server.service.MemberService;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class MemberServiceMock implements MemberService {
     }
 
     @Override
-    public List<Member> list() {
+    public List<? extends Member> list() {
         return repository.list();
     }
 
@@ -41,7 +40,7 @@ public class MemberServiceMock implements MemberService {
     }
 
     @Override
-    public Observable<List<Member>> observable() {
+    public Observable<List<? extends Member>> observable() {
         return repository.observable();
     }
 }

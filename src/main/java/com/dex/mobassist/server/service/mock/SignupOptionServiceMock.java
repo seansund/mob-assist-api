@@ -6,7 +6,6 @@ import com.dex.mobassist.server.service.SignupOptionService;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class SignupOptionServiceMock implements SignupOptionService {
     }
 
     @Override
-    public List<SignupOption> list() {
+    public List<? extends SignupOption> list() {
         return repository.list();
     }
 
@@ -41,7 +40,7 @@ public class SignupOptionServiceMock implements SignupOptionService {
     }
 
     @Override
-    public Observable<List<SignupOption>> observable() {
+    public Observable<List<? extends SignupOption>> observable() {
         return repository.observable();
     }
 }

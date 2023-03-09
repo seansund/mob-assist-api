@@ -1,21 +1,34 @@
 package com.dex.mobassist.server.service;
 
-import com.dex.mobassist.server.model.Member;
-import com.dex.mobassist.server.model.MemberSignupResponse;
-import com.dex.mobassist.server.model.Signup;
-import com.dex.mobassist.server.model.SignupOption;
+import com.dex.mobassist.server.model.*;
 import io.reactivex.rxjava3.core.Observable;
+import lombok.NonNull;
 
 import java.util.List;
 
 public interface MemberSignupResponseService extends BaseService<MemberSignupResponse> {
-    List<MemberSignupResponse> listByUser(String phone);
+    @Override
+    List<? extends MemberSignupResponse> list();
 
-    List<MemberSignupResponse> listBySignup(String id);
+    @Override
+    MemberSignupResponse getById(String id);
 
-    Observable<List<MemberSignupResponse>> observableOfUserResponses(String phone);
+    @Override
+    MemberSignupResponse addUpdate(@NonNull MemberSignupResponse newMember);
 
-    Observable<List<MemberSignupResponse>> observableOfSignupResponses(String id);
+    @Override
+    boolean delete(@NonNull String id);
+
+    @Override
+    Observable<List<? extends MemberSignupResponse>> observable();
+
+    List<? extends MemberSignupResponse> listByUser(String phone);
+
+    List<? extends MemberSignupResponse> listBySignup(String id);
+
+    Observable<List<? extends MemberSignupResponse>> observableOfUserResponses(String phone);
+
+    Observable<List<? extends MemberSignupResponse>> observableOfSignupResponses(String id);
 
     MemberSignupResponse checkIn(String id);
     MemberSignupResponse removeCheckIn(String id);

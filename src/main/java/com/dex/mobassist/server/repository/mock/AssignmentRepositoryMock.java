@@ -21,7 +21,7 @@ public class AssignmentRepositoryMock extends AbstractRepositoryMock<Assignment>
     }
 
     @Override
-    public List<Assignment> getByIds(List<String> assignmentIds) {
+    public List<? extends Assignment> getByIds(List<String> assignmentIds) {
         return list()
                 .stream()
                 .filter((Assignment assignment) -> assignmentIds.contains(assignment.getId()))

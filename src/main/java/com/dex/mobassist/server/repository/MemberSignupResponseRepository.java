@@ -1,21 +1,18 @@
 package com.dex.mobassist.server.repository;
 
-import com.dex.mobassist.server.model.Member;
-import com.dex.mobassist.server.model.MemberSignupResponse;
-import com.dex.mobassist.server.model.Signup;
-import com.dex.mobassist.server.model.SignupOption;
+import com.dex.mobassist.server.model.*;
 import io.reactivex.rxjava3.core.Observable;
 
 import java.util.List;
 
 public interface MemberSignupResponseRepository extends BaseRepository<MemberSignupResponse> {
-    List<MemberSignupResponse> listByUser(String phone);
+    List<? extends MemberSignupResponse> listByUser(String phone);
 
-    List<MemberSignupResponse> listBySignup(String id);
+    List<? extends MemberSignupResponse> listBySignup(String id);
 
-    Observable<List<MemberSignupResponse>> observableOfUserResponses(String phone);
+    Observable<List<? extends MemberSignupResponse>> observableOfUserResponses(String phone);
 
-    Observable<List<MemberSignupResponse>> observableOfSignupResponses(String id);
+    Observable<List<? extends MemberSignupResponse>> observableOfSignupResponses(String id);
 
     MemberSignupResponse checkIn(String id);
     MemberSignupResponse removeCheckIn(String id);

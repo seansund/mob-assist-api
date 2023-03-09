@@ -1,6 +1,8 @@
 package com.dex.mobassist.server.controllers;
 
 import com.dex.mobassist.server.model.*;
+import com.dex.mobassist.server.model.simple.SimpleSignup;
+import com.dex.mobassist.server.model.simple.SimpleSignupOptionResponse;
 import com.dex.mobassist.server.service.AssignmentSetService;
 import com.dex.mobassist.server.service.MemberSignupResponseService;
 import com.dex.mobassist.server.service.SignupOptionSetService;
@@ -18,7 +20,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static com.dex.mobassist.server.model.SignupOptionResponse.createSignupOptionResponse;
+import static com.dex.mobassist.server.model.simple.SimpleSignupOptionResponse.createSignupOptionResponse;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 
@@ -65,15 +67,15 @@ public class SignupController {
     }
 
     @SchemaMapping(typeName="Signup", field="responses")
-    public List<SignupOptionResponse> loadSignupOptionResponses(final Signup signup) {
+    public List<? extends SignupOptionResponse> loadSignupOptionResponses(final Signup signup) {
         final SignupOptionSet optionSet = signupOptionSetService.getById(signup.getOptions().getId());
 
-        final List<SignupOptionResponse> initialResponses = optionSet.getOptions()
+        final List<? extends SignupOptionResponse> initialResponses = optionSet.getOptions()
                 .stream()
-                .map(SignupOptionResponse::createSignupOptionResponse)
+                .map(SimpleSignupOptionResponse::createSignupOptionResponse)
                 .toList();
 
-        final List<MemberSignupResponse> responses = memberSignupResponseService.listBySignup(signup.getId());
+        final List<? extends MemberSignupResponse> responses = memberSignupResponseService.listBySignup(signup.getId());
 
         final Function<MemberSignupResponse, Predicate<SignupOptionResponse>> matchSignupOption = (MemberSignupResponse memberSignupResponse) -> {
             final SignupOptionRef a = memberSignupResponse != null ? memberSignupResponse.getSelectedOption() : null;
@@ -91,12 +93,12 @@ public class SignupController {
             };
         };
 
-        final List<SignupOptionResponse> result = responses.stream()
+        final List<? extends SignupOptionResponse> result = responses.stream()
                 .reduce(
                         initialResponses,
-                        (@NonNull final List<SignupOptionResponse> partialResult, @NonNull final MemberSignupResponse response) -> {
+                        (@NonNull final List<? extends SignupOptionResponse> partialResult, @NonNull final MemberSignupResponse response) -> {
 
-                            final Optional<SignupOptionResponse> signupOptionResponse = partialResult
+                            final Optional<? extends SignupOptionResponse> signupOptionResponse = partialResult
                                     .stream()
                                     .filter(matchSignupOption.apply(response))
                                     .findFirst();
@@ -115,7 +117,7 @@ public class SignupController {
 
                             return partialResult;
                         },
-                        (List<SignupOptionResponse> a, List<SignupOptionResponse> b) -> {
+                        (List<? extends SignupOptionResponse> a, List<? extends SignupOptionResponse> b) -> {
                             System.out.println("A: " + a);
                             System.out.println("B: " + b);
                             return a;
@@ -127,7 +129,7 @@ public class SignupController {
     }
 
     @QueryMapping
-    public List<Signup> listSignups(@Argument("scope") String scopeString) {
+    public List<? extends Signup> listSignups(@Argument("scope") String scopeString) {
         final SignupQueryScope scope = SignupQueryScope.lookup(scopeString);
 
         return service.list(scope);
@@ -143,7 +145,7 @@ public class SignupController {
         final AssignmentSet assignmentSet = assignmentSetService.getById(assignmentSetId);
         final SignupOptionSet signupOptionSet = signupOptionSetService.getById(optionSetId);
 
-        final Signup signup = Signup.createSignup(id, date, title, assignmentSet, signupOptionSet);
+        final Signup signup = SimpleSignup.createSignup(id, date, title, assignmentSet, signupOptionSet);
 
         return service.addUpdate(signup);
     }
@@ -154,7 +156,7 @@ public class SignupController {
     }
 
     @SubscriptionMapping
-    public Flux<List<Signup>> signups() {
+    public Flux<List<? extends Signup>> signups() {
         return RxJava3Adapter.observableToFlux(service.observable(), BackpressureStrategy.LATEST);
     }
 }

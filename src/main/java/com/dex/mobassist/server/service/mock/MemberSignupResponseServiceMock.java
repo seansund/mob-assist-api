@@ -1,9 +1,10 @@
 package com.dex.mobassist.server.service.mock;
 
-import com.dex.mobassist.server.model.*;
-import com.dex.mobassist.server.repository.MemberRepository;
+import com.dex.mobassist.server.model.Member;
+import com.dex.mobassist.server.model.MemberSignupResponse;
+import com.dex.mobassist.server.model.Signup;
+import com.dex.mobassist.server.model.SignupOption;
 import com.dex.mobassist.server.repository.MemberSignupResponseRepository;
-import com.dex.mobassist.server.repository.SignupRepository;
 import com.dex.mobassist.server.service.MemberSignupResponseService;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
@@ -11,12 +12,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
-import static com.dex.mobassist.server.model.MemberSignupResponse.createMemberSignupResponse;
-import static java.util.stream.Stream.concat;
 
 @Service("MemberSignupResponseService")
 @Profile("mock")
@@ -28,7 +23,7 @@ public class MemberSignupResponseServiceMock implements MemberSignupResponseServ
     }
 
     @Override
-    public List<MemberSignupResponse> list() {
+    public List<? extends MemberSignupResponse> list() {
         return repository.list();
     }
 
@@ -48,27 +43,27 @@ public class MemberSignupResponseServiceMock implements MemberSignupResponseServ
     }
 
     @Override
-    public Observable<List<MemberSignupResponse>> observable() {
+    public Observable<List<? extends MemberSignupResponse>> observable() {
         return repository.observable();
     }
 
     @Override
-    public List<MemberSignupResponse> listByUser(String phone) {
+    public List<? extends MemberSignupResponse> listByUser(String phone) {
         return repository.listByUser(phone);
     }
 
     @Override
-    public List<MemberSignupResponse> listBySignup(String id) {
+    public List<? extends MemberSignupResponse> listBySignup(String id) {
         return repository.listBySignup(id);
     }
 
     @Override
-    public Observable<List<MemberSignupResponse>> observableOfUserResponses(String phone) {
+    public Observable<List<? extends MemberSignupResponse>> observableOfUserResponses(String phone) {
         return repository.observableOfUserResponses(phone);
     }
 
     @Override
-    public Observable<List<MemberSignupResponse>> observableOfSignupResponses(String id) {
+    public Observable<List<? extends MemberSignupResponse>> observableOfSignupResponses(String id) {
         return repository.observableOfSignupResponses(id);
     }
 

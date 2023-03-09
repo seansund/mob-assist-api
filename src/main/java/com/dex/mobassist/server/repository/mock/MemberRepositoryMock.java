@@ -21,7 +21,7 @@ public class MemberRepositoryMock extends AbstractRepositoryMock<Member> impleme
         return value.getPhone();
     }
 
-    protected List<Member> preOnList(List<Member> members) {
+    protected List<? extends Member> preOnList(List<? extends Member> members) {
         return members.stream().sorted().toList();
     }
 }

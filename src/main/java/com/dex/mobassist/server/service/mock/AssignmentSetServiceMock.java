@@ -6,7 +6,6 @@ import com.dex.mobassist.server.service.AssignmentSetService;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class AssignmentSetServiceMock implements AssignmentSetService {
     }
 
     @Override
-    public List<AssignmentSet> list() {
+    public List<? extends AssignmentSet> list() {
         return repository.list();
     }
 
@@ -41,7 +40,7 @@ public class AssignmentSetServiceMock implements AssignmentSetService {
     }
 
     @Override
-    public Observable<List<AssignmentSet>> observable() {
+    public Observable<List<? extends AssignmentSet>> observable() {
         return repository.observable();
     }
 }

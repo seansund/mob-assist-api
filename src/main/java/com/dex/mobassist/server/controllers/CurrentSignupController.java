@@ -38,17 +38,17 @@ public class CurrentSignupController {
     }
 
     @GetMapping("/current/options")
-    public List<SignupOption> getCurrentSignupOptions() {
+    public List<? extends SignupOption> getCurrentSignupOptions() {
         return getSignupOptions(service.getCurrent());
     }
 
     @GetMapping("/current/assignments")
-    public List<Assignment> getCurrentSignupAssignments() {
+    public List<? extends Assignment> getCurrentSignupAssignments() {
         return getAssignments(service.getCurrent());
     }
 
     @GetMapping("/current/responses")
-    public List<MemberSignupResponse> getCurrentResponses() {
+    public List<? extends MemberSignupResponse> getCurrentResponses() {
         final Signup signup = service.getCurrent();
 
         return memberSignupResponseService.listBySignup(signup.getId());
@@ -57,9 +57,9 @@ public class CurrentSignupController {
     @GetMapping("/current/respond")
     public MemberSignupResponse respondToCurrent(@RequestParam @NonNull String phone, @RequestParam("option") @NonNull String optionValue) {
         final Signup signup = service.getCurrent();
-        final List<SignupOption> options = getSignupOptions(signup);
+        final List<? extends SignupOption> options = getSignupOptions(signup);
 
-        final Optional<SignupOption> selectedOption = options
+        final Optional<? extends SignupOption> selectedOption = options
                 .stream()
                 .filter(option -> optionValue.equals(option.getValue()))
                 .findFirst();
@@ -73,7 +73,7 @@ public class CurrentSignupController {
         return memberSignupResponseService.signUp(signup, member, selectedOption.get());
     }
 
-    protected List<SignupOption> getSignupOptions(@NonNull Signup signup) {
+    protected List<? extends SignupOption> getSignupOptions(@NonNull Signup signup) {
         final SignupOptionSetRef optionSetRef = signup.getOptions();
         if (optionSetRef instanceof SignupOptionSet) {
             return ((SignupOptionSet)optionSetRef).getOptions();
@@ -84,7 +84,7 @@ public class CurrentSignupController {
         return optionSet.getOptions();
     }
 
-    protected List<Assignment> getAssignments(@NonNull Signup signup) {
+    protected List<? extends Assignment> getAssignments(@NonNull Signup signup) {
         final AssignmentSetRef assignmentSetRef = signup.getAssignments();
         if (assignmentSetRef instanceof AssignmentSet) {
             return ((AssignmentSet)assignmentSetRef).getAssignments();

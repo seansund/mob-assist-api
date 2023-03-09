@@ -1,8 +1,8 @@
 package com.dex.mobassist.server.repository.initializer;
 
-import com.dex.mobassist.server.model.AssignmentSet;
-import com.dex.mobassist.server.model.Member;
-import com.dex.mobassist.server.model.SignupOptionSet;
+import com.dex.mobassist.server.model.*;
+import com.dex.mobassist.server.model.simple.SimpleAssignmentSet;
+import com.dex.mobassist.server.model.simple.SimpleMember;
 import com.dex.mobassist.server.repository.*;
 import lombok.NonNull;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.stream.Stream;
 
-import static com.dex.mobassist.server.model.Assignment.createAssignment;
-import static com.dex.mobassist.server.model.Signup.createSignup;
-import static com.dex.mobassist.server.model.SignupOption.createSignupOption;
-import static com.dex.mobassist.server.model.SignupOptionSet.createSignupOptionSet;
+import static com.dex.mobassist.server.model.simple.SimpleAssignment.createAssignment;
+import static com.dex.mobassist.server.model.simple.SimpleSignup.createSignup;
+import static com.dex.mobassist.server.model.simple.SimpleSignupOption.createSignupOption;
+import static com.dex.mobassist.server.model.simple.SimpleSignupOptionSet.createSignupOptionSet;
 
 @Component
 @Profile("initialize")
@@ -98,7 +98,7 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
     protected void initializeAssignmentSetRepository(AssignmentSetRepository repository) {
 
         Stream.of(
-                        AssignmentSet.createAssignmentSet(
+                        SimpleAssignmentSet.createAssignmentSet(
                                 "basic",
                                 assignmentRepository.list()
                         )
@@ -147,8 +147,8 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
 
     protected void initializeMemberRepository(MemberRepository repository) {
         Stream.of(
-                        Member.createMember("5126535564", "Sean", "Sundberg", "seansund@gmail.com", "text"),
-                        Member.createMember("5128977929", "Harry", "Sundberg", "hasundberg@yahoo.com", "text")
+                        SimpleMember.createMember("5126535564", "Sean", "Sundberg", "seansund@gmail.com", "text"),
+                        SimpleMember.createMember("5128977929", "Harry", "Sundberg", "hasundberg@yahoo.com", "text")
                 )
                 .forEach(repository::addUpdate);
     }

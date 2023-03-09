@@ -1,49 +1,13 @@
 package com.dex.mobassist.server.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class AssignmentSet extends AssignmentSetRef {
-    private String name;
-    private List<Assignment> assignments;
+public interface AssignmentSet extends AssignmentSetRef {
+    String getName();
 
-    public AssignmentSet() {
-        this("");
-    }
+    List<? extends Assignment> getAssignments();
 
-    public AssignmentSet(String id) {
-        super(id);
-    }
+    void setName(String name);
 
-    public static AssignmentSet createAssignmentSet(@NonNull String name, @NonNull List<Assignment> assignments) {
-        return createAssignmentSet(name, name, assignments);
-    }
-
-    public static AssignmentSet createAssignmentSet(int id, @NonNull String name, @NonNull List<Assignment> assignments) {
-        return createAssignmentSet(String.valueOf(id), name, assignments);
-    }
-
-    public static AssignmentSet createAssignmentSet(@NonNull String id, @NonNull String name, @NonNull List<Assignment> assignments) {
-        final AssignmentSet set = new AssignmentSet(id);
-
-        set.name = name;
-        set.assignments = assignments;
-
-        return set;
-    }
-
-    public AssignmentSet withId(String id) {
-        this.setId(id);
-
-        return this;
-    }
-
-    public AssignmentSet withId(int id) {
-        return withId(String.valueOf(id));
-    }
+    void setAssignments(List<? extends Assignment> assignments);
 }

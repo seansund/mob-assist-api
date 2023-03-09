@@ -1,64 +1,23 @@
 package com.dex.mobassist.server.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+public interface Member extends MemberRef {
+    String getFirstName();
 
-import java.util.stream.Stream;
+    String getLastName();
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class Member extends MemberRef implements Comparable<Member> {
-    @NonNull private String firstName;
-    @NonNull private String lastName;
-    @NonNull private String phone;
-    private String email;
-    private String preferredContact;
+    String getPhone();
 
-    public Member() {
-        this("");
-    }
+    String getEmail();
 
-    public Member(String id) {
-        super(id);
-    }
+    String getPreferredContact();
 
-    public static Member createMember(String phone, String firstName, String lastName) {
-        return createMember(phone, firstName, lastName, "", "");
-    }
+    void setFirstName(String firstName);
 
-    public static Member createMember(String phone, String firstName, String lastName, String email, String preferredContact) {
-        final Member member = new Member(phone);
+    void setLastName(String lastName);
 
-        member.phone = phone;
-        member.lastName = lastName;
-        member.firstName = firstName;
-        member.email = email;
-        member.preferredContact = preferredContact;
+    void setPhone(String phone);
 
-        return member;
-    }
+    void setEmail(String email);
 
-    public Member update(Member newMember) {
-        this.phone = newMember.phone;
-        this.lastName = newMember.lastName;
-        this.firstName = newMember.firstName;
-        this.email = newMember.email;
-        this.preferredContact = newMember.preferredContact;
-
-        return this;
-    }
-
-    @Override
-    public int compareTo(Member o) {
-        return Stream
-                .of(
-                        this.lastName.compareTo(o.lastName),
-                        this.firstName.compareTo(o.firstName)
-                )
-                .filter((Integer value) -> value != 0)
-                .findFirst()
-                .orElse(0);
-    }
+    void setPreferredContact(String preferredContact);
 }

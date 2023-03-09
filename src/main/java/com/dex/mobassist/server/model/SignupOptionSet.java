@@ -1,57 +1,11 @@
 package com.dex.mobassist.server.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+public interface SignupOptionSet extends SignupOptionSetRef {
+    String getName();
 
-import java.util.List;
+    java.util.List<? extends SignupOption> getOptions();
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class SignupOptionSet extends SignupOptionSetRef {
-    private String name;
-    private List<SignupOption> options;
+    void setName(String name);
 
-    public SignupOptionSet() {
-        this("");
-    }
-
-    public SignupOptionSet(@NonNull String id) {
-        super(id);
-    }
-
-    public static SignupOptionSet createSignupOptionSet(@NonNull String name, @NonNull List<SignupOption> options) {
-        return createSignupOptionSet("", name, options);
-    }
-
-    public static SignupOptionSet createSignupOptionSet(int id, @NonNull String name, @NonNull List<SignupOption> options) {
-        return createSignupOptionSet(String.valueOf(id), name, options);
-    }
-
-    public static SignupOptionSet createSignupOptionSet(@NonNull String id, @NonNull String name, @NonNull List<SignupOption> options) {
-        final SignupOptionSet set = new SignupOptionSet(id);
-
-        set.name = name;
-        set.options = options;
-
-        return set;
-    }
-
-    public void setId(@NonNull String id) {
-        super.setId(id);
-
-        options.forEach((SignupOption option) -> {
-            option.setId(id + "-" + option.getValue());
-        });
-    }
-
-    public SignupOptionSet withId(@NonNull String id) {
-        this.setId(id);
-
-        return this;
-    }
-
-    public SignupOptionSet withId(int id) {
-        return withId(String.valueOf(id));
-    }
+    void setOptions(java.util.List<? extends SignupOption> options);
 }

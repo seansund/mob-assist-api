@@ -7,13 +7,13 @@ import lombok.NonNull;
 import java.util.List;
 
 public interface BaseRepository<T> {
-    List<T> list();
+    List<? extends T> list();
 
-    T getById(String id);
+    <A extends T> A getById(String id);
 
-    T addUpdate(@NonNull T newMember);
+    <A extends T> A addUpdate(@NonNull A newMember);
 
     boolean delete(@NonNull String id);
 
-    Observable<List<T>> observable();
+    Observable<List<? extends T>> observable();
 }

@@ -1,45 +1,23 @@
 package com.dex.mobassist.server.model;
 
-import lombok.Data;
-import lombok.NonNull;
+public interface SignupOptionResponse {
+    SignupOptionRef getOption();
 
-@Data
-public class SignupOptionResponse {
-    private SignupOptionRef option;
-    private int count;
-    private int assignments;
+    int getCount();
 
-    public static SignupOptionResponse createSignupOptionResponse(SignupOptionRef option) {
-        return createSignupOptionResponse(option, 0, 0);
-    }
+    int getAssignments();
 
-    public static SignupOptionResponse createSignupOptionResponse(SignupOptionRef option, int count, int assignments) {
-        final SignupOptionResponse response = new SignupOptionResponse();
+    void setOption(SignupOptionRef option);
 
-        response.option = option;
-        response.count = count;
-        response.assignments = assignments;
+    void setCount(int count);
 
-        return response;
-    }
+    void setAssignments(int assignments);
 
-    public SignupOptionResponse addCount() {
-        return addCount(1);
-    }
+    <T extends SignupOptionResponse> T addCount();
 
-    public SignupOptionResponse addCount(int amount) {
-        count = count + amount;
+    <T extends SignupOptionResponse> T addCount(int amount);
 
-        return this;
-    }
+    <T extends SignupOptionResponse> T addAssignment();
 
-    public SignupOptionResponse addAssignment() {
-        return addAssignment(1);
-    }
-
-    public SignupOptionResponse addAssignment(int amount) {
-        assignments = assignments + amount;
-
-        return this;
-    }
+    <T extends SignupOptionResponse> T addAssignment(int amount);
 }

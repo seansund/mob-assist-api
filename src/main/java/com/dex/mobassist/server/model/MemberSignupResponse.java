@@ -1,76 +1,37 @@
 package com.dex.mobassist.server.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class MemberSignupResponse extends MemberSignupResponseRef {
-    @NonNull
-    private SignupRef signup;
-    @NonNull
-    private MemberRef member;
+public interface MemberSignupResponse extends MemberSignupResponseRef {
+    SignupRef getSignup();
 
-    private SignupOptionRef selectedOption;
-    private List<? extends AssignmentRef> assignments = new ArrayList<>();
-    private String message;
-    private boolean checkedIn = false;
+    MemberRef getMember();
 
-    public MemberSignupResponse() {
-        this("");
-    }
+    SignupOptionRef getSelectedOption();
 
-    public MemberSignupResponse(@NonNull String id) {
-        super(id);
-    }
+    List<? extends AssignmentRef> getAssignments();
 
-    public static MemberSignupResponse createMemberSignupResponse(int id, @NonNull SignupRef signup, @NonNull MemberRef member) {
-        return createMemberSignupResponse(String.valueOf(id), signup, member);
-    }
+    String getMessage();
 
-    public static MemberSignupResponse createMemberSignupResponse(@NonNull String id, @NonNull SignupRef signup, @NonNull MemberRef member) {
-        return createMemberSignupResponse(id, signup, member, null);
-    }
+    boolean isCheckedIn();
 
-    public static MemberSignupResponse createMemberSignupResponse(@NonNull String id, @NonNull SignupRef signup, @NonNull MemberRef member, SignupOptionRef selectedOption) {
-        return createMemberSignupResponse(id, signup, member, selectedOption, new ArrayList<>());
-    }
+    void setSignup(SignupRef signup);
 
-    public static MemberSignupResponse createMemberSignupResponse(@NonNull String id, @NonNull SignupRef signup, @NonNull MemberRef member, SignupOptionRef selectedOption, @NonNull List<? extends AssignmentRef> assignments) {
-        return createMemberSignupResponse(id, signup, member, selectedOption, assignments, "");
-    }
+    void setMember(MemberRef member);
 
-    public static MemberSignupResponse createMemberSignupResponse(@NonNull String id, @NonNull SignupRef signup, @NonNull MemberRef member, SignupOptionRef selectedOption, @NonNull List<? extends AssignmentRef> assignments, String message) {
-        final MemberSignupResponse response = new MemberSignupResponse(id);
+    void setSelectedOption(SignupOptionRef selectedOption);
 
-        response.signup = signup;
-        response.member = member;
-        response.selectedOption = selectedOption;
-        if (assignments != null) {
-            response.assignments = assignments;
-        }
-        response.message = message;
+    void setAssignments(List<? extends AssignmentRef> assignments);
 
-        return response;
-    }
+    void setMessage(String message);
 
-    public MemberSignupResponse withId(int id) {
-        return withId(String.valueOf(id));
-    }
+    void setCheckedIn(boolean checkedIn);
 
-    public MemberSignupResponse withId(@NonNull String id) {
-        setId(id);
-
-        return this;
-    }
-
-    public MemberSignupResponse withSelectedOption(SignupOption option) {
+    public default <T extends MemberSignupResponse> T withSelectedOption(SignupOption option) {
         setSelectedOption(option);
 
-        return this;
+        return (T) this;
     }
 }

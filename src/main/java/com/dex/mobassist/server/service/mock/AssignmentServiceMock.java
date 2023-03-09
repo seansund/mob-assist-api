@@ -20,12 +20,12 @@ public class AssignmentServiceMock implements AssignmentService {
     }
 
     @Override
-    public List<Assignment> getByIds(List<String> assignmentIds) {
+    public List<? extends Assignment> getByIds(List<String> assignmentIds) {
         return repository.getByIds(assignmentIds);
     }
 
     @Override
-    public List<Assignment> list() {
+    public List<? extends Assignment> list() {
         return repository.list();
     }
 
@@ -45,7 +45,7 @@ public class AssignmentServiceMock implements AssignmentService {
     }
 
     @Override
-    public Observable<List<Assignment>> observable() {
+    public Observable<List<? extends Assignment>> observable() {
         return repository.observable();
     }
 }

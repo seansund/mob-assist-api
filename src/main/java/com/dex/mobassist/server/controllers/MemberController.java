@@ -15,6 +15,8 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
+import static com.dex.mobassist.server.model.simple.SimpleMember.createMember;
+
 @Controller
 @CrossOrigin
 public class MemberController {
@@ -25,7 +27,7 @@ public class MemberController {
     }
 
     @QueryMapping
-    public List<Member> listMembers() {
+    public List<? extends Member> listMembers() {
         return service.list();
     }
 
@@ -36,7 +38,7 @@ public class MemberController {
 
     @MutationMapping
     public Member addUpdateMember(@Argument("phone") String phone, @Argument("firstName") String firstName, @Argument("lastName") String lastName, @Argument("email") String email, @Argument("preferredContact") String preferredContact) {
-        final Member member = Member.createMember(
+        final Member member = createMember(
                 phone,
                 firstName,
                 lastName,
@@ -44,7 +46,6 @@ public class MemberController {
                 preferredContact
         );
 
-        System.out.println("Updating member: " + member);
         return service.addUpdate(member);
     }
 
@@ -54,7 +55,7 @@ public class MemberController {
     }
 
     @SubscriptionMapping
-    public Flux<List<Member>> members() {
+    public Flux<List<? extends Member>> members() {
         return RxJava3Adapter.observableToFlux(service.observable(), BackpressureStrategy.LATEST);
     }
 }
