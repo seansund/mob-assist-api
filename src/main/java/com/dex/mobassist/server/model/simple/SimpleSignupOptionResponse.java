@@ -23,28 +23,4 @@ public class SimpleSignupOptionResponse implements SignupOptionResponse {
 
         return response;
     }
-
-    @Override
-    public <T extends SignupOptionResponse> T addCount() {
-        return addCount(1);
-    }
-
-    @Override
-    public <T extends SignupOptionResponse> T addCount(int amount) {
-        count = count + amount;
-
-        return (T) this;
-    }
-
-    @Override
-    public <T extends SignupOptionResponse> T addAssignment() {
-        return addAssignment(1);
-    }
-
-    @Override
-    public <T extends SignupOptionResponse> T addAssignment(int amount) {
-        assignments = assignments + amount;
-
-        return (T) this;
-    }
 }

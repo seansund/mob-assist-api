@@ -9,15 +9,45 @@ public interface SignupOptionResponse {
 
     void setOption(SignupOptionRef option);
 
+    default <T extends SignupOptionResponse> T withOption(SignupOptionRef option) {
+        setOption(option);
+
+        return (T) this;
+    }
+
     void setCount(int count);
+
+    default <T extends SignupOptionResponse> T withCount(int count) {
+        setCount(count);
+
+        return (T) this;
+    }
 
     void setAssignments(int assignments);
 
-    <T extends SignupOptionResponse> T addCount();
+    default <T extends SignupOptionResponse> T withAssignments(int assignments) {
+        setAssignments(assignments);
 
-    <T extends SignupOptionResponse> T addCount(int amount);
+        return (T) this;
+    }
 
-    <T extends SignupOptionResponse> T addAssignment();
+    default <T extends SignupOptionResponse> T addCount() {
+        return addCount(1);
+    }
 
-    <T extends SignupOptionResponse> T addAssignment(int amount);
+    default <T extends SignupOptionResponse> T addCount(int amount) {
+        setCount(getCount() + amount);
+
+        return (T) this;
+    }
+
+    default <T extends SignupOptionResponse> T addAssignment() {
+        return addAssignment(1);
+    }
+
+    default <T extends SignupOptionResponse> T addAssignment(int amount) {
+        setAssignments(getAssignments() + amount);
+
+        return (T) this;
+    }
 }

@@ -1,10 +1,12 @@
 package com.dex.mobassist.server.model.simple;
 
 import com.dex.mobassist.server.model.Member;
+import com.dex.mobassist.server.model.MemberRoleRef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 @Data
@@ -15,6 +17,7 @@ public class SimpleMember extends SimpleMemberRef implements Comparable<SimpleMe
     @NonNull private String phone;
     private String email;
     private String preferredContact;
+    private List<? extends MemberRoleRef> roles;
 
     public SimpleMember() {
         this("");

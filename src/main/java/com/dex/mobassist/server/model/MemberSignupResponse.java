@@ -19,18 +19,48 @@ public interface MemberSignupResponse extends MemberSignupResponseRef {
 
     void setSignup(SignupRef signup);
 
+    default <T extends MemberSignupResponse> T withSignup(SignupRef signup) {
+        setSignup(signup);
+
+        return (T) this;
+    }
+
     void setMember(MemberRef member);
+
+    default <T extends MemberSignupResponse> T withMember(MemberRef member) {
+        setMember(member);
+
+        return (T) this;
+    }
 
     void setSelectedOption(SignupOptionRef selectedOption);
 
+    default <T extends MemberSignupResponse> T withSelectedOption(SignupOptionRef selectedOption) {
+        setSelectedOption(selectedOption);
+
+        return (T) this;
+    }
+
     void setAssignments(List<? extends AssignmentRef> assignments);
+
+    default <T extends MemberSignupResponse> T withAssignments(List<? extends AssignmentRef> assignments) {
+        setAssignments(assignments);
+
+        return (T) this;
+    }
 
     void setMessage(String message);
 
+    default <T extends MemberSignupResponse> T withMessage(String message) {
+        setMessage(message);
+
+        return (T) this;
+    }
+
     void setCheckedIn(boolean checkedIn);
 
-    public default <T extends MemberSignupResponse> T withSelectedOption(SignupOption option) {
-        setSelectedOption(option);
+    default <T extends MemberSignupResponse> T withCheckedIn(boolean checkedIn) {
+        setCheckedIn(checkedIn);
 
         return (T) this;
     }
