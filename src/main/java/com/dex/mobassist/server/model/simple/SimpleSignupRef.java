@@ -17,12 +17,4 @@ public class SimpleSignupRef extends BaseModelRef implements SignupRef {
     public SimpleSignupRef(@NonNull String id) {
         super(id);
     }
-
-    public static SignupRef createSignupRef(String id) {
-        if (id == null) {
-            return null;
-        }
-
-        return new SimpleSignupRef(id);
-    }
 }

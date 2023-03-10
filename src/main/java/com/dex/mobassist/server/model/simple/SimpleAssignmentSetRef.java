@@ -17,12 +17,4 @@ public class SimpleAssignmentSetRef extends BaseModelRef implements AssignmentSe
     public SimpleAssignmentSetRef(@NonNull String id) {
         super(id);
     }
-
-    public static AssignmentSetRef createAssignmentSetRef(String id) {
-        if (id == null) {
-            return null;
-        }
-
-        return new SimpleAssignmentSetRef(id);
-    }
 }

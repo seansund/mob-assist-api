@@ -1,10 +1,14 @@
 package com.dex.mobassist.server.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
 
 public interface Signup extends SignupRef {
+    static final DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+
     Date getDate();
 
     String getTitle();
@@ -18,8 +22,21 @@ public interface Signup extends SignupRef {
     SignupOptionSetRef getOptions();
 
     void setDate(Date date);
+    default void setDate(String dateString) {
+        try {
+            setDate(dateFormat.parse(dateString));
+        } catch (Exception ex) {
+            throw new RuntimeException("Unable to parse date: " + dateString);
+        }
+    }
 
     default <T extends Signup> T withDate(Date date) {
+        setDate(date);
+
+        return (T) this;
+    }
+
+    default <T extends Signup> T withDate(String date) {
         setDate(date);
 
         return (T) this;

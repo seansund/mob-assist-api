@@ -16,12 +16,4 @@ public class SimpleMemberRoleRef extends BaseModelRef implements MemberRoleRef {
     public SimpleMemberRoleRef(@NonNull String id) {
         super(id);
     }
-
-    public static SimpleMemberRoleRef createMemberRoleRef(String id) {
-        if (id == null) {
-            return null;
-        }
-
-        return new SimpleMemberRoleRef(id);
-    }
 }

@@ -10,38 +10,41 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
-
-import static com.dex.mobassist.server.model.simple.SimpleAssignment.createAssignment;
-import static com.dex.mobassist.server.model.simple.SimpleSignup.createSignup;
-import static com.dex.mobassist.server.model.simple.SimpleSignupOption.createSignupOption;
-import static com.dex.mobassist.server.model.simple.SimpleSignupOptionSet.createSignupOptionSet;
 
 @Component
 @Profile("initialize")
 public class RepositoryInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
+    private final ModelFactory modelFactory;
     private final SignupRepository signupRepository;
     private final AssignmentSetRepository assignmentSetRepository;
     private final SignupOptionSetRepository signupOptionSetRepository;
     private final SignupOptionRepository signupOptionRepository;
     private final AssignmentRepository assignmentRepository;
     private final MemberRepository memberRepository;
+    private final MemberRoleRepository memberRoleRepository;
 
     public RepositoryInitializer(
+            ModelFactory modelFactory,
             SignupRepository signupRepository,
             AssignmentSetRepository assignmentSetRepository,
             SignupOptionSetRepository signupOptionSetRepository,
             SignupOptionRepository signupOptionRepository,
             AssignmentRepository assignmentRepository,
-            MemberRepository memberRepository
+            MemberRepository memberRepository,
+            MemberRoleRepository memberRoleRepository
     ) {
+        this.modelFactory = modelFactory;
         this.signupRepository = signupRepository;
         this.assignmentSetRepository = assignmentSetRepository;
         this.signupOptionSetRepository = signupOptionSetRepository;
         this.signupOptionRepository = signupOptionRepository;
         this.assignmentRepository = assignmentRepository;
         this.memberRepository = memberRepository;
+        this.memberRoleRepository = memberRoleRepository;
     }
 
     @Override
@@ -49,11 +52,19 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
         initializeAssignmentRepository(assignmentRepository);
         initializeAssignmentSetRepository(assignmentSetRepository);
 
+        initializeMemberRoleRepository(memberRoleRepository);
         initializeMemberRepository(memberRepository);
 
         initializeSignupOptionRepository(signupOptionRepository);
         initializeSignupOptionSetRepository(signupOptionSetRepository);
         initializeSignupRepository(signupRepository);
+    }
+
+    protected Assignment createAssignment(String name, String group, int row) {
+        return modelFactory.createAssignment("")
+                .withName(name)
+                .withGroup(group)
+                .withRow(row);
     }
 
     protected void initializeAssignmentRepository(AssignmentRepository repository) {
@@ -95,10 +106,16 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
 
     }
 
+    protected AssignmentSet createAssignmentSet(String name, List<? extends Assignment> assignments) {
+        return modelFactory.createAssignmentSet("")
+                .withName(name)
+                .withAssignments(assignments);
+    }
+
     protected void initializeAssignmentSetRepository(AssignmentSetRepository repository) {
 
         Stream.of(
-                        SimpleAssignmentSet.createAssignmentSet(
+                        createAssignmentSet(
                                 "basic",
                                 assignmentRepository.list()
                         )
@@ -106,7 +123,15 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
                 .forEach(repository::addUpdate);
     }
 
-    private void initializeSignupRepository(SignupRepository repository) {
+    protected Signup createSignup(String date, String title, AssignmentSet assignmentSet, SignupOptionSet options) {
+        return modelFactory.createSignup("")
+                .withDate(date)
+                .withTitle(title)
+                .withAssignments(assignmentSet)
+                .withOptions(options);
+    }
+
+    protected void initializeSignupRepository(SignupRepository repository) {
 
         final String title = "Communion";
         final AssignmentSet assignmentSet = assignmentSetRepository.list().stream().findFirst().orElseThrow();
@@ -129,11 +154,27 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
                 .forEach(repository::addUpdate);
     }
 
+    protected SignupOptionSet createSignupOptionSet(String name, List<? extends SignupOption> options) {
+        return modelFactory.createSignupOptionSet("")
+                .withName(name)
+                .withOptions(options);
+    }
+
     protected void initializeSignupOptionSetRepository(SignupOptionSetRepository repository) {
         Stream.of(
                         createSignupOptionSet("service", signupOptionRepository.list())
                 )
                 .forEach(repository::addUpdate);
+    }
+
+    protected SignupOption createSignupOption(@NonNull String value) {
+        return createSignupOption(value, false);
+    }
+
+    protected SignupOption createSignupOption(@NonNull String value, boolean declineOption) {
+        return modelFactory.createSignupOption("")
+                .withValue(value)
+                .withDeclineOption(declineOption);
     }
 
     protected void initializeSignupOptionRepository(SignupOptionRepository repository) {
@@ -145,10 +186,40 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
                 .forEach(repository::addUpdate);
     }
 
-    protected void initializeMemberRepository(MemberRepository repository) {
+    protected Member createMember(@NonNull String phone, String firstName, String lastName, String email, String preferredContact) {
+        return createMember(phone, firstName, lastName, email, preferredContact, new ArrayList<>());
+    }
+
+    protected Member createMember(@NonNull String phone, String firstName, String lastName, String email, String preferredContact, List<? extends MemberRole> roles) {
+        return modelFactory.createMember(phone)
+                .withPhone(phone)
+                .withEmail(email)
+                .withFirstName(firstName)
+                .withLastName(lastName)
+                .withPreferredContact(preferredContact)
+                .withRoles(roles);
+    }
+
+    protected MemberRole createMemberRole(String name) {
+        return modelFactory.createMemberRole(name)
+                .withName(name);
+    }
+
+    protected void initializeMemberRoleRepository(MemberRoleRepository repository) {
         Stream.of(
-                        SimpleMember.createMember("5126535564", "Sean", "Sundberg", "seansund@gmail.com", "text"),
-                        SimpleMember.createMember("5128977929", "Harry", "Sundberg", "hasundberg@yahoo.com", "text")
+                createMemberRole("user"),
+                createMemberRole("admin")
+        )
+                .forEach(repository::addUpdate);
+    }
+
+    protected void initializeMemberRepository(MemberRepository repository) {
+        final List<? extends MemberRole> allRoles = memberRoleRepository.list();
+        final List<? extends MemberRole> roles = allRoles.stream().filter((role) -> role.getName().equals("user")).toList();
+
+        Stream.of(
+                        createMember("5126535564", "Sean", "Sundberg", "seansund@gmail.com", "text", allRoles),
+                        createMember("5128977929", "Harry", "Sundberg", "hasundberg@yahoo.com", "text", roles)
                 )
                 .forEach(repository::addUpdate);
     }

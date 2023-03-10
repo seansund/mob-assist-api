@@ -22,23 +22,6 @@ public class SimpleSignupOptionSet extends SimpleSignupOptionSetRef implements S
         super(id);
     }
 
-    public static SignupOptionSet createSignupOptionSet(@NonNull String name, @NonNull List<? extends SignupOption> options) {
-        return createSignupOptionSet("", name, options);
-    }
-
-    public static SignupOptionSet createSignupOptionSet(int id, @NonNull String name, @NonNull List<? extends SignupOption> options) {
-        return createSignupOptionSet(String.valueOf(id), name, options);
-    }
-
-    public static SignupOptionSet createSignupOptionSet(@NonNull String id, @NonNull String name, @NonNull List<? extends SignupOption> options) {
-        final SimpleSignupOptionSet set = new SimpleSignupOptionSet(id);
-
-        set.name = name;
-        set.options = options;
-
-        return set;
-    }
-
     public void setId(@NonNull String id) {
         super.setId(id);
 

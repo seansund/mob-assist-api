@@ -16,12 +16,4 @@ public class SimpleMemberRef extends BaseModelRef implements MemberRef {
     public SimpleMemberRef(@NonNull String id) {
         super(id);
     }
-
-    public static MemberRef createMemberRef(String id) {
-        if (id == null) {
-            return null;
-        }
-
-        return new SimpleMemberRef(id);
-    }
 }

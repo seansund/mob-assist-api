@@ -17,12 +17,4 @@ public class SimpleSignupOptionSetRef extends BaseModelRef implements SignupOpti
     public SimpleSignupOptionSetRef(@NonNull String id) {
         super(id);
     }
-
-    public static SignupOptionSetRef createSignupOptionSetRef(String id) {
-        if (id == null) {
-            return null;
-        }
-
-        return new SimpleSignupOptionSetRef(id);
-    }
 }

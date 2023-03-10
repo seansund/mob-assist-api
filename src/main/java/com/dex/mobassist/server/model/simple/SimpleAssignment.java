@@ -19,18 +19,4 @@ public class SimpleAssignment extends SimpleAssignmentRef implements Assignment 
     public SimpleAssignment(String id) {
         super(id);
     }
-
-    public static Assignment createAssignment(@NonNull String group, @NonNull String name, int row) {
-        return createAssignment(group + "-" + name, group, name, row);
-    }
-
-    public static Assignment createAssignment(@NonNull String id, @NonNull String group, @NonNull String name, int row) {
-        final SimpleAssignment assignment = new SimpleAssignment(id);
-
-        assignment.group = group;
-        assignment.name = name;
-        assignment.row = row;
-
-        return assignment;
-    }
 }

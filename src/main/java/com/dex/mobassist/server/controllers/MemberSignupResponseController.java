@@ -1,7 +1,6 @@
 package com.dex.mobassist.server.controllers;
 
 import com.dex.mobassist.server.model.*;
-import com.dex.mobassist.server.model.simple.*;
 import com.dex.mobassist.server.service.*;
 import graphql.com.google.common.base.Strings;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
@@ -13,11 +12,6 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
-import static com.dex.mobassist.server.model.simple.SimpleAssignmentRef.createAssignmentRefs;
-import static com.dex.mobassist.server.model.simple.SimpleMemberRef.createMemberRef;
-import static com.dex.mobassist.server.model.simple.SimpleSignupOptionRef.createSignupOptionRef;
-import static com.dex.mobassist.server.model.simple.SimpleSignupRef.createSignupRef;
-
 @Controller
 @CrossOrigin
 public class MemberSignupResponseController {
@@ -28,12 +22,15 @@ public class MemberSignupResponseController {
     private final SignupOptionService signupOptionService;
     private final AssignmentService assignmentService;
 
+    private final ModelFactory factory;
+
     public MemberSignupResponseController(
             MemberSignupResponseService service,
             SignupService signupService,
             MemberService memberService,
             SignupOptionService signupOptionService,
-            AssignmentService assignmentService
+            AssignmentService assignmentService,
+            ModelFactory factory
     ) {
         this.service = service;
 
@@ -41,6 +38,8 @@ public class MemberSignupResponseController {
         this.memberService = memberService;
         this.signupOptionService = signupOptionService;
         this.assignmentService = assignmentService;
+
+        this.factory = factory;
     }
 
     @QueryMapping
@@ -69,14 +68,13 @@ public class MemberSignupResponseController {
 
     @MutationMapping
     public MemberSignupResponse addUpdateSignupResponse(@Argument("id") String id, @Argument("signupId") String signupId, @Argument("memberPhone") String memberPhone, @Argument("selectedOptionId") String selectedOptionId, @Argument("assignmentIds") List<String> assignmentIds, @Argument("message") String message) {
-        final MemberSignupResponse response = SimpleMemberSignupResponse.createMemberSignupResponse(
-                Strings.isNullOrEmpty(id) ? "" : id,
-                createSignupRef(signupId),
-                createMemberRef(memberPhone),
-                createSignupOptionRef(selectedOptionId),
-                createAssignmentRefs(assignmentIds),
-                message
-        );
+        final MemberSignupResponse response = factory
+                .createMemberSignupResponse(Strings.isNullOrEmpty(id) ? "" : id)
+                .withSignup(factory.createSignupRef(signupId))
+                .withMember(factory.createMemberRef(memberPhone))
+                .withSelectedOption(factory.createSignupOptionRef(selectedOptionId))
+                .withAssignments(factory.createAssignmentRefs(assignmentIds))
+                .withMessage(message);
 
         return service.addUpdate(response);
     }
@@ -113,7 +111,7 @@ public class MemberSignupResponseController {
 
     @SchemaMapping(typeName="MemberSignupResponse", field="signup")
     protected Signup loadSignup(MemberSignupResponse response) {
-        if (response.getSignup() instanceof SimpleSignup) {
+        if (response.getSignup() instanceof Signup) {
             return (Signup)response.getSignup();
         }
 
@@ -124,7 +122,7 @@ public class MemberSignupResponseController {
     protected Member loadMember(MemberSignupResponse response) {
         System.out.println("Loading member: " + response.getMember());
 
-        if (response.getMember() instanceof SimpleMember) {
+        if (response.getMember() instanceof Member) {
             return (Member)response.getMember();
         }
 
@@ -137,7 +135,7 @@ public class MemberSignupResponseController {
             return null;
         }
 
-        if (response.getSelectedOption() instanceof SimpleSignupOption) {
+        if (response.getSelectedOption() instanceof SignupOption) {
             return (SignupOption)response.getSelectedOption();
         }
 
@@ -150,7 +148,7 @@ public class MemberSignupResponseController {
             return null;
         }
 
-        if (response.getAssignments().stream().allMatch((assignment) -> assignment instanceof SimpleAssignment)) {
+        if (response.getAssignments().stream().allMatch((assignment) -> assignment instanceof Assignment)) {
             return response.getAssignments().stream()
                     .map((assignment) -> (Assignment)assignment)
                     .toList();

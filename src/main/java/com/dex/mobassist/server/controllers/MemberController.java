@@ -1,6 +1,7 @@
 package com.dex.mobassist.server.controllers;
 
 import com.dex.mobassist.server.model.Member;
+import com.dex.mobassist.server.model.ModelFactory;
 import com.dex.mobassist.server.model.SimpleResult;
 import com.dex.mobassist.server.service.MemberService;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
@@ -15,15 +16,15 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
-import static com.dex.mobassist.server.model.simple.SimpleMember.createMember;
-
 @Controller
 @CrossOrigin
 public class MemberController {
     private final MemberService service;
+    private final ModelFactory factory;
 
-    public MemberController(MemberService service) {
+    public MemberController(MemberService service, ModelFactory factory) {
         this.service = service;
+        this.factory = factory;
     }
 
     @QueryMapping
@@ -38,13 +39,12 @@ public class MemberController {
 
     @MutationMapping
     public Member addUpdateMember(@Argument("phone") String phone, @Argument("firstName") String firstName, @Argument("lastName") String lastName, @Argument("email") String email, @Argument("preferredContact") String preferredContact) {
-        final Member member = createMember(
-                phone,
-                firstName,
-                lastName,
-                email,
-                preferredContact
-        );
+        final Member member = factory.createMember(phone)
+                .withPhone(phone)
+                .withFirstName(firstName)
+                .withLastName(lastName)
+                .withEmail(email)
+                .withPreferredContact(preferredContact);
 
         return service.addUpdate(member);
     }

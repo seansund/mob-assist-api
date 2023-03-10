@@ -21,18 +21,4 @@ public class SimpleAssignmentRef extends BaseModelRef implements AssignmentRef {
         super(id);
     }
 
-    public static AssignmentRef createAssignmentRef(String id) {
-        if (id == null) {
-            return null;
-        }
-
-        return new SimpleAssignmentRef(id);
-    }
-
-    public static List<? extends AssignmentRef> createAssignmentRefs(@NonNull List<String> ids) {
-        return ids.stream()
-                .map(SimpleAssignmentRef::createAssignmentRef)
-                .filter(Objects::nonNull)
-                .toList();
-    }
 }

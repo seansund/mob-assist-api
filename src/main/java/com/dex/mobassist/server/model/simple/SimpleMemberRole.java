@@ -17,16 +17,4 @@ public class SimpleMemberRole extends SimpleMemberRoleRef implements MemberRole 
     public SimpleMemberRole(@NonNull String id) {
         super(id);
     }
-
-    public static SimpleMemberRole createMemberRole(String id) {
-        return createMemberRole(id, "");
-    }
-
-    public static SimpleMemberRole createMemberRole(String id, String name) {
-        final SimpleMemberRole result = new SimpleMemberRole(id);
-
-        result.name = name;
-
-        return result;
-    }
 }

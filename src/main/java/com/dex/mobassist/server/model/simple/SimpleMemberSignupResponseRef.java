@@ -17,16 +17,4 @@ public class SimpleMemberSignupResponseRef extends BaseModelRef implements Membe
     public SimpleMemberSignupResponseRef(@NonNull String id) {
         super(id);
     }
-
-    public static MemberSignupResponseRef createMemberSignupResponseRef(int id) {
-        return createMemberSignupResponseRef(String.valueOf(id));
-    }
-
-    public static MemberSignupResponseRef createMemberSignupResponseRef(String id) {
-        if (id == null) {
-            return null;
-        }
-
-        return new SimpleMemberSignupResponseRef(id);
-    }
 }

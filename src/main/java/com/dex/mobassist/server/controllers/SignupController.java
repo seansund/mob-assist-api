@@ -1,8 +1,6 @@
 package com.dex.mobassist.server.controllers;
 
 import com.dex.mobassist.server.model.*;
-import com.dex.mobassist.server.model.simple.SimpleSignup;
-import com.dex.mobassist.server.model.simple.SimpleSignupOptionResponse;
 import com.dex.mobassist.server.service.AssignmentSetService;
 import com.dex.mobassist.server.service.MemberSignupResponseService;
 import com.dex.mobassist.server.service.SignupOptionSetService;
@@ -20,7 +18,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static com.dex.mobassist.server.model.simple.SimpleSignupOptionResponse.createSignupOptionResponse;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 
@@ -31,17 +28,20 @@ public class SignupController {
     private final AssignmentSetService assignmentSetService;
     private final SignupOptionSetService signupOptionSetService;
     private final MemberSignupResponseService memberSignupResponseService;
+    private final ModelFactory factory;
 
     public SignupController(
             SignupService service,
             AssignmentSetService assignmentSetService,
             SignupOptionSetService signupOptionSetService,
-            MemberSignupResponseService memberSignupResponseService
+            MemberSignupResponseService memberSignupResponseService,
+            ModelFactory factory
     ) {
         this.service = service;
         this.assignmentSetService = assignmentSetService;
         this.signupOptionSetService = signupOptionSetService;
         this.memberSignupResponseService = memberSignupResponseService;
+        this.factory = factory;
     }
 
     @SchemaMapping(typeName="Signup", field="assignmentSet")
@@ -62,8 +62,20 @@ public class SignupController {
         return signupOptionSetService.getById(signup.getOptions().getId());
     }
 
-    protected boolean isNullOrEmpty(List<? extends Object> list) {
+    protected boolean isNullOrEmpty(List<?> list) {
         return list == null || list.isEmpty();
+    }
+
+    protected SignupOptionResponse createSignupOptionResponse(SignupOption option) {
+        return factory.createSignupOptionResponse()
+                .withOption(option);
+    }
+
+    protected SignupOptionResponse createSignupOptionResponse(SignupOptionRef option, int count, int assignments) {
+        return factory.createSignupOptionResponse()
+                .withOption(option)
+                .withCount(count)
+                .withAssignments(assignments);
     }
 
     @SchemaMapping(typeName="Signup", field="responses")
@@ -72,7 +84,7 @@ public class SignupController {
 
         final List<? extends SignupOptionResponse> initialResponses = optionSet.getOptions()
                 .stream()
-                .map(SimpleSignupOptionResponse::createSignupOptionResponse)
+                .map(this::createSignupOptionResponse)
                 .toList();
 
         final List<? extends MemberSignupResponse> responses = memberSignupResponseService.listBySignup(signup.getId());
@@ -140,12 +152,20 @@ public class SignupController {
         return service.getById(id);
     }
 
+    protected Signup createSignup(String id, String date, String title, AssignmentSet assignmentSet, SignupOptionSet options) {
+        return factory.createSignup(id)
+                .withDate(date)
+                .withTitle(title)
+                .withAssignments(assignmentSet)
+                .withOptions(options);
+    }
+
     @MutationMapping
     public Signup addUpdateSignup(@Argument("id") String id, @Argument("date") String date, @Argument("title") String title, @Argument("assignmentSetId") String assignmentSetId, @Argument("optionSetId") String optionSetId) {
         final AssignmentSet assignmentSet = assignmentSetService.getById(assignmentSetId);
         final SignupOptionSet signupOptionSet = signupOptionSetService.getById(optionSetId);
 
-        final Signup signup = SimpleSignup.createSignup(id, date, title, assignmentSet, signupOptionSet);
+        final Signup signup = createSignup(id, date, title, assignmentSet, signupOptionSet);
 
         return service.addUpdate(signup);
     }

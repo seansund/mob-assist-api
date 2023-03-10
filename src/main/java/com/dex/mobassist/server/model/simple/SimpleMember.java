@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -17,7 +18,7 @@ public class SimpleMember extends SimpleMemberRef implements Comparable<SimpleMe
     @NonNull private String phone;
     private String email;
     private String preferredContact;
-    private List<? extends MemberRoleRef> roles;
+    private List<? extends MemberRoleRef> roles = new ArrayList();
 
     public SimpleMember() {
         this("");
@@ -25,22 +26,6 @@ public class SimpleMember extends SimpleMemberRef implements Comparable<SimpleMe
 
     public SimpleMember(String id) {
         super(id);
-    }
-
-    public static Member createMember(String phone, String firstName, String lastName) {
-        return createMember(phone, firstName, lastName, "", "");
-    }
-
-    public static Member createMember(String phone, String firstName, String lastName, String email, String preferredContact) {
-        final SimpleMember member = new SimpleMember(phone);
-
-        member.phone = phone;
-        member.lastName = lastName;
-        member.firstName = firstName;
-        member.email = email;
-        member.preferredContact = preferredContact;
-
-        return member;
     }
 
     public Member update(SimpleMember newMember) {

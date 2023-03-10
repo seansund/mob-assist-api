@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static com.dex.mobassist.server.model.simple.SimpleMemberSignupResponse.createMemberSignupResponse;
 import static java.util.stream.Stream.concat;
 
 @Repository("MemberSignupResponseRepository")
@@ -25,9 +24,12 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
     private final MemberRepository memberRepository;
     private final SignupRepository signupRepository;
 
-    public MemberSignupResponseRepositoryMock(MemberRepository memberRepository, SignupRepository signupRepository) {
+    private final ModelFactory factory;
+
+    public MemberSignupResponseRepositoryMock(MemberRepository memberRepository, SignupRepository signupRepository, ModelFactory factory) {
         this.memberRepository = memberRepository;
         this.signupRepository = signupRepository;
+        this.factory = factory;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
                 .filter((MemberSignupResponse res) -> res.getMember().getId().equals(phone))
                 .toList();
 
-        final Predicate<Signup> signupNoResponse = (Signup signup) -> {
+        final Predicate<? super Signup> signupNoResponse = (Signup signup) -> {
             final Stream<String> signupIds = memberResponses.stream().map((response) -> response.getSignup().getId());
 
             return signupIds.noneMatch((id) -> id.equals(signup.getId()));
@@ -66,10 +68,10 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
             return memberResponses;
         }
 
-        final List<MemberSignupResponse> memberNoResponse = signups
+        final List<? extends MemberSignupResponse> memberNoResponse = signups
                 .stream()
                 .filter(signupNoResponse)
-                .map((signup) -> createMemberSignupResponse(signup.getId() + "-" + member.getId(), signup, member))
+                .map((signup) -> (MemberSignupResponse) factory.createMemberSignupResponse(signup.getId() + "-" + member.getId()).withSignup(signup).withMember(member))
                 .toList();
 
         return concat(memberResponses.stream(), memberNoResponse.stream()).toList();
@@ -94,7 +96,7 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
         final List<? extends MemberSignupResponse> signupNoResponse = members
                 .stream()
                 .filter(memberNoResponse)
-                .map((member) -> createMemberSignupResponse("", signup, member))
+                .map((member) -> (MemberSignupResponse) factory.createMemberSignupResponse("").withSignup(signup).withMember(member))
                 .toList();
 
         final List<? extends MemberSignupResponse> result = concat(signupResponses.stream(), signupNoResponse.stream()).toList();
@@ -154,7 +156,7 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
                 })
                 .orElseGet(() -> {
                     System.out.println("Adding new response");
-                    return addUpdate(createMemberSignupResponse("", signup, member, option));
+                    return addUpdate(factory.createMemberSignupResponse("").withSignup(signup).withMember(member).withSelectedOption(option));
                 });
     }
 }

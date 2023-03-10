@@ -28,32 +28,4 @@ public class SimpleMemberSignupResponse extends SimpleMemberSignupResponseRef im
     public SimpleMemberSignupResponse(@NonNull String id) {
         super(id);
     }
-
-    public static MemberSignupResponse createMemberSignupResponse(int id, @NonNull SignupRef signup, @NonNull MemberRef member) {
-        return createMemberSignupResponse(String.valueOf(id), signup, member);
-    }
-
-    public static MemberSignupResponse createMemberSignupResponse(@NonNull String id, @NonNull SignupRef signup, @NonNull MemberRef member) {
-        return createMemberSignupResponse(id, signup, member, null);
-    }
-
-    public static MemberSignupResponse createMemberSignupResponse(@NonNull String id, @NonNull SignupRef signup, @NonNull MemberRef member, SignupOptionRef selectedOption) {
-        return createMemberSignupResponse(id, signup, member, selectedOption, new ArrayList<>());
-    }
-
-    public static MemberSignupResponse createMemberSignupResponse(@NonNull String id, @NonNull SignupRef signup, @NonNull MemberRef member, SignupOptionRef selectedOption, @NonNull List<? extends AssignmentRef> assignments) {
-        return createMemberSignupResponse(id, signup, member, selectedOption, assignments, "");
-    }
-
-    public static MemberSignupResponse createMemberSignupResponse(@NonNull String id, @NonNull SignupRef signup, @NonNull MemberRef member, SignupOptionRef selectedOption, @NonNull List<? extends AssignmentRef> assignments, String message) {
-        final SimpleMemberSignupResponse response = new SimpleMemberSignupResponse(id);
-
-        response.signup = signup;
-        response.member = member;
-        response.selectedOption = selectedOption;
-        response.assignments = assignments;
-        response.message = message;
-
-        return response;
-    }
 }
