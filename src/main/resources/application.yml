@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: mock,initialize
+    active: mongodb
   graphql:
     websocket:
       path: /subscription
@@ -8,6 +8,14 @@ spring:
       printer:
         enabled: true
     path: /graphql
+
+  data:
+    mongodb:
+      uri: "${MONGODB_URI:}"
+      database: "${MONGODB_DATABASE:}"
+      username: "${MONGODB_USERNAME:}"
+      password: "${MONGODB_PASSWORD:}"
+      ca-cert-base64: "${MONGODB_CACERT_BASE64:}"
 
 management:
   endpoints:

@@ -1,8 +1,8 @@
 package com.dex.mobassist.server.controllers;
 
+import com.dex.mobassist.server.cargo.*;
 import com.dex.mobassist.server.model.*;
 import com.dex.mobassist.server.service.*;
-import graphql.com.google.common.base.Strings;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import org.springframework.graphql.data.method.annotation.*;
 import org.springframework.stereotype.Controller;
@@ -22,15 +22,12 @@ public class MemberSignupResponseController {
     private final SignupOptionService signupOptionService;
     private final AssignmentService assignmentService;
 
-    private final ModelFactory factory;
-
     public MemberSignupResponseController(
             MemberSignupResponseService service,
             SignupService signupService,
             MemberService memberService,
             SignupOptionService signupOptionService,
-            AssignmentService assignmentService,
-            ModelFactory factory
+            AssignmentService assignmentService
     ) {
         this.service = service;
 
@@ -38,8 +35,6 @@ public class MemberSignupResponseController {
         this.memberService = memberService;
         this.signupOptionService = signupOptionService;
         this.assignmentService = assignmentService;
-
-        this.factory = factory;
     }
 
     @QueryMapping
@@ -48,8 +43,10 @@ public class MemberSignupResponseController {
     }
 
     @QueryMapping
-    public List<? extends MemberSignupResponse> listSignupResponsesByUser(@Argument("phone") String phone) {
-        return service.listByUser(phone);
+    public List<? extends MemberSignupResponse> listSignupResponsesByUser(@Argument("phone") String phone, @Argument("scope") String scopeString) {
+        final SignupQueryScope scope = SignupQueryScope.lookup(scopeString);
+
+        return service.listByUser(phone, scope);
     }
 
     @QueryMapping
@@ -68,12 +65,11 @@ public class MemberSignupResponseController {
 
     @MutationMapping
     public MemberSignupResponse addUpdateSignupResponse(@Argument("id") String id, @Argument("signupId") String signupId, @Argument("memberPhone") String memberPhone, @Argument("selectedOptionId") String selectedOptionId, @Argument("assignmentIds") List<String> assignmentIds, @Argument("message") String message) {
-        final MemberSignupResponse response = factory
-                .createMemberSignupResponse(Strings.isNullOrEmpty(id) ? "" : id)
-                .withSignup(factory.createSignupRef(signupId))
-                .withMember(factory.createMemberRef(memberPhone))
-                .withSelectedOption(factory.createSignupOptionRef(selectedOptionId))
-                .withAssignments(factory.createAssignmentRefs(assignmentIds))
+        final MemberSignupResponse response = new MemberSignupResponseCargo(id)
+                .withSignup(new SignupRefCargo(signupId))
+                .withMember(new MemberRefCargo(memberPhone))
+                .withSelectedOption(new SignupOptionRefCargo(selectedOptionId))
+                .withAssignments(AssignmentRefCargo.createAssignmentRefs(assignmentIds))
                 .withMessage(message);
 
         return service.addUpdate(response);
@@ -154,7 +150,7 @@ public class MemberSignupResponseController {
                     .toList();
         }
 
-        return assignmentService.getByIds(response.getAssignments()
+        return assignmentService.findAllById(response.getAssignments()
                 .stream()
                 .map(AssignmentRef::getId)
                 .toList());

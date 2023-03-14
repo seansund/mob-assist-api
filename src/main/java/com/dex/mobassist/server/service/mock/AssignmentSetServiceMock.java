@@ -1,5 +1,6 @@
 package com.dex.mobassist.server.service.mock;
 
+import com.dex.mobassist.server.exceptions.AssignmentSetNotFound;
 import com.dex.mobassist.server.model.AssignmentSet;
 import com.dex.mobassist.server.repository.AssignmentSetRepository;
 import com.dex.mobassist.server.service.AssignmentSetService;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service("AssignmentSetService")
-@Profile("mock")
 public class AssignmentSetServiceMock implements AssignmentSetService {
     private final AssignmentSetRepository repository;
 
@@ -21,22 +21,22 @@ public class AssignmentSetServiceMock implements AssignmentSetService {
 
     @Override
     public List<? extends AssignmentSet> list() {
-        return repository.list();
+        return repository.findAll();
     }
 
     @Override
     public AssignmentSet getById(String id) {
-        return repository.getById(id);
+        return repository.findById(id).orElseThrow(() -> new AssignmentSetNotFound(id));
     }
 
     @Override
     public AssignmentSet addUpdate(@NonNull AssignmentSet newMember) {
-        return repository.addUpdate(newMember);
+        return repository.save(newMember);
     }
 
     @Override
     public boolean delete(@NonNull String id) {
-        return repository.delete(id);
+        return repository.deleteById(id);
     }
 
     @Override

@@ -1,25 +1,46 @@
 type Query {
     listMembers: [Member]
+    listMemberRoles: [MemberRole]
     getMemberByPhone(phone: ID!): Member
 
     listSignups(scope: String = "upcoming"): [Signup]
     getSignupById(id: ID!): Signup
 
+    listSignupOptionSets: [SignupOptionSet]
+    listSignupOptions: [SignupOption]
+    listAssignmentSets: [AssignmentSet]
+    listAssignments: [Assignment]
+
     listSignupResponses: [MemberSignupResponse]
-    listSignupResponsesByUser(phone: ID!): [MemberSignupResponse]
+    listSignupResponsesByUser(phone: ID!, scope: String): [MemberSignupResponse]
     listSignupResponsesBySignup(id: ID!): [MemberSignupResponse]
     getSignupResponseById(id: ID!): MemberSignupResponse
 }
 
 type Mutation {
-    addUpdateMember(phone: ID!, firstName: String!, lastName: String!, email: String, preferredContact: String): Member
+    addUpdateMember(phone: ID!, firstName: String, lastName: String, email: String, preferredContact: String, roleIds: String): Member
     removeMember(phone: ID!): SimpleResult
+
+    addUpdateMemberRole(id: ID, name: String): MemberRole
+    removeMemberRole(id: ID!): SimpleResult
 
     addUpdateSignup(id: ID, date: String!, title: String!, assignmentSetId: String!, optionSetId: String!): Signup
     removeSignup(id: ID!): SimpleResult
 
     addUpdateSignupResponse(id: ID, signupId: ID!, memberPhone: ID!, selectedOptionId: ID, assignmentIds: [String], message: String): MemberSignupResponse
     removeSignupResponse(id: ID!): SimpleResult
+
+    addUpdateSignupOptionSet(id: ID, name: String, optionIDs: String): SignupOptionSet
+    removeSignupOptionSet(id: ID!): SimpleResult
+
+    addUpdateSignupOption(id: ID, value: String, declineOption: Boolean, sortIndex: Int): SignupOption
+    removeSignupOption(id: ID!): SimpleResult
+
+    addUpdateAssignmentSet(id: ID, name: String, assignmentIds: String): AssignmentSet
+    removeAssignmentSet(id: ID!): SimpleResult
+
+    addUpdateAssignment(id: ID, group: String, name: String, row: Int): Assignment
+    removeAssignment(id: ID!): SimpleResult
 
     checkIn(id: ID!): MemberSignupResponse
     removeCheckIn(id: ID!): MemberSignupResponse
@@ -36,11 +57,13 @@ type Subscription {
 }
 
 type Member {
-    phone: ID!
+    id: ID!
+    phone: String!
     firstName: String!
     lastName: String!
     email: String
     preferredContact: String
+    roles: [MemberRole]
 }
 
 type Signup {
@@ -75,6 +98,7 @@ type SignupOption {
     id: ID!
     value: String!
     declineOption: Boolean
+    sortIndex: Int
 }
 
 type SignupOptionResponse {
@@ -92,6 +116,11 @@ type MemberSignupResponse {
     assignments: [Assignment]
     message: String
     checkedIn: Boolean
+}
+
+type MemberRole {
+    id: ID!
+    name: String!
 }
 
 type SimpleResult {

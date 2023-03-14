@@ -5,5 +5,5 @@ import com.dex.mobassist.server.model.Assignment;
 import java.util.List;
 
 public interface AssignmentRepository extends BaseRepository<Assignment> {
-    public List<? extends Assignment> getByIds(List<String> assignmentIds);
+    List<? extends Assignment> findAllById(List<String> assignmentIds);
 }

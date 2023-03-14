@@ -1,32 +1,42 @@
 package com.dex.mobassist.server.model;
 
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
+
+import java.util.Objects;
+
 public interface SignupOptionResponse {
     SignupOptionRef getOption();
 
-    int getCount();
+    Integer getCount();
 
-    int getAssignments();
+    Integer getAssignments();
 
     void setOption(SignupOptionRef option);
 
     default <T extends SignupOptionResponse> T withOption(SignupOptionRef option) {
-        setOption(option);
+        if (Objects.nonNull(option)) {
+            setOption(option);
+        }
 
         return (T) this;
     }
 
-    void setCount(int count);
+    void setCount(Integer count);
 
-    default <T extends SignupOptionResponse> T withCount(int count) {
-        setCount(count);
+    default <T extends SignupOptionResponse> T withCount(Integer count) {
+        if (Objects.nonNull(count)) {
+            setCount(count);
+        }
 
         return (T) this;
     }
 
-    void setAssignments(int assignments);
+    void setAssignments(Integer assignments);
 
-    default <T extends SignupOptionResponse> T withAssignments(int assignments) {
-        setAssignments(assignments);
+    default <T extends SignupOptionResponse> T withAssignments(Integer assignments) {
+        if (Objects.nonNull(assignments)) {
+            setAssignments(assignments);
+        }
 
         return (T) this;
     }
@@ -36,7 +46,7 @@ public interface SignupOptionResponse {
     }
 
     default <T extends SignupOptionResponse> T addCount(int amount) {
-        setCount(getCount() + amount);
+        setCount((Objects.isNull(getCount()) ? 0 : getCount()) + amount);
 
         return (T) this;
     }
@@ -46,7 +56,7 @@ public interface SignupOptionResponse {
     }
 
     default <T extends SignupOptionResponse> T addAssignment(int amount) {
-        setAssignments(getAssignments() + amount);
+        setAssignments((Objects.isNull(getAssignments()) ? 0 : getAssignments()) + amount);
 
         return (T) this;
     }

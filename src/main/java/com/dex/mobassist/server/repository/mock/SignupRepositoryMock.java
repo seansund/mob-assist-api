@@ -1,14 +1,14 @@
 package com.dex.mobassist.server.repository.mock;
 
 import com.dex.mobassist.server.model.Signup;
-import com.dex.mobassist.server.model.SignupQueryScope;
 import com.dex.mobassist.server.repository.SignupRepository;
+import lombok.NonNull;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 @Repository("SignupRepository")
@@ -26,44 +26,33 @@ public class SignupRepositoryMock extends AbstractRepositoryMock<Signup> impleme
     }
 
     @Override
-    public List<? extends Signup> list() {
-        return list(SignupQueryScope.upcoming);
-    }
-
-    @Override
-    public List<? extends Signup> list(SignupQueryScope scope) {
-
-        final Predicate<? super Signup> predicate = getPredicate(scope);
-
-        return super.list()
+    public List<? extends Signup> findSignupsAfter(Date target) {
+        return super.findAll()
                 .stream()
-                .filter(predicate)
+                .filter(after(target))
                 .toList();
     }
 
     @Override
-    public Signup getCurrent() {
-        return list(SignupQueryScope.upcoming)
+    public List<? extends Signup> findSignupsBetween(@NonNull Date start, @NonNull Date end) {
+        return super.findAll()
                 .stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Current signup not found"));
+                .filter(between(start, end))
+                .toList();
     }
 
-    protected Predicate<Signup> getPredicate(SignupQueryScope scope) {
-        final Date today = new Date();
-        final Calendar upcoming = Calendar.getInstance();
-        upcoming.add(Calendar.MONTH, 3);
+    @Override
+    public Optional<? extends Signup> getCurrent() {
+        return this.findAll()
+                .stream()
+                .findFirst();
+    }
 
-        switch (scope) {
-            case all -> {
-                return (Signup signup) -> true;
-            }
-            case future -> {
-                return (Signup signup) -> signup.getDate().compareTo(today) > 0;
-            }
-            default -> {
-                return (Signup signup) -> signup.getDate().compareTo(today) > 0 && signup.getDate().compareTo(upcoming.getTime()) < 0;
-            }
-        }
+    protected Predicate<Signup> after(Date start) {
+        return (Signup signup) -> signup.getDate().compareTo(start) > 0;
+    }
+
+    protected Predicate<Signup> between(@NonNull Date start, @NonNull Date end) {
+        return (Signup signup) -> signup.getDate().compareTo(start) > 0 && signup.getDate().compareTo(end) < 0;
     }
 }

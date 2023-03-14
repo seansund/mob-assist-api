@@ -1,5 +1,6 @@
 package com.dex.mobassist.server.service.mock;
 
+import com.dex.mobassist.server.exceptions.SignupOptionSetNotFound;
 import com.dex.mobassist.server.model.SignupOptionSet;
 import com.dex.mobassist.server.repository.SignupOptionSetRepository;
 import com.dex.mobassist.server.service.SignupOptionSetService;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service("SignupOptionSetService")
-@Profile("mock")
 public class SignupOptionSetServiceMock implements SignupOptionSetService {
     private SignupOptionSetRepository repository;
 
@@ -21,22 +21,22 @@ public class SignupOptionSetServiceMock implements SignupOptionSetService {
 
     @Override
     public List<? extends SignupOptionSet> list() {
-        return repository.list();
+        return repository.findAll();
     }
 
     @Override
     public SignupOptionSet getById(String id) {
-        return repository.getById(id);
+        return repository.findById(id).orElseThrow(() -> new SignupOptionSetNotFound(id));
     }
 
     @Override
     public SignupOptionSet addUpdate(@NonNull SignupOptionSet newMember) {
-        return repository.addUpdate(newMember);
+        return repository.save(newMember);
     }
 
     @Override
     public boolean delete(@NonNull String id) {
-        return repository.delete(id);
+        return repository.deleteById(id);
     }
 
     @Override

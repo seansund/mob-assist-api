@@ -1,45 +1,60 @@
 package com.dex.mobassist.server.service.mock;
 
-import com.dex.mobassist.server.model.Member;
-import com.dex.mobassist.server.model.MemberSignupResponse;
-import com.dex.mobassist.server.model.Signup;
-import com.dex.mobassist.server.model.SignupOption;
+import com.dex.mobassist.server.exceptions.MemberNotFound;
+import com.dex.mobassist.server.exceptions.MemberSignupResponseNotFound;
+import com.dex.mobassist.server.exceptions.SignupNotFound;
+import com.dex.mobassist.server.model.*;
+import com.dex.mobassist.server.repository.MemberRepository;
 import com.dex.mobassist.server.repository.MemberSignupResponseRepository;
+import com.dex.mobassist.server.repository.SignupRepository;
+import com.dex.mobassist.server.repository.mock.domain.SimpleMemberSignupResponse;
 import com.dex.mobassist.server.service.MemberSignupResponseService;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import static java.util.stream.Stream.concat;
 
 @Service("MemberSignupResponseService")
-@Profile("mock")
 public class MemberSignupResponseServiceMock implements MemberSignupResponseService {
     private final MemberSignupResponseRepository repository;
+    private final SignupRepository signupRepository;
+    private final MemberRepository memberRepository;
 
-    public MemberSignupResponseServiceMock(MemberSignupResponseRepository repository) {
+    public MemberSignupResponseServiceMock(
+            MemberSignupResponseRepository repository,
+            SignupRepository signupRepository,
+            MemberRepository memberRepository
+    ) {
         this.repository = repository;
+        this.signupRepository = signupRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Override
     public List<? extends MemberSignupResponse> list() {
-        return repository.list();
+        return repository.findAll();
     }
 
     @Override
     public MemberSignupResponse getById(String id) {
-        return repository.getById(id);
+        return repository.findById(id).orElseThrow(() -> new MemberSignupResponseNotFound(id));
     }
 
     @Override
     public MemberSignupResponse addUpdate(@NonNull MemberSignupResponse newMember) {
-        return repository.addUpdate(newMember);
+        return repository.save(newMember);
     }
 
     @Override
     public boolean delete(@NonNull String id) {
-        return repository.delete(id);
+        return repository.deleteById(id);
     }
 
     @Override
@@ -48,13 +63,64 @@ public class MemberSignupResponseServiceMock implements MemberSignupResponseServ
     }
 
     @Override
-    public List<? extends MemberSignupResponse> listByUser(String phone) {
-        return repository.listByUser(phone);
+    public List<? extends MemberSignupResponse> listByUser(String phone, SignupQueryScope scope) {
+        final List<? extends MemberSignupResponse> memberResponses = repository.listByUser(phone);
+
+        final Member member = memberRepository.findByPhone(phone).orElseThrow(() -> new MemberNotFound(phone));
+        final List<? extends Signup> signups = signupRepository.findSignupsByScope(scope);
+
+        final Predicate<? super Signup> signupNoResponse = (Signup signup) -> {
+            final Stream<String> signupIds = memberResponses.stream().map((response) -> response.getSignup().getId());
+
+            return signupIds.noneMatch((id) -> id.equals(signup.getId()));
+        };
+
+        final List<? extends MemberSignupResponse> memberNoResponse = signups
+                .stream()
+                .filter(signupNoResponse)
+                .map(createMemberNoResponse(member))
+                .toList();
+
+        return concat(memberResponses.stream(), memberNoResponse.stream()).toList();
+    }
+
+    protected Function<SignupRef, MemberSignupResponse> createMemberNoResponse(MemberRef member) {
+        return (SignupRef signup) -> (MemberSignupResponse) new SimpleMemberSignupResponse(signup.getId() + "-" + member.getId())
+                .withSignup(signup)
+                .withMember(member);
     }
 
     @Override
     public List<? extends MemberSignupResponse> listBySignup(String id) {
-        return repository.listBySignup(id);
+        final List<? extends MemberSignupResponse> signupResponses = repository.listBySignup(id);
+
+        final Signup signup = signupRepository.findById(id).orElseThrow(() -> new SignupNotFound(id));
+        final List<? extends Member> members = memberRepository.findAll();
+
+        final Predicate<Member> memberNoResponse = (Member member) -> {
+            final Stream<String> memberIds = signupResponses.stream().map((response) -> response.getMember().getId());
+
+            return memberIds.noneMatch((phone) -> phone.equals(member.getId()));
+        };
+
+        final List<? extends MemberSignupResponse> signupNoResponse = members
+                .stream()
+                .filter(memberNoResponse)
+                .map(createSignupNoResponse(signup))
+                .toList();
+
+        return concat(signupResponses.stream(), signupNoResponse.stream()).toList();
+    }
+
+    @Override
+    public Optional<? extends MemberSignupResponse> getSignupResponseForUser(String signupId, String phone) {
+        return repository.findForSignupAndMember(signupId, phone);
+    }
+
+    protected Function<MemberRef, MemberSignupResponse> createSignupNoResponse(SignupRef signup) {
+        return (MemberRef member) -> (MemberSignupResponse) new SimpleMemberSignupResponse(signup.getId() + "-" + member.getId())
+                .withSignup(signup)
+                .withMember(member);
     }
 
     @Override
@@ -69,12 +135,12 @@ public class MemberSignupResponseServiceMock implements MemberSignupResponseServ
 
     @Override
     public MemberSignupResponse checkIn(String id) {
-        return repository.checkIn(id);
+        return repository.checkIn(id).orElseThrow(() -> new MemberSignupResponseNotFound(id));
     }
 
     @Override
     public MemberSignupResponse removeCheckIn(String id) {
-        return repository.removeCheckIn(id);
+        return repository.removeCheckIn(id).orElseThrow(() -> new MemberSignupResponseNotFound(id));
     }
 
     @Override

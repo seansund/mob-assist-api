@@ -2,7 +2,9 @@ package com.dex.mobassist.server.model;
 
 import lombok.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public interface Member extends MemberRef {
     String getFirstName();
@@ -18,7 +20,9 @@ public interface Member extends MemberRef {
     void setFirstName(String firstName);
 
     default <T extends Member> T withFirstName(String firstName) {
-        setFirstName(firstName);
+        if (Objects.nonNull(firstName)) {
+            setFirstName(firstName);
+        }
 
         return (T) this;
     }
@@ -26,7 +30,9 @@ public interface Member extends MemberRef {
     void setLastName(String lastName);
 
     default <T extends Member> T withLastName(String lastName) {
-        setFirstName(lastName);
+        if (Objects.nonNull(lastName)) {
+            setLastName(lastName);
+        }
 
         return (T) this;
     }
@@ -34,7 +40,9 @@ public interface Member extends MemberRef {
     void setPhone(String phone);
 
     default <T extends Member> T withPhone(@NonNull String phone) {
-        setPhone(phone);
+        if (Objects.nonNull(phone)) {
+            setPhone(phone);
+        }
 
         return (T) this;
     }
@@ -42,7 +50,9 @@ public interface Member extends MemberRef {
     void setEmail(String email);
 
     default <T extends Member> T withEmail(String email) {
-        setEmail(email);
+        if (Objects.nonNull(email)) {
+            setEmail(email);
+        }
 
         return (T) this;
     }
@@ -50,7 +60,9 @@ public interface Member extends MemberRef {
     void setPreferredContact(String preferredContact);
 
     default <T extends Member> T withPreferredContact(String preferredContact) {
-        setPreferredContact(preferredContact);
+        if (Objects.nonNull(preferredContact)) {
+            setPreferredContact(preferredContact);
+        }
 
         return (T) this;
     }
@@ -60,9 +72,10 @@ public interface Member extends MemberRef {
     void setRoles(List<? extends MemberRoleRef> roles);
 
     default <T extends Member> T withRoles(List<? extends MemberRoleRef> roles) {
-        setRoles(roles);
+        if (Objects.nonNull(roles)) {
+            setRoles(roles);
+        }
 
         return (T) this;
     }
-
 }

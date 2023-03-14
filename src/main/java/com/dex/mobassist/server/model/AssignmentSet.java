@@ -1,24 +1,29 @@
 package com.dex.mobassist.server.model;
 
 import java.util.List;
+import java.util.Objects;
 
 public interface AssignmentSet extends AssignmentSetRef {
     String getName();
 
-    List<? extends Assignment> getAssignments();
+    List<? extends AssignmentRef> getAssignments();
 
     void setName(String name);
 
-    void setAssignments(List<? extends Assignment> assignments);
+    void setAssignments(List<? extends AssignmentRef> assignments);
 
     default <T extends AssignmentSet> T withName(String name) {
-        setName(name);
+        if (Objects.nonNull(name)) {
+            setName(name);
+        }
 
         return (T) this;
     }
 
-    default <T extends AssignmentSet> T withAssignments(List<? extends Assignment> assignments) {
-        setAssignments(assignments);
+    default <T extends AssignmentSet> T withAssignments(List<? extends AssignmentRef> assignments) {
+        if (Objects.nonNull(assignments)) {
+            setAssignments(assignments);
+        }
 
         return (T) this;
     }

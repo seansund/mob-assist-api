@@ -1,5 +1,6 @@
 package com.dex.mobassist.server.repository.mock;
 
+import com.dex.mobassist.server.exceptions.EntityNotFound;
 import com.dex.mobassist.server.repository.BaseRepository;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
@@ -22,21 +23,20 @@ public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
     }
 
     @Override
-    public List<? extends T> list() {
+    public List<? extends T> findAll() {
         return subject.getValue();
     }
 
     @Override
-    public <A extends T> A getById(@NonNull String id) {
-        return (A) subject.getValue()
+    public <A extends T> Optional<? extends A> findById(@NonNull String id) {
+        return (Optional<? extends A>) subject.getValue()
                 .stream()
                 .filter(compareById(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Value not found: " + id));
+                .findFirst();
     }
 
     @Override
-    public <A extends T> A addUpdate(@NonNull A newValue) {
+    public <A extends T> A save(@NonNull A newValue) {
         final List<? extends T> values = subject.getValue();
 
         final Predicate<? super T> matchExisting = compareById(getId(newValue));
@@ -56,7 +56,7 @@ public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
     }
 
     @Override
-    public boolean delete(@NonNull String id) {
+    public boolean deleteById(@NonNull String id) {
         final List<? extends T> values = subject.getValue();
 
         final List<? extends T> result = values
@@ -81,8 +81,16 @@ public abstract class AbstractRepositoryMock<T> implements BaseRepository<T> {
         subject.onNext(preOnList(value));
     }
 
-    protected <A extends T> Predicate<A> compareById(@NonNull String id) {
-        return  (A set) -> id.equals(getId(set));
+    protected <A extends T> Predicate<A> compareById(String id) {
+        return  (A set) -> {
+            if (id == null && getId(set) == null) {
+                return true;
+            } else if (id != null) {
+                return id.equals(getId(set));
+            } else {
+                return false;
+            }
+        };
     }
 
     protected List<? extends T> preOnList(List<? extends T> value) {

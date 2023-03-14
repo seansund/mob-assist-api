@@ -1,24 +1,19 @@
 package com.dex.mobassist.server.service;
 
 import com.dex.mobassist.server.model.Member;
+import com.dex.mobassist.server.model.MemberRole;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
 
 import java.util.List;
 
 public interface MemberService extends BaseService<Member> {
-    @Override
-    List<? extends Member> list();
 
-    @Override
-    Member getById(String id);
+    Member findByPhone(String phone);
 
-    @Override
-    Member addUpdate(@NonNull Member newMember);
+    List<? extends MemberRole> listRoles();
 
-    @Override
-    boolean delete(@NonNull String id);
+    MemberRole addUpdateMemberRole(MemberRole role);
 
-    @Override
-    Observable<List<? extends Member>> observable();
+    boolean removeRole(@NonNull String id);
 }

@@ -10,9 +10,13 @@ public enum SignupQueryScope {
     future;
 
     public static SignupQueryScope lookup(String scope) {
+        return lookup(scope, SignupQueryScope.upcoming);
+    }
+
+    public static SignupQueryScope lookup(String scope, SignupQueryScope defaultScope) {
         return stream(values())
                 .filter((SignupQueryScope scopeVal) -> scopeVal.name().equals(scope))
                 .findFirst()
-                .orElse(SignupQueryScope.upcoming);
+                .orElse(defaultScope);
     }
 }

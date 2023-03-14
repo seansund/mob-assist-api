@@ -1,13 +1,17 @@
 package com.dex.mobassist.server.model;
 
+import com.dex.mobassist.server.exceptions.UnableToParseDate;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.SortedMap;
 
 public interface Signup extends SignupRef {
-    static final DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    static final String dateFormatPattern = "MM/dd/yyyy";
+    static final DateFormat dateFormat = new SimpleDateFormat(dateFormatPattern);
 
     Date getDate();
 
@@ -26,18 +30,22 @@ public interface Signup extends SignupRef {
         try {
             setDate(dateFormat.parse(dateString));
         } catch (Exception ex) {
-            throw new RuntimeException("Unable to parse date: " + dateString);
+            throw new UnableToParseDate(dateFormatPattern, dateString);
         }
     }
 
     default <T extends Signup> T withDate(Date date) {
-        setDate(date);
+        if (Objects.nonNull(date)) {
+            setDate(date);
+        }
 
         return (T) this;
     }
 
     default <T extends Signup> T withDate(String date) {
-        setDate(date);
+        if (Objects.nonNull(date)) {
+            setDate(date);
+        }
 
         return (T) this;
     }
@@ -45,7 +53,9 @@ public interface Signup extends SignupRef {
     void setTitle(String title);
 
     default <T extends Signup> T withTitle(String title) {
-        setTitle(title);
+        if (Objects.nonNull(title)) {
+            setTitle(title);
+        }
 
         return (T) this;
     }
@@ -53,7 +63,9 @@ public interface Signup extends SignupRef {
     void setDescription(String description);
 
     default <T extends Signup> T withDescription(String description) {
-        setDescription(description);
+        if (Objects.nonNull(description)) {
+            setDescription(description);
+        }
 
         return (T) this;
     }
@@ -61,7 +73,9 @@ public interface Signup extends SignupRef {
     void setResponses(List<? extends SignupOptionResponse> responses);
 
     default <T extends Signup> T withResponses(List<? extends SignupOptionResponse> responses) {
-        setResponses(responses);
+        if (Objects.nonNull(responses)) {
+            setResponses(responses);
+        }
 
         return (T) this;
     }
@@ -69,7 +83,9 @@ public interface Signup extends SignupRef {
     void setAssignments(AssignmentSetRef assignments);
 
     default <T extends Signup> T withAssignments(AssignmentSetRef assignments) {
-        setAssignments(assignments);
+        if (Objects.nonNull(assignments)) {
+            setAssignments(assignments);
+        }
 
         return (T) this;
     }
@@ -77,7 +93,9 @@ public interface Signup extends SignupRef {
     void setOptions(SignupOptionSetRef options);
 
     default <T extends Signup> T withOptions(SignupOptionSetRef options) {
-        setOptions(options);
+        if (Objects.nonNull(options)) {
+            setOptions(options);
+        }
 
         return (T) this;
     }

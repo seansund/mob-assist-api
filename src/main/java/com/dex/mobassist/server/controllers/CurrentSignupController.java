@@ -1,7 +1,10 @@
 package com.dex.mobassist.server.controllers;
 
+import com.dex.mobassist.server.cargo.MemberCargo;
+import com.dex.mobassist.server.cargo.MemberSignupResponseCargo;
 import com.dex.mobassist.server.model.*;
 import com.dex.mobassist.server.service.*;
+import jakarta.websocket.server.PathParam;
 import lombok.NonNull;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,23 +16,29 @@ import java.util.Optional;
 @RequestMapping("/signup")
 public class CurrentSignupController {
     private final SignupService service;
+    private final SignupOptionService optionService;
     private final SignupOptionSetService optionSetService;
     private final MemberSignupResponseService memberSignupResponseService;
     private final MemberService memberService;
     private final AssignmentSetService assignmentSetService;
+    private final AssignmentService assignmentService;
 
     public CurrentSignupController(
             SignupService service,
+            SignupOptionService optionService,
             SignupOptionSetService optionSetService,
             MemberSignupResponseService memberSignupResponseService,
             MemberService memberService,
-            AssignmentSetService assignmentSetService
+            AssignmentSetService assignmentSetService,
+            AssignmentService assignmentService
     ) {
         this.service = service;
+        this.optionService = optionService;
         this.optionSetService = optionSetService;
         this.memberSignupResponseService = memberSignupResponseService;
         this.memberService = memberService;
         this.assignmentSetService = assignmentSetService;
+        this.assignmentService = assignmentService;
     }
 
     @GetMapping("/current")
@@ -54,9 +63,20 @@ public class CurrentSignupController {
         return memberSignupResponseService.listBySignup(signup.getId());
     }
 
+    @GetMapping("/current/responses/{phone}")
+    public Object getCurrentResponseForUser(@PathVariable String phone) {
+        final Signup signup = service.getCurrent();
+
+        final Optional<? extends MemberSignupResponse> result = memberSignupResponseService.getSignupResponseForUser(signup.getId(), phone);
+
+        return result.orElseGet(() -> new MemberSignupResponseCargo(signup.getId() + "-" + phone).withSignup(signup).withMember(new MemberCargo(phone).withPhone(phone)));
+    }
+
     @GetMapping("/current/respond")
     public MemberSignupResponse respondToCurrent(@RequestParam @NonNull String phone, @RequestParam("option") @NonNull String optionValue) {
         final Signup signup = service.getCurrent();
+
+        // TODO this logic should all be pushed down to the service
         final List<? extends SignupOption> options = getSignupOptions(signup);
 
         final Optional<? extends SignupOption> selectedOption = options
@@ -75,23 +95,37 @@ public class CurrentSignupController {
 
     protected List<? extends SignupOption> getSignupOptions(@NonNull Signup signup) {
         final SignupOptionSetRef optionSetRef = signup.getOptions();
-        if (optionSetRef instanceof SignupOptionSet) {
-            return ((SignupOptionSet)optionSetRef).getOptions();
+
+        final List<? extends SignupOptionRef> optionRefs = (optionSetRef instanceof SignupOptionSet)
+                ? ((SignupOptionSet)optionSetRef).getOptions()
+                : optionSetService.getById(optionSetRef.getId()).getOptions();
+
+        return getSignupOptions(optionRefs);
+    }
+
+    protected List<? extends SignupOption> getSignupOptions(@NonNull List<? extends SignupOptionRef> optionRefs) {
+        if (optionRefs.stream().allMatch(ref -> ref instanceof SignupOption)) {
+            return optionRefs.stream().map(ref -> (SignupOption) ref).toList();
         }
 
-        final SignupOptionSet optionSet = optionSetService.getById(optionSetRef.getId());
-
-        return optionSet.getOptions();
+        return optionService.findAllById(optionRefs.stream().map(ModelRef::getId).toList());
     }
 
     protected List<? extends Assignment> getAssignments(@NonNull Signup signup) {
         final AssignmentSetRef assignmentSetRef = signup.getAssignments();
-        if (assignmentSetRef instanceof AssignmentSet) {
-            return ((AssignmentSet)assignmentSetRef).getAssignments();
+
+        final List<? extends AssignmentRef> assignmentRefs = (assignmentSetRef instanceof AssignmentSet)
+                ? ((AssignmentSet)assignmentSetRef).getAssignments()
+                : assignmentSetService.getById(assignmentSetRef.getId()).getAssignments();
+
+        return getAssignments(assignmentRefs);
+    }
+
+    protected List<? extends Assignment> getAssignments(@NonNull List<? extends AssignmentRef> assignmentRefs) {
+        if (assignmentRefs.stream().allMatch(ref -> ref instanceof Assignment)) {
+            return assignmentRefs.stream().map(ref -> (Assignment) ref).toList();
         }
 
-        final AssignmentSet assignmentSet = assignmentSetService.getById(assignmentSetRef.getId());
-
-        return assignmentSet.getAssignments();
+        return assignmentService.findAllById(assignmentRefs.stream().map(ModelRef::getId).toList());
     }
 }

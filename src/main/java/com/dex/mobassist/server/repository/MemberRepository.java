@@ -1,10 +1,9 @@
 package com.dex.mobassist.server.repository;
 
 import com.dex.mobassist.server.model.Member;
-import io.reactivex.rxjava3.core.Observable;
-import lombok.NonNull;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface MemberRepository extends BaseRepository<Member> {
+    Optional<? extends Member> findByPhone(String phone);
 }

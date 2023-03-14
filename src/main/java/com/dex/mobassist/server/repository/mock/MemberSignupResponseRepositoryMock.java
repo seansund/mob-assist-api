@@ -1,10 +1,15 @@
 package com.dex.mobassist.server.repository.mock;
 
-import com.dex.mobassist.server.model.*;
-import com.dex.mobassist.server.model.simple.SimpleMemberSignupResponse;
+import com.dex.mobassist.server.exceptions.MemberPhoneNotFound;
+import com.dex.mobassist.server.exceptions.SignupNotFound;
+import com.dex.mobassist.server.model.Member;
+import com.dex.mobassist.server.model.MemberSignupResponse;
+import com.dex.mobassist.server.model.Signup;
+import com.dex.mobassist.server.model.SignupOption;
 import com.dex.mobassist.server.repository.MemberRepository;
 import com.dex.mobassist.server.repository.MemberSignupResponseRepository;
 import com.dex.mobassist.server.repository.SignupRepository;
+import com.dex.mobassist.server.repository.mock.domain.SimpleMemberSignupResponse;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
 import org.springframework.context.annotation.Profile;
@@ -24,12 +29,9 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
     private final MemberRepository memberRepository;
     private final SignupRepository signupRepository;
 
-    private final ModelFactory factory;
-
-    public MemberSignupResponseRepositoryMock(MemberRepository memberRepository, SignupRepository signupRepository, ModelFactory factory) {
+    public MemberSignupResponseRepositoryMock(MemberRepository memberRepository, SignupRepository signupRepository) {
         this.memberRepository = memberRepository;
         this.signupRepository = signupRepository;
-        this.factory = factory;
     }
 
     @Override
@@ -46,64 +48,29 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
 
     @Override
     public List<? extends MemberSignupResponse> listByUser(String phone) {
-        return listByUser(phone, true);
-    }
-
-    public List<? extends MemberSignupResponse> listByUser(String phone, boolean fill) {
-        final Member member = memberRepository.getById(phone);
-        final List<? extends Signup> signups = signupRepository.list(SignupQueryScope.future);
-
-        final List<? extends MemberSignupResponse> memberResponses = list()
+        final List<? extends MemberSignupResponse> memberResponses = findAll()
                 .stream()
                 .filter((MemberSignupResponse res) -> res.getMember().getId().equals(phone))
                 .toList();
 
-        final Predicate<? super Signup> signupNoResponse = (Signup signup) -> {
-            final Stream<String> signupIds = memberResponses.stream().map((response) -> response.getSignup().getId());
-
-            return signupIds.noneMatch((id) -> id.equals(signup.getId()));
-        };
-
-        if (!fill) {
-            return memberResponses;
-        }
-
-        final List<? extends MemberSignupResponse> memberNoResponse = signups
-                .stream()
-                .filter(signupNoResponse)
-                .map((signup) -> (MemberSignupResponse) factory.createMemberSignupResponse(signup.getId() + "-" + member.getId()).withSignup(signup).withMember(member))
-                .toList();
-
-        return concat(memberResponses.stream(), memberNoResponse.stream()).toList();
+        return memberResponses;
     }
 
     @Override
     public List<? extends MemberSignupResponse> listBySignup(String id) {
-        final Signup signup = signupRepository.getById(id);
-        final List<? extends Member> members = memberRepository.list();
 
-        final List<? extends MemberSignupResponse> signupResponses = list()
+        return findAll()
                 .stream()
                 .filter((MemberSignupResponse res) -> res.getSignup().getId().equals(id))
                 .toList();
+    }
 
-        final Predicate<Member> memberNoResponse = (Member member) -> {
-            final Stream<String> memberIds = signupResponses.stream().map((response) -> response.getMember().getId());
-
-            return memberIds.noneMatch((phone) -> phone.equals(member.getId()));
-        };
-
-        final List<? extends MemberSignupResponse> signupNoResponse = members
+    @Override
+    public Optional<? extends MemberSignupResponse> findForSignupAndMember(String id, String phone) {
+        return findAll()
                 .stream()
-                .filter(memberNoResponse)
-                .map((member) -> (MemberSignupResponse) factory.createMemberSignupResponse("").withSignup(signup).withMember(member))
-                .toList();
-
-        final List<? extends MemberSignupResponse> result = concat(signupResponses.stream(), signupNoResponse.stream()).toList();
-
-        System.out.println("Signup responses for " + id + ": " + result.stream().map((resp) -> resp.getMember().getId() + "-" + resp.getSelectedOption()).toList());
-
-        return result;
+                .filter((resp) -> resp.getSignup().getId().equals(id) && resp.getMember().getId().equals(phone))
+                .findFirst();
     }
 
     @Override
@@ -123,26 +90,8 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
     }
 
     @Override
-    public MemberSignupResponse checkIn(@NonNull String id) {
-        final SimpleMemberSignupResponse response = getById(id);
-
-        response.setCheckedIn(true);
-
-        return response;
-    }
-
-    @Override
-    public MemberSignupResponse removeCheckIn(@NonNull String id) {
-        final SimpleMemberSignupResponse response = getById(id);
-
-        response.setCheckedIn(false);
-
-        return response;
-    }
-
-    @Override
     public MemberSignupResponse signUp(@NonNull Signup signup, @NonNull Member member, @NonNull SignupOption option) {
-        final List<? extends MemberSignupResponse> responses = listByUser(member.getPhone(), false);
+        final List<? extends MemberSignupResponse> responses = listByUser(member.getPhone());
 
         final Optional<? extends MemberSignupResponse> response = responses
                 .stream()
@@ -156,7 +105,7 @@ public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<M
                 })
                 .orElseGet(() -> {
                     System.out.println("Adding new response");
-                    return addUpdate(factory.createMemberSignupResponse("").withSignup(signup).withMember(member).withSelectedOption(option));
+                    return save(new SimpleMemberSignupResponse("").withSignup(signup).withMember(member).withSelectedOption(option));
                 });
     }
 }

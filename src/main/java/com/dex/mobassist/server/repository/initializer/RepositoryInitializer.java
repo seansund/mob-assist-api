@@ -1,8 +1,7 @@
 package com.dex.mobassist.server.repository.initializer;
 
+import com.dex.mobassist.server.cargo.*;
 import com.dex.mobassist.server.model.*;
-import com.dex.mobassist.server.model.simple.SimpleAssignmentSet;
-import com.dex.mobassist.server.model.simple.SimpleMember;
 import com.dex.mobassist.server.repository.*;
 import lombok.NonNull;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -18,7 +17,6 @@ import java.util.stream.Stream;
 @Profile("initialize")
 public class RepositoryInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
-    private final ModelFactory modelFactory;
     private final SignupRepository signupRepository;
     private final AssignmentSetRepository assignmentSetRepository;
     private final SignupOptionSetRepository signupOptionSetRepository;
@@ -28,7 +26,6 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
     private final MemberRoleRepository memberRoleRepository;
 
     public RepositoryInitializer(
-            ModelFactory modelFactory,
             SignupRepository signupRepository,
             AssignmentSetRepository assignmentSetRepository,
             SignupOptionSetRepository signupOptionSetRepository,
@@ -37,7 +34,6 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
             MemberRepository memberRepository,
             MemberRoleRepository memberRoleRepository
     ) {
-        this.modelFactory = modelFactory;
         this.signupRepository = signupRepository;
         this.assignmentSetRepository = assignmentSetRepository;
         this.signupOptionSetRepository = signupOptionSetRepository;
@@ -49,6 +45,8 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
 
     @Override
     public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+        System.out.println("Initializing database");
+
         initializeAssignmentRepository(assignmentRepository);
         initializeAssignmentSetRepository(assignmentSetRepository);
 
@@ -58,10 +56,12 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
         initializeSignupOptionRepository(signupOptionRepository);
         initializeSignupOptionSetRepository(signupOptionSetRepository);
         initializeSignupRepository(signupRepository);
+
+        System.out.println("Database initialization complete!");
     }
 
     protected Assignment createAssignment(String name, String group, int row) {
-        return modelFactory.createAssignment("")
+        return new AssignmentCargo()
                 .withName(name)
                 .withGroup(group)
                 .withRow(row);
@@ -102,12 +102,12 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
                         createAssignment("Table 5", "J31", 3),
                         createAssignment("Table 5", "J32", 3)
                 )
-                .forEach(repository::addUpdate);
+                .forEach(repository::save);
 
     }
 
     protected AssignmentSet createAssignmentSet(String name, List<? extends Assignment> assignments) {
-        return modelFactory.createAssignmentSet("")
+        return new AssignmentSetCargo()
                 .withName(name)
                 .withAssignments(assignments);
     }
@@ -117,14 +117,14 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
         Stream.of(
                         createAssignmentSet(
                                 "basic",
-                                assignmentRepository.list()
+                                assignmentRepository.findAll()
                         )
                 )
-                .forEach(repository::addUpdate);
+                .forEach(repository::save);
     }
 
     protected Signup createSignup(String date, String title, AssignmentSet assignmentSet, SignupOptionSet options) {
-        return modelFactory.createSignup("")
+        return new SignupCargo()
                 .withDate(date)
                 .withTitle(title)
                 .withAssignments(assignmentSet)
@@ -134,8 +134,8 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
     protected void initializeSignupRepository(SignupRepository repository) {
 
         final String title = "Communion";
-        final AssignmentSet assignmentSet = assignmentSetRepository.list().stream().findFirst().orElseThrow();
-        final SignupOptionSet options = signupOptionSetRepository.list().stream().findFirst().orElseThrow();
+        final AssignmentSet assignmentSet = assignmentSetRepository.findAll().stream().findFirst().orElseThrow();
+        final SignupOptionSet options = signupOptionSetRepository.findAll().stream().findFirst().orElseThrow();
 
         Stream.of(
                 createSignup("02/19/2023", title, assignmentSet, options),
@@ -151,47 +151,47 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
                 createSignup("12/17/2023", title, assignmentSet, options),
                 createSignup("01/21/2024", title, assignmentSet, options)
         )
-                .forEach(repository::addUpdate);
+                .forEach(repository::save);
     }
 
     protected SignupOptionSet createSignupOptionSet(String name, List<? extends SignupOption> options) {
-        return modelFactory.createSignupOptionSet("")
+        return new SignupOptionSetCargo()
                 .withName(name)
                 .withOptions(options);
     }
 
     protected void initializeSignupOptionSetRepository(SignupOptionSetRepository repository) {
         Stream.of(
-                        createSignupOptionSet("service", signupOptionRepository.list())
+                        createSignupOptionSet("service", signupOptionRepository.findAll())
                 )
-                .forEach(repository::addUpdate);
+                .forEach(repository::save);
     }
 
-    protected SignupOption createSignupOption(@NonNull String value) {
-        return createSignupOption(value, false);
+    protected SignupOption createSignupOption(@NonNull String value, @NonNull Integer sortIndex) {
+        return createSignupOption(value, sortIndex, false);
     }
 
     protected SignupOption createSignupOption(@NonNull String value, boolean declineOption) {
-        return modelFactory.createSignupOption("")
+        return createSignupOption(value, 10000, declineOption);
+    }
+
+    protected SignupOption createSignupOption(@NonNull String value, @NonNull Integer sortIndex, boolean declineOption) {
+        return new SignupOptionCargo()
                 .withValue(value)
                 .withDeclineOption(declineOption);
     }
 
     protected void initializeSignupOptionRepository(SignupOptionRepository repository) {
         Stream.of(
-                        createSignupOption("9am"),
-                        createSignupOption("10:30am"),
+                        createSignupOption("9am", 900),
+                        createSignupOption("10:30am", 1030),
                         createSignupOption("No", true)
                 )
-                .forEach(repository::addUpdate);
-    }
-
-    protected Member createMember(@NonNull String phone, String firstName, String lastName, String email, String preferredContact) {
-        return createMember(phone, firstName, lastName, email, preferredContact, new ArrayList<>());
+                .forEach(repository::save);
     }
 
     protected Member createMember(@NonNull String phone, String firstName, String lastName, String email, String preferredContact, List<? extends MemberRole> roles) {
-        return modelFactory.createMember(phone)
+        return new MemberCargo(phone)
                 .withPhone(phone)
                 .withEmail(email)
                 .withFirstName(firstName)
@@ -201,7 +201,7 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
     }
 
     protected MemberRole createMemberRole(String name) {
-        return modelFactory.createMemberRole(name)
+        return new MemberRoleCargo()
                 .withName(name);
     }
 
@@ -210,17 +210,17 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
                 createMemberRole("user"),
                 createMemberRole("admin")
         )
-                .forEach(repository::addUpdate);
+                .forEach(repository::save);
     }
 
     protected void initializeMemberRepository(MemberRepository repository) {
-        final List<? extends MemberRole> allRoles = memberRoleRepository.list();
+        final List<? extends MemberRole> allRoles = memberRoleRepository.findAll();
         final List<? extends MemberRole> roles = allRoles.stream().filter((role) -> role.getName().equals("user")).toList();
 
         Stream.of(
                         createMember("5126535564", "Sean", "Sundberg", "seansund@gmail.com", "text", allRoles),
                         createMember("5128977929", "Harry", "Sundberg", "hasundberg@yahoo.com", "text", roles)
                 )
-                .forEach(repository::addUpdate);
+                .forEach(repository::save);
     }
 }
