@@ -5,6 +5,8 @@ import java.util.Objects;
 public interface SignupOption extends SignupOptionRef {
     String getValue();
 
+    String getShortName();
+
     Boolean getDeclineOption();
 
     Integer getSortIndex();
@@ -14,6 +16,16 @@ public interface SignupOption extends SignupOptionRef {
     default <T extends SignupOption> T withValue(String value) {
         if (Objects.nonNull(value)) {
             setValue(value);
+        }
+
+        return (T) this;
+    }
+
+    void setShortName(String shortName);
+
+    default <T extends SignupOption> T withShortName(String shortName) {
+        if (Objects.nonNull(shortName)) {
+            setShortName(shortName);
         }
 
         return (T) this;

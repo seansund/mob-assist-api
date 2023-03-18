@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class SignupOptionCargo extends SignupOptionRefCargo implements SignupOption {
     private String value;
+    private String shortName;
     private Boolean declineOption;
     private Integer sortIndex;
 

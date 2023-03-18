@@ -1,4 +1,4 @@
-package com.dex.mobassist.server.service.mock;
+package com.dex.mobassist.server.service.base;
 
 import com.dex.mobassist.server.exceptions.MemberNotFound;
 import com.dex.mobassist.server.exceptions.MemberSignupResponseNotFound;
@@ -22,12 +22,12 @@ import java.util.stream.Stream;
 import static java.util.stream.Stream.concat;
 
 @Service("MemberSignupResponseService")
-public class MemberSignupResponseServiceMock implements MemberSignupResponseService {
+public class MemberSignupResponseServiceBase implements MemberSignupResponseService {
     private final MemberSignupResponseRepository repository;
     private final SignupRepository signupRepository;
     private final MemberRepository memberRepository;
 
-    public MemberSignupResponseServiceMock(
+    public MemberSignupResponseServiceBase(
             MemberSignupResponseRepository repository,
             SignupRepository signupRepository,
             MemberRepository memberRepository
@@ -92,7 +92,16 @@ public class MemberSignupResponseServiceMock implements MemberSignupResponseServ
 
     @Override
     public List<? extends MemberSignupResponse> listBySignup(String id) {
+        return listBySignup(id, true);
+    }
+
+    @Override
+    public List<? extends MemberSignupResponse> listBySignup(String id, boolean fill) {
         final List<? extends MemberSignupResponse> signupResponses = repository.listBySignup(id);
+
+        if (!fill) {
+            return signupResponses;
+        }
 
         final Signup signup = signupRepository.findById(id).orElseThrow(() -> new SignupNotFound(id));
         final List<? extends Member> members = memberRepository.findAll();

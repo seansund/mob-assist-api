@@ -10,6 +10,7 @@ import lombok.NonNull;
 public class SimpleSignupOption extends SimpleSignupOptionRef implements SignupOption {
     @NonNull
     private String value = "";
+    private String shortName = "";
     private Boolean declineOption = false;
     private Integer sortIndex = 0;
 

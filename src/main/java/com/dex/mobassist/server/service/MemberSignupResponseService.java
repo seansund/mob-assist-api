@@ -12,6 +12,7 @@ public interface MemberSignupResponseService extends BaseService<MemberSignupRes
     List<? extends MemberSignupResponse> listByUser(String phone, SignupQueryScope scope);
 
     List<? extends MemberSignupResponse> listBySignup(String id);
+    List<? extends MemberSignupResponse> listBySignup(String id, boolean fill);
 
     Optional<? extends MemberSignupResponse> getSignupResponseForUser(String signupId, String phone);
 

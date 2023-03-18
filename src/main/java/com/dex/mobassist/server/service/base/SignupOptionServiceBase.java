@@ -1,4 +1,4 @@
-package com.dex.mobassist.server.service.mock;
+package com.dex.mobassist.server.service.base;
 
 import com.dex.mobassist.server.exceptions.SignupOptionNotFound;
 import com.dex.mobassist.server.model.SignupOption;
@@ -6,16 +6,15 @@ import com.dex.mobassist.server.repository.SignupOptionRepository;
 import com.dex.mobassist.server.service.SignupOptionService;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service("SignupOptionService")
-public class SignupOptionServiceMock implements SignupOptionService {
+public class SignupOptionServiceBase implements SignupOptionService {
     private final SignupOptionRepository repository;
 
-    public SignupOptionServiceMock(SignupOptionRepository repository) {
+    public SignupOptionServiceBase(SignupOptionRepository repository) {
         this.repository = repository;
     }
 

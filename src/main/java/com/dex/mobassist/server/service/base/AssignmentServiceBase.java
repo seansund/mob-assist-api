@@ -1,4 +1,4 @@
-package com.dex.mobassist.server.service.mock;
+package com.dex.mobassist.server.service.base;
 
 import com.dex.mobassist.server.exceptions.AssignmentNotFound;
 import com.dex.mobassist.server.model.Assignment;
@@ -6,16 +6,15 @@ import com.dex.mobassist.server.repository.AssignmentRepository;
 import com.dex.mobassist.server.service.AssignmentService;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service("AssignmentService")
-public class AssignmentServiceMock implements AssignmentService {
+public class AssignmentServiceBase implements AssignmentService {
     private final AssignmentRepository repository;
 
-    public AssignmentServiceMock(AssignmentRepository repository) {
+    public AssignmentServiceBase(AssignmentRepository repository) {
         this.repository = repository;
     }
 

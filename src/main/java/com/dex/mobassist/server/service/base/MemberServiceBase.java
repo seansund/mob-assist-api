@@ -1,26 +1,24 @@
-package com.dex.mobassist.server.service.mock;
+package com.dex.mobassist.server.service.base;
 
 import com.dex.mobassist.server.exceptions.MemberNotFound;
 import com.dex.mobassist.server.exceptions.MemberPhoneNotFound;
 import com.dex.mobassist.server.model.Member;
 import com.dex.mobassist.server.model.MemberRole;
-import com.dex.mobassist.server.model.MemberRoleRef;
 import com.dex.mobassist.server.repository.MemberRepository;
 import com.dex.mobassist.server.repository.MemberRoleRepository;
 import com.dex.mobassist.server.service.MemberService;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service("MemberService")
-public class MemberServiceMock implements MemberService {
+public class MemberServiceBase implements MemberService {
     private final MemberRepository repository;
     private final MemberRoleRepository memberRoleRepository;
 
-    public MemberServiceMock(MemberRepository repository, MemberRoleRepository memberRoleRepository) {
+    public MemberServiceBase(MemberRepository repository, MemberRoleRepository memberRoleRepository) {
         this.repository = repository;
         this.memberRoleRepository = memberRoleRepository;
     }

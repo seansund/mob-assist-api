@@ -17,6 +17,7 @@ import java.util.Objects;
 public class MongoDBSignupOption extends MongoDBSignupOptionRef implements SignupOption {
     @Indexed(unique = true)
     @NonNull private String value = "";
+    @NonNull private String shortName = "";
     @NonNull private Boolean declineOption = false;
     @Indexed
     @NonNull private Integer sortIndex = 0;
@@ -59,6 +60,7 @@ public class MongoDBSignupOption extends MongoDBSignupOptionRef implements Signu
         return this
                 .withValue(signupOption.getValue())
                 .withDeclineOption(signupOption.getDeclineOption())
-                .withSortIndex(signupOption.getSortIndex());
+                .withSortIndex(signupOption.getSortIndex())
+                .withShortName(signupOption.getShortName());
     }
 }

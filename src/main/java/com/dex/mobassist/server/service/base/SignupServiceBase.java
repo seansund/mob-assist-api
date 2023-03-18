@@ -1,4 +1,4 @@
-package com.dex.mobassist.server.service.mock;
+package com.dex.mobassist.server.service.base;
 
 import com.dex.mobassist.server.exceptions.CurrentSignupNotFound;
 import com.dex.mobassist.server.exceptions.SignupNotFound;
@@ -6,24 +6,17 @@ import com.dex.mobassist.server.model.Signup;
 import com.dex.mobassist.server.model.SignupQueryScope;
 import com.dex.mobassist.server.repository.SignupRepository;
 import com.dex.mobassist.server.service.SignupService;
-import com.dex.mobassist.server.util.Dates;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
-import static com.dex.mobassist.server.util.Dates.daysFromToday;
-import static com.dex.mobassist.server.util.Dates.yesterday;
-
 @Service("SignupService")
-public class SignupServiceMock implements SignupService {
+public class SignupServiceBase implements SignupService {
     private final SignupRepository repository;
 
-    public SignupServiceMock(SignupRepository repository) {
+    public SignupServiceBase(SignupRepository repository) {
         this.repository = repository;
     }
 

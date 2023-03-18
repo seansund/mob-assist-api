@@ -167,24 +167,25 @@ public class RepositoryInitializer implements ApplicationListener<ApplicationRea
                 .forEach(repository::save);
     }
 
-    protected SignupOption createSignupOption(@NonNull String value, @NonNull Integer sortIndex) {
-        return createSignupOption(value, sortIndex, false);
+    protected SignupOption createSignupOption(@NonNull String value, @NonNull String shortName, @NonNull Integer sortIndex) {
+        return createSignupOption(value, shortName, sortIndex, false);
     }
 
     protected SignupOption createSignupOption(@NonNull String value, boolean declineOption) {
-        return createSignupOption(value, 10000, declineOption);
+        return createSignupOption(value, value,10000, declineOption);
     }
 
-    protected SignupOption createSignupOption(@NonNull String value, @NonNull Integer sortIndex, boolean declineOption) {
+    protected SignupOption createSignupOption(@NonNull String value, @NonNull String shortName, @NonNull Integer sortIndex, boolean declineOption) {
         return new SignupOptionCargo()
                 .withValue(value)
-                .withDeclineOption(declineOption);
+                .withDeclineOption(declineOption)
+                .withShortName(shortName);
     }
 
     protected void initializeSignupOptionRepository(SignupOptionRepository repository) {
         Stream.of(
-                        createSignupOption("9am", 900),
-                        createSignupOption("10:30am", 1030),
+                        createSignupOption("9am", "9", 900),
+                        createSignupOption("10:30am", "10:30", 1030),
                         createSignupOption("No", true)
                 )
                 .forEach(repository::save);
