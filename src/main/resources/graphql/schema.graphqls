@@ -44,6 +44,10 @@ type Mutation {
 
     checkIn(id: ID!): MemberSignupResponse
     removeCheckIn(id: ID!): MemberSignupResponse
+
+    sendSignupRequest(id: ID!): NotificationResult
+    sendSignupAssignments(id: ID!): NotificationResult
+    sendSignupCheckin(id: ID!): NotificationResult
 }
 
 type Subscription {
@@ -125,6 +129,11 @@ type MemberRole {
 
 type SimpleResult {
     result: Boolean!
+}
+
+type NotificationResult {
+    type: String!
+    count: Int!
 }
 
 scalar Date

@@ -25,4 +25,6 @@ public interface MemberSignupResponseService extends BaseService<MemberSignupRes
 
     MemberSignupResponse signUp(Signup signup, Member member, SignupOption option);
 
+    MemberSignupResponse signUp(Signup signup, String memberPhone, String optionValue);
+
 }

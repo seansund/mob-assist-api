@@ -1,18 +1,15 @@
 package com.dex.mobassist.server.service.base;
 
-import com.dex.mobassist.server.exceptions.MemberNotFound;
-import com.dex.mobassist.server.exceptions.MemberSignupResponseNotFound;
-import com.dex.mobassist.server.exceptions.SignupNotFound;
+import com.dex.mobassist.server.exceptions.*;
 import com.dex.mobassist.server.model.*;
-import com.dex.mobassist.server.repository.MemberRepository;
-import com.dex.mobassist.server.repository.MemberSignupResponseRepository;
-import com.dex.mobassist.server.repository.SignupRepository;
+import com.dex.mobassist.server.repository.*;
 import com.dex.mobassist.server.repository.mock.domain.SimpleMemberSignupResponse;
 import com.dex.mobassist.server.service.MemberSignupResponseService;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -26,15 +23,21 @@ public class MemberSignupResponseServiceBase implements MemberSignupResponseServ
     private final MemberSignupResponseRepository repository;
     private final SignupRepository signupRepository;
     private final MemberRepository memberRepository;
+    private final SignupOptionSetRepository signupOptionSetRepository;
+    private final SignupOptionRepository signupOptionRepository;
 
     public MemberSignupResponseServiceBase(
             MemberSignupResponseRepository repository,
             SignupRepository signupRepository,
-            MemberRepository memberRepository
+            MemberRepository memberRepository,
+            SignupOptionSetRepository signupOptionSetRepository,
+            SignupOptionRepository signupOptionRepository
     ) {
         this.repository = repository;
         this.signupRepository = signupRepository;
         this.memberRepository = memberRepository;
+        this.signupOptionSetRepository = signupOptionSetRepository;
+        this.signupOptionRepository = signupOptionRepository;
     }
 
     @Override
@@ -156,4 +159,43 @@ public class MemberSignupResponseServiceBase implements MemberSignupResponseServ
     public MemberSignupResponse signUp(Signup signup, Member member, SignupOption option) {
         return repository.signUp(signup, member, option);
     }
+
+    @Override
+    public MemberSignupResponse signUp(Signup signup, String memberPhone, String optionValue) {
+
+        // TODO this logic should all be pushed down to the service
+        final List<? extends SignupOption> options = getSignupOptions(signup);
+
+        final Optional<? extends SignupOption> selectedOption = options
+                .stream()
+                .filter(option -> optionValue.equals(option.getValue()))
+                .findFirst();
+
+        if (selectedOption.isEmpty()) {
+            throw new SignupOptionNotFound(optionValue);
+        }
+
+        final Member member = memberRepository.findByPhone(memberPhone).orElseThrow(() -> new MemberPhoneNotFound(memberPhone));
+
+        return signUp(signup, member, selectedOption.get());
+    }
+
+    protected List<? extends SignupOption> getSignupOptions(@NonNull Signup signup) {
+        final SignupOptionSetRef optionSetRef = signup.getOptions();
+
+        final List<? extends SignupOptionRef> optionRefs = (optionSetRef instanceof SignupOptionSet)
+                ? ((SignupOptionSet)optionSetRef).getOptions()
+                : signupOptionSetRepository.findById(optionSetRef.getId()).map(SignupOptionSet::getOptions).orElseGet(ArrayList::new);
+
+        return getSignupOptions(optionRefs);
+    }
+
+    protected List<? extends SignupOption> getSignupOptions(@NonNull List<? extends SignupOptionRef> optionRefs) {
+        if (optionRefs.stream().allMatch(ref -> ref instanceof SignupOption)) {
+            return optionRefs.stream().map(ref -> (SignupOption) ref).toList();
+        }
+
+        return signupOptionRepository.findAllById(optionRefs.stream().map(ModelRef::getId).toList());
+    }
+
 }

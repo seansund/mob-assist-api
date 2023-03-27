@@ -4,7 +4,6 @@ import com.dex.mobassist.server.cargo.MemberCargo;
 import com.dex.mobassist.server.cargo.MemberSignupResponseCargo;
 import com.dex.mobassist.server.model.*;
 import com.dex.mobassist.server.service.*;
-import jakarta.websocket.server.PathParam;
 import lombok.NonNull;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,21 +75,7 @@ public class CurrentSignupController {
     public MemberSignupResponse respondToCurrent(@RequestParam @NonNull String phone, @RequestParam("option") @NonNull String optionValue) {
         final Signup signup = service.getCurrent();
 
-        // TODO this logic should all be pushed down to the service
-        final List<? extends SignupOption> options = getSignupOptions(signup);
-
-        final Optional<? extends SignupOption> selectedOption = options
-                .stream()
-                .filter(option -> optionValue.equals(option.getValue()))
-                .findFirst();
-
-        if (selectedOption.isEmpty()) {
-            throw new RuntimeException("Unable to find signup option: " + optionValue);
-        }
-
-        final Member member = memberService.getById(phone);
-
-        return memberSignupResponseService.signUp(signup, member, selectedOption.get());
+        return memberSignupResponseService.signUp(signup, phone, optionValue);
     }
 
     protected List<? extends SignupOption> getSignupOptions(@NonNull Signup signup) {

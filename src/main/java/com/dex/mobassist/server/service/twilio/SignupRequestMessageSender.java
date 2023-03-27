@@ -25,7 +25,7 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseMess
 
     @Override
     protected NotificationResult buildResult() {
-        return new NotificationResultCargo().withType("SignupRequest");
+        return new NotificationResultCargo("SignupRequest");
     }
 
     @Override

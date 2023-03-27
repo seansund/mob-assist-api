@@ -29,6 +29,7 @@ public class SignupController {
     private final SignupOptionSetService signupOptionSetService;
     private final SignupOptionService signupOptionService;
     private final MemberSignupResponseService memberSignupResponseService;
+    private final NotificationService notificationService;
 
     public SignupController(
             SignupService service,
@@ -36,7 +37,8 @@ public class SignupController {
             AssignmentService assignmentService,
             SignupOptionSetService signupOptionSetService,
             SignupOptionService signupOptionService,
-            MemberSignupResponseService memberSignupResponseService
+            MemberSignupResponseService memberSignupResponseService,
+            NotificationService notificationService
     ) {
         this.service = service;
         this.assignmentSetService = assignmentSetService;
@@ -44,6 +46,7 @@ public class SignupController {
         this.signupOptionSetService = signupOptionSetService;
         this.signupOptionService = signupOptionService;
         this.memberSignupResponseService = memberSignupResponseService;
+        this.notificationService = notificationService;
     }
 
     @SchemaMapping(typeName="Signup", field="assignmentSet")
@@ -267,5 +270,20 @@ public class SignupController {
     @MutationMapping
     public SimpleResult removeAssignment(@Argument("id") String id) {
         return new SimpleResult(assignmentService.delete(id));
+    }
+
+    @MutationMapping
+    public NotificationResult sendSignupRequest(@Argument("id") String id) {
+        return notificationService.sendSignupRequest(id);
+    }
+
+    @MutationMapping
+    public NotificationResult sendSignupAssignments(@Argument("id") String id) {
+        return notificationService.sendAssignments(id);
+    }
+
+    @MutationMapping
+    public NotificationResult sendSignupCheckin(@Argument("id") String id) {
+        return notificationService.sendCheckinRequest(id);
     }
 }

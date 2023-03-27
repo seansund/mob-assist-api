@@ -6,5 +6,11 @@ import lombok.Data;
 @Data
 public class NotificationResultCargo implements NotificationResult {
     private String type;
-    private Integer count;
+    private Integer count = 0;
+
+    public NotificationResultCargo() {
+    }
+    public NotificationResultCargo(String type) {
+        this.type = type;
+    }
 }

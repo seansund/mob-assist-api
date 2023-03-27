@@ -44,3 +44,12 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task copyJarToServerJar(type: Copy) {
+	dependsOn('bootJar')
+	mustRunAfter('jar')
+	from ('build/libs') {
+		rename "${project.name}-${project.version}.jar", 'server.jar'
+	}
+	into 'build/libs'
+}
