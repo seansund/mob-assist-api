@@ -1,6 +1,6 @@
 package com.dex.mobassist.server.service.twilio;
 
-import com.dex.mobassist.server.backend.TwilioConfig;
+import com.dex.mobassist.server.backend.TwilioBackend;
 import com.dex.mobassist.server.cargo.NotificationResultCargo;
 import com.dex.mobassist.server.model.*;
 import com.dex.mobassist.server.service.*;
@@ -17,7 +17,7 @@ import static com.twilio.rest.api.v2010.account.Message.creator;
 import static java.lang.String.format;
 
 public class CheckinRequestMessageSender extends AbstractMemberSignupResponseMessageSender implements MemberSignupResponseMessageSender {
-    public CheckinRequestMessageSender(TwilioConfig config, MemberSignupResponseService service, SignupService signupService, SignupOptionSetService signupOptionSetService, SignupOptionService signupOptionService, AssignmentSetService assignmentSetService, AssignmentService assignmentService) {
+    public CheckinRequestMessageSender(TwilioBackend config, MemberSignupResponseService service, SignupService signupService, SignupOptionSetService signupOptionSetService, SignupOptionService signupOptionService, AssignmentSetService assignmentSetService, AssignmentService assignmentService) {
         super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService);
     }
 

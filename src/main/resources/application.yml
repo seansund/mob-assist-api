@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: "${ACTIVE_PROFILE:mongodb}"
+    active: "${ACTIVE_PROFILE:mongodb,twilio}"
   graphql:
     websocket:
       path: /subscription

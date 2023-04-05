@@ -1,6 +1,6 @@
 package com.dex.mobassist.server.service.twilio;
 
-import com.dex.mobassist.server.backend.TwilioConfig;
+import com.dex.mobassist.server.backend.TwilioBackend;
 import com.dex.mobassist.server.cargo.AssignmentGroupCargo;
 import com.dex.mobassist.server.model.*;
 import com.dex.mobassist.server.service.*;
@@ -20,7 +20,7 @@ public abstract class AbstractMemberSignupResponseMessageSender implements Membe
     protected static final String dateFormatString = "MM/dd/yyyy";
     protected static final DateFormat format = new SimpleDateFormat(dateFormatString);
 
-    protected final TwilioConfig config;
+    protected final TwilioBackend config;
     private final MemberSignupResponseService service;
     private final SignupService signupService;
     private final SignupOptionSetService signupOptionSetService;
@@ -29,7 +29,7 @@ public abstract class AbstractMemberSignupResponseMessageSender implements Membe
     private final AssignmentService assignmentService;
 
     protected AbstractMemberSignupResponseMessageSender(
-            TwilioConfig config,
+            TwilioBackend backend,
             MemberSignupResponseService service,
             SignupService signupService,
             SignupOptionSetService signupOptionSetService,
@@ -37,7 +37,7 @@ public abstract class AbstractMemberSignupResponseMessageSender implements Membe
             AssignmentSetService assignmentSetService,
             AssignmentService assignmentService
     ) {
-        this.config = config;
+        this.config = backend;
 
         this.service = service;
         this.signupService = signupService;

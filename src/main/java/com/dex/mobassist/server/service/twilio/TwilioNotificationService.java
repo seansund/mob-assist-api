@@ -1,5 +1,6 @@
 package com.dex.mobassist.server.service.twilio;
 
+import com.dex.mobassist.server.backend.TwilioBackend;
 import com.dex.mobassist.server.backend.TwilioConfig;
 import com.dex.mobassist.server.model.NotificationResult;
 import com.dex.mobassist.server.service.*;
@@ -15,7 +16,7 @@ public class TwilioNotificationService implements NotificationService {
     private final MemberSignupResponseMessageSender checkinRequestMessageSender;
 
     public TwilioNotificationService(
-            TwilioConfig config,
+            TwilioBackend config,
             MemberSignupResponseService service,
             SignupService signupService,
             SignupOptionSetService signupOptionSetService,
