@@ -31,7 +31,7 @@ jobs:
           REPO_NAME="mob-assist-api"
           CHART_NAME="mob-assist-api"
           CHART_PATH="release/chart/${CHART_NAME}"
-          CHART_PACKAGE="${CHART_NAME}-${RELEASE_TAG}.tar.gz"
+          CHART_PACKAGE="${CHART_NAME}-${RELEASE_TAG}.tgz"
           PACKAGE_DIR="packages"
           
           ASSET_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${FULL_RELEASE_TAG}"
