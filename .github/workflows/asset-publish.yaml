@@ -35,7 +35,7 @@ jobs:
           PACKAGE_DIR="packages"
           
           ASSET_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${FULL_RELEASE_TAG}"
-          REPO_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}"
+          REPO_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}/index.yaml"
           
           echo "Release tag: ${RELEASE_TAG}"
           echo "release-tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
@@ -74,9 +74,10 @@ jobs:
 
       - name: Generate helm index
         run: |
+          curl -Lo index.current.yaml ${{ steps.variables.outputs.repo-url }}
           helm repo index ${{ steps.variables.outputs.package-dir }} \
             --url ${{ steps.variables.outputs.asset-url }} \
-            --merge ${{ steps.variables.outputs.repo-url }}
+            --merge ./index.current.yaml
 
       - name: Checkout gh-pages
         uses: actions/checkout@v3
