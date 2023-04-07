@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository("SignupOptionSetRepository")
-@Profile("mongodb")
+@Profile("db-mongodb")
 public class SignupOptionSetRepositoryMongoDB extends AbstractRepositoryMongoDB<SignupOptionSet, MongoDBSignupOptionSet> implements SignupOptionSetRepository {
     protected SignupOptionSetRepositoryMongoDB(MongoTemplate mongoTemplate) {
         super(mongoTemplate, MongoDBSignupOptionSet.class);

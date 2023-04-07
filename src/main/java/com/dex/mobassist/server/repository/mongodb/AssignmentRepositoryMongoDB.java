@@ -15,7 +15,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Repository("AssignmentRepository")
-@Profile("mongodb")
+@Profile("db-mongodb")
 public class AssignmentRepositoryMongoDB extends AbstractRepositoryMongoDB<Assignment, MongoDBAssignment> implements AssignmentRepository {
 
     public AssignmentRepositoryMongoDB(MongoTemplate mongoTemplate) {

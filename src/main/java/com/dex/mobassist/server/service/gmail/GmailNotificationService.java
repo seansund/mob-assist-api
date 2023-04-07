@@ -1,21 +1,20 @@
-package com.dex.mobassist.server.service.twilio;
+package com.dex.mobassist.server.service.gmail;
 
-import com.dex.mobassist.server.backend.TwilioBackend;
+import com.dex.mobassist.server.backend.EmailNotificationConfig;
 import com.dex.mobassist.server.model.NotificationResult;
 import com.dex.mobassist.server.service.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-@Service("SMSNotification")
-@Profile("sms-twilio")
-public class TwilioNotificationService implements NotificationService {
-
+@Service("EmailNotification")
+@Profile("email-gmail")
+public class GmailNotificationService implements NotificationService {
     private final MemberSignupResponseMessageSender signupRequestSender;
     private final MemberSignupResponseMessageSender assignmentMessageSender;
     private final MemberSignupResponseMessageSender checkinRequestMessageSender;
 
-    public TwilioNotificationService(
-            TwilioBackend config,
+    public GmailNotificationService(
+            EmailNotificationConfig config,
             MemberSignupResponseService service,
             SignupService signupService,
             SignupOptionSetService signupOptionSetService,

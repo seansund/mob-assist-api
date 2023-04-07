@@ -39,6 +39,12 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/com.twilio.sdk/twilio
 	implementation group: 'com.twilio.sdk', name: 'twilio', version: '9.2.5'
+	// https://mvnrepository.com/artifact/com.google.apis/google-api-services-gmail
+	implementation group: 'com.google.apis', name: 'google-api-services-gmail', version: 'v1-rev110-1.25.0'
+// https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api
+	implementation group: 'jakarta.mail', name: 'jakarta.mail-api', version: '2.1.1'
+// https://mvnrepository.com/artifact/com.google.auth/google-auth-library-oauth2-http
+	implementation group: 'com.google.auth', name: 'google-auth-library-oauth2-http', version: '1.16.0'
 }
 
 tasks.named('test') {

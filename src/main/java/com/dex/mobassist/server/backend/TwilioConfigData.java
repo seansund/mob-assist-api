@@ -20,4 +20,9 @@ public class TwilioConfigData implements TwilioConfig {
     public String getAccountSid() { return accountSid; }
     @Override
     public String getAuthToken() { return authToken; }
+
+    @Override
+    public String getChannel() {
+        return "text";
+    }
 }

@@ -1,11 +1,10 @@
-package com.dex.mobassist.server.service.twilio;
+package com.dex.mobassist.server.service.gmail;
 
-import com.dex.mobassist.server.backend.TwilioBackend;
+import com.dex.mobassist.server.backend.EmailNotificationConfig;
 import com.dex.mobassist.server.cargo.NotificationResultCargo;
 import com.dex.mobassist.server.model.*;
 import com.dex.mobassist.server.service.*;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
+import com.google.api.services.gmail.model.Message;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,12 +12,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.twilio.rest.api.v2010.account.Message.creator;
 import static java.lang.String.format;
 
-public class AssignmentMessageSender extends AbstractMemberSignupResponseMessageSender<TwilioBackend> implements MemberSignupResponseMessageSender {
+public class AssignmentMessageSender extends AbstractMemberSignupResponseEmailMessageSender implements MemberSignupResponseMessageSender {
     public AssignmentMessageSender(
-            TwilioBackend config,
+            EmailNotificationConfig config,
             MemberSignupResponseService service,
             SignupService signupService,
             SignupOptionSetService signupOptionSetService,
@@ -42,17 +40,21 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseMessage
 
     @Override
     protected Function<MemberSignupResponse, Message> sendMessage(Signup signup, List<? extends Member> members) {
+        final String subject = buildSubject(signup);
+
         return (MemberSignupResponse response) -> {
             final String message = !response.getAssignments().isEmpty()
                     ? buildAssignmentMessage(signup, loadSignupOption(response.getSelectedOption()), loadAssignments(response.getAssignments()))
                     : buildNoAssignmentMessage(signup, loadSignupOption(response.getSelectedOption()));
 
-            return creator(
-                    new PhoneNumber(response.getMember().getId()),
-                    new PhoneNumber(config.getPhoneNumber()),
-                    message
-            ).create();
+            final String toEmail = getToEmail(response.getMember(), members);
+
+            return sendEmail(toEmail, subject, message);
         };
+    }
+
+    protected String buildSubject(Signup signup) {
+        return String.format("%s %s: Assignment", signup.getTitle(), signup.getDate());
     }
 
     protected String buildAssignmentMessage(Signup signup, SignupOption selectedOption, List<? extends Assignment> assignmentList) {

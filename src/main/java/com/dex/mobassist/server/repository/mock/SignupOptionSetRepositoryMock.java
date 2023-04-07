@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 @Repository("SignupOptionSetRepository")
-@Profile("mock")
+@Profile("db-mock")
 public class SignupOptionSetRepositoryMock extends AbstractRepositoryMock<SignupOptionSet> implements SignupOptionSetRepository {
 
     @Override

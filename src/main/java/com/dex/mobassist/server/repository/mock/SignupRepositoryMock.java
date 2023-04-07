@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 @Repository("SignupRepository")
-@Profile("mock")
+@Profile("db-mock")
 public class SignupRepositoryMock extends AbstractRepositoryMock<Signup> implements SignupRepository {
 
     @Override

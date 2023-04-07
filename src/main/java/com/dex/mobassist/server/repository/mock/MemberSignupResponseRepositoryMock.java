@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Stream.concat;
 
 @Repository("MemberSignupResponseRepository")
-@Profile("mock")
+@Profile("db-mock")
 public class MemberSignupResponseRepositoryMock extends AbstractRepositoryMock<MemberSignupResponse> implements MemberSignupResponseRepository {
 
     private final MemberRepository memberRepository;

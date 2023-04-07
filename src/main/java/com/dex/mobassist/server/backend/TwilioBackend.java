@@ -35,4 +35,9 @@ public class TwilioBackend implements TwilioConfig {
     public String getAuthToken() {
         return config.getAuthToken();
     }
+
+    @Override
+    public String getChannel() {
+        return config.getChannel();
+    }
 }

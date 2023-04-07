@@ -25,7 +25,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Repository("MemberSignupResponseRepository")
-@Profile("mongodb")
+@Profile("db-mongodb")
 public class MemberSignupResponseRepositoryMongoDB extends AbstractRepositoryMongoDB<MemberSignupResponse, MongoDBMemberSignupResponse> implements MemberSignupResponseRepository {
 
     private final SignupRepository signupRepository;

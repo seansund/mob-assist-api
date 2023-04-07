@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository("SignupOptionRepository")
-@Profile("mock")
+@Profile("db-mock")
 public class SignupOptionRepositoryMock extends AbstractRepositoryMock<SignupOption> implements SignupOptionRepository {
 
     @Override

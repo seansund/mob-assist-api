@@ -19,7 +19,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Repository("SignupRepository")
-@Profile("mongodb")
+@Profile("db-mongodb")
 public class SignupRepositoryMongoDB extends AbstractRepositoryMongoDB<Signup, MongoDBSignup> implements SignupRepository {
 
     public static final String dateField = "date";

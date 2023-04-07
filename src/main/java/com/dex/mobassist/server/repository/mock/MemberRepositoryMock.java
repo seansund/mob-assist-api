@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository("MemberRepository")
-@Profile("mock")
+@Profile("db-mock")
 public class MemberRepositoryMock extends AbstractRepositoryMock<Member> implements MemberRepository {
 
     @Override
