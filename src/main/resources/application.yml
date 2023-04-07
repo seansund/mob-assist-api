@@ -11,11 +11,11 @@ spring:
 
   data:
     mongodb:
-      uri: "${MONGODB_URI:}"
-      database: "${MONGODB_DATABASE:}"
-      username: "${MONGODB_USERNAME:}"
-      password: "${MONGODB_PASSWORD:}"
-      ca-cert-base64: "${MONGODB_CACERT_BASE64:}"
+      uri: "${MONGODB_URI}"
+      database: "${MONGODB_DATABASE}"
+      username: "${MONGODB_USERNAME}"
+      password: "${MONGODB_PASSWORD}"
+      ca-cert-base64: "${MONGODB_CACERT_BASE64}"
 
 twilio:
   accountSid: "${TWILIO_ACCOUNT_SID}"
