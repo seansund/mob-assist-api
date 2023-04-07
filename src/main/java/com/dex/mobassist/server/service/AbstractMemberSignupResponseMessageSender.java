@@ -1,41 +1,38 @@
-package com.dex.mobassist.server.service.twilio;
+package com.dex.mobassist.server.service;
 
-import com.dex.mobassist.server.backend.TwilioBackend;
+import com.dex.mobassist.server.backend.NotificationConfig;
 import com.dex.mobassist.server.cargo.AssignmentGroupCargo;
 import com.dex.mobassist.server.model.*;
-import com.dex.mobassist.server.service.*;
-import com.twilio.rest.api.v2010.account.Message;
 import lombok.NonNull;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class AbstractMemberSignupResponseMessageSender implements MemberSignupResponseMessageSender {
+public abstract class AbstractMemberSignupResponseMessageSender<T extends NotificationConfig> implements MemberSignupResponseMessageSender {
     protected static final String dateFormatString = "MM/dd/yyyy";
     protected static final DateFormat format = new SimpleDateFormat(dateFormatString);
 
-    protected final TwilioBackend config;
+    protected final T config;
     private final MemberSignupResponseService service;
     private final SignupService signupService;
     private final SignupOptionSetService signupOptionSetService;
     private final SignupOptionService signupOptionService;
     private final AssignmentSetService assignmentSetService;
     private final AssignmentService assignmentService;
+    private final MemberService memberService;
 
     protected AbstractMemberSignupResponseMessageSender(
-            TwilioBackend backend,
+            T backend,
             MemberSignupResponseService service,
             SignupService signupService,
             SignupOptionSetService signupOptionSetService,
             SignupOptionService signupOptionService,
             AssignmentSetService assignmentSetService,
-            AssignmentService assignmentService
+            AssignmentService assignmentService,
+            MemberService memberService
     ) {
         this.config = backend;
 
@@ -45,23 +42,42 @@ public abstract class AbstractMemberSignupResponseMessageSender implements Membe
         this.signupOptionService = signupOptionService;
         this.assignmentSetService = assignmentSetService;
         this.assignmentService = assignmentService;
+        this.memberService = memberService;
     }
 
     public NotificationResult sendMessages(String signupId) {
         final Signup signup = signupService.getById(signupId);
         final List<? extends MemberSignupResponse> responses = service.listBySignup(signupId);
 
-        final List<Message> statuses = responses.stream()
+        final List<? extends Member> members = memberService.list();
+
+        final List<?> statuses = responses.stream()
+                .filter(filterByNotificationPreference(members))
                 .filter(filterMessage())
-                .map(sendMessage(signup))
+                .map(sendMessage(signup, members))
+                .filter(Objects::nonNull)
                 .toList();
 
-        return buildResult().withCount(statuses.size());
+        return buildResult().addChannel(config.getChannel(), statuses.size());
     }
 
     protected abstract NotificationResult buildResult();
+
+    protected Predicate<MemberSignupResponse> filterByNotificationPreference(@NonNull List<? extends Member> members) {
+        return (MemberSignupResponse resp) -> {
+            final String preferredContact = members.stream()
+                    .filter(member -> resp.getMember().getId().equals(member.getId()))
+                    .findFirst()
+                    .map(Member::getPreferredContact)
+                    .orElse("text");
+
+            return preferredContact.equals(config.getChannel());
+        };
+    }
+
     protected abstract Predicate<MemberSignupResponse> filterMessage();
-    protected abstract Function<MemberSignupResponse, Message> sendMessage(Signup signup);
+
+    protected abstract Function<MemberSignupResponse, ?> sendMessage(Signup signup, List<? extends Member> members);
 
     protected List<? extends SignupOption> loadSignupOptions(SignupOptionSetRef optionSetRef) {
         final SignupOptionSet optionSet = loadSignupOptionSet(optionSetRef);

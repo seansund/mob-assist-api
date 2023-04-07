@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 @Repository("MemberRoleRepository")
-@Profile("mock")
+@Profile("db-mock")
 public class MemberRoleRepositoryMock extends AbstractRepositoryMock<MemberRole> implements MemberRoleRepository {
     @Override
     protected <A extends MemberRole> A updateValueWithId(A value, int id) {

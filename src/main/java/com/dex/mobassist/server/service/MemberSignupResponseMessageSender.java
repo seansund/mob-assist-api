@@ -1,4 +1,4 @@
-package com.dex.mobassist.server.service.twilio;
+package com.dex.mobassist.server.service;
 
 import com.dex.mobassist.server.model.NotificationResult;
 

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository("AssignmentRepository")
-@Profile("mock")
+@Profile("db-mock")
 public class AssignmentRepositoryMock extends AbstractRepositoryMock<Assignment> implements AssignmentRepository {
     @Override
     protected Assignment updateValueWithId(Assignment value, int id) {

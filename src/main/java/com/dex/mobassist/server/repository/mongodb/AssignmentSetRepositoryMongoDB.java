@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository("AssignmentSetRepository")
-@Profile("mongodb")
+@Profile("db-mongodb")
 public class AssignmentSetRepositoryMongoDB extends AbstractRepositoryMongoDB<AssignmentSet, MongoDBAssignmentSet> implements AssignmentSetRepository {
     protected AssignmentSetRepositoryMongoDB(MongoTemplate mongoTemplate) {
         super(mongoTemplate, MongoDBAssignmentSet.class);

@@ -133,6 +133,11 @@ type SimpleResult {
 
 type NotificationResult {
     type: String!
+    channels: [NotificationChannelResult]
+}
+
+type NotificationChannelResult {
+    channel: String!
     count: Int!
 }
 

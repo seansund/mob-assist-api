@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 import static com.twilio.rest.api.v2010.account.Message.creator;
 import static java.lang.String.format;
 
-public class CheckinRequestMessageSender extends AbstractMemberSignupResponseMessageSender implements MemberSignupResponseMessageSender {
-    public CheckinRequestMessageSender(TwilioBackend config, MemberSignupResponseService service, SignupService signupService, SignupOptionSetService signupOptionSetService, SignupOptionService signupOptionService, AssignmentSetService assignmentSetService, AssignmentService assignmentService) {
-        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService);
+public class CheckinRequestMessageSender extends AbstractMemberSignupResponseMessageSender<TwilioBackend> implements MemberSignupResponseMessageSender {
+    public CheckinRequestMessageSender(TwilioBackend config, MemberSignupResponseService service, SignupService signupService, SignupOptionSetService signupOptionSetService, SignupOptionService signupOptionService, AssignmentSetService assignmentSetService, AssignmentService assignmentService, MemberService memberService) {
+        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class CheckinRequestMessageSender extends AbstractMemberSignupResponseMes
     }
 
     @Override
-    protected Function<MemberSignupResponse, Message> sendMessage(Signup signup) {
+    protected Function<MemberSignupResponse, Message> sendMessage(Signup signup, List<? extends Member> members) {
         return (MemberSignupResponse response) -> {
             final String message = format(
                     "%s. %s",

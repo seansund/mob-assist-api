@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository("MemberRoleRepository")
-@Profile("mongodb")
+@Profile("db-mongodb")
 public class MemberRoleRepositoryMongoDB extends AbstractRepositoryMongoDB<MemberRole, MongoDBMemberRole> implements MemberRoleRepository {
     protected MemberRoleRepositoryMongoDB(MongoTemplate mongoTemplate) {
         super(mongoTemplate, MongoDBMemberRole.class);
