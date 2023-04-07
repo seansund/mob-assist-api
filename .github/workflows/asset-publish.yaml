@@ -35,7 +35,7 @@ jobs:
           PACKAGE_DIR="packages"
           
           ASSET_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${FULL_RELEASE_TAG}"
-          REPO_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}/index.yaml"
+          REPO_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}"
           
           echo "Release tag: ${RELEASE_TAG}"
           echo "release-tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
