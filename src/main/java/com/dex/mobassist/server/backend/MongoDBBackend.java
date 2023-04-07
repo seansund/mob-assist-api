@@ -33,6 +33,8 @@ public class MongoDBBackend {
         try {
             final String certificateDecoded = new String(Base64.getDecoder().decode(config.getCaCertBase64()));
 
+            System.out.println("Got CA certificate: " + certificateDecoded);
+
             InputStream inputStream = new ByteArrayInputStream(certificateDecoded.getBytes(StandardCharsets.UTF_8));
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             X509Certificate caCert = (X509Certificate) certificateFactory.generateCertificate(inputStream);
@@ -64,9 +66,12 @@ public class MongoDBBackend {
                 .credential(MongoCredential.createCredential(config.getDatabaseUsername(), "admin", config.getDatabasePassword().toCharArray()))
                 .applyToSslSettings(builder -> {
                     if (!Strings.isNullOrEmpty(config.getCaCertBase64())) {
+                        System.out.println("No CA cert found. Skipping SSL settings");
                         builder.invalidHostNameAllowed(true)
                                 .enabled(true)
                                 .context(buildSSLContext());
+                    } else {
+                        System.out.println("No CA cert found. Skipping SSL settings");
                     }
                 })
                 .build();

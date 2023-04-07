@@ -30,7 +30,7 @@ management:
 
 logging:
   level:
-    org.springframework.web: debug
-    org.springframework.http: debug
+    org.springframework.web: info
+    org.springframework.http: info
     org.springframework.graphql: debug
     reactor.netty: debug
