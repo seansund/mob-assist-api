@@ -4,11 +4,14 @@ import com.dex.mobassist.server.cargo.TwilioWebhookRequestCargo;
 import com.dex.mobassist.server.service.twilio.TwilioWebhookService;
 import com.twilio.twiml.TwiML;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.print.attribute.standard.Media;
 
 @Controller
 @CrossOrigin
@@ -20,10 +23,16 @@ public class TwilioWebhookController {
         this.service = service;
     }
 
-    @PostMapping("/twilio")
+    @PostMapping(
+            path = "/twilio",
+            consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
+            produces = {MediaType.APPLICATION_XML_VALUE}
+    )
     @ResponseBody
-    public TwiML twilioMessageWebhook(@RequestBody TwilioWebhookRequestCargo request) {
-        return service.handleMessageWebhook(request);
+    public String twilioMessageWebhook(@RequestBody TwilioWebhookRequestCargo request) {
+        System.out.println("Got message: " + request);
+
+        return service.handleMessageWebhook(request).toXml();
     }
 
 }
