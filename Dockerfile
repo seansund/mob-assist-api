@@ -1,10 +1,10 @@
-FROM registry.access.redhat.com/ubi9/openjdk-17:1.14-2 as builder
+FROM registry.access.redhat.com/ubi9/openjdk-17:1.14-2.1679391793 as builder
 
 COPY --chown=default . .
 
 RUN ./gradlew copyJarToServerJar && ls build/libs
 
-FROM registry.access.redhat.com/ubi9/openjdk-17-runtime:1.14-2
+FROM registry.access.redhat.com/ubi9/openjdk-17-runtime:1.14-2.1679391794
 
 COPY --from=builder --chown=default /home/default/build/libs/server.jar .
 
