@@ -15,7 +15,7 @@ import javax.print.attribute.standard.Media;
 
 @Controller
 @CrossOrigin
-@Profile("twilio")
+@Profile("sms-twilio")
 public class TwilioWebhookController {
     private final TwilioWebhookService service;
 

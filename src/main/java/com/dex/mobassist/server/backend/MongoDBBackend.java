@@ -54,7 +54,7 @@ public class MongoDBBackend {
     }
 
     @Bean
-    @Profile("mongodb")
+    @Profile("db-mongodb")
     public MongoClient mongo() {
         System.out.println("Found mongo connect string: " + config.getDatabaseUri());
 
@@ -78,7 +78,7 @@ public class MongoDBBackend {
     }
 
     @Bean
-    @Profile("mongodb")
+    @Profile("db-mongodb")
     public MongoTemplate mongoTemplate() throws Exception {
         return new MongoTemplate(mongo(), config.getDatabaseName());
     }
