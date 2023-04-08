@@ -24,7 +24,7 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 
 @Configuration
-@Profile("mongodb")
+@Profile("db-mongodb")
 @Data
 public class MongoDBConfig {
 

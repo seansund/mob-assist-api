@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile("mock")
+@Profile("sms-mock")
 public class NotificationServiceMock implements NotificationService {
     @Override
     public NotificationResult sendSignupRequest(String signupId) {
