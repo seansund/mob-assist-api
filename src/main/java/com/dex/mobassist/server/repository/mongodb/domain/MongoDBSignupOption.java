@@ -2,6 +2,7 @@ package com.dex.mobassist.server.repository.mongodb.domain;
 
 import com.dex.mobassist.server.model.SignupOption;
 import com.dex.mobassist.server.model.SignupOptionRef;
+import com.google.common.base.Strings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -62,5 +63,14 @@ public class MongoDBSignupOption extends MongoDBSignupOptionRef implements Signu
                 .withDeclineOption(signupOption.getDeclineOption())
                 .withSortIndex(signupOption.getSortIndex())
                 .withShortName(signupOption.getShortName());
+    }
+
+    @Override
+    public String getShortName() {
+        if (!Strings.isNullOrEmpty(shortName)) {
+            return shortName;
+        }
+
+        return value.replace(":", "").replace("am", "");
     }
 }

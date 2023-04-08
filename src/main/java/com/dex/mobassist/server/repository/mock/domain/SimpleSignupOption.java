@@ -1,6 +1,7 @@
 package com.dex.mobassist.server.repository.mock.domain;
 
 import com.dex.mobassist.server.model.SignupOption;
+import com.google.common.base.Strings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -20,6 +21,15 @@ public class SimpleSignupOption extends SimpleSignupOptionRef implements SignupO
 
     public SimpleSignupOption(String id) {
         super(id);
+    }
+
+    @Override
+    public String getShortName() {
+        if (!Strings.isNullOrEmpty(shortName)) {
+            return shortName;
+        }
+
+        return value.replace(":", "").replace("am", "");
     }
 }
 
