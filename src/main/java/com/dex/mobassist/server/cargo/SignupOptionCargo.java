@@ -1,6 +1,7 @@
 package com.dex.mobassist.server.cargo;
 
 import com.dex.mobassist.server.model.SignupOption;
+import com.google.common.base.Strings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -20,4 +21,12 @@ public class SignupOptionCargo extends SignupOptionRefCargo implements SignupOpt
         super(id);
     }
 
+    @Override
+    public String getShortName() {
+        if (!Strings.isNullOrEmpty(shortName)) {
+            return shortName;
+        }
+
+        return value.replace(":", "").replace("am", "");
+    }
 }
