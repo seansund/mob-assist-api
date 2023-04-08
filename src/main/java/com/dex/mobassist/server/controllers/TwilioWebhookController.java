@@ -29,7 +29,7 @@ public class TwilioWebhookController {
             produces = {MediaType.APPLICATION_XML_VALUE}
     )
     @ResponseBody
-    public String twilioMessageWebhook(@RequestBody TwilioWebhookRequestCargo request) {
+    public String twilioMessageWebhook(TwilioWebhookRequestCargo request) {
         System.out.println("Got message: " + request);
 
         return service.handleMessageWebhook(request).toXml();
