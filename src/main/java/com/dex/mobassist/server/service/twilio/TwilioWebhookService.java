@@ -48,7 +48,7 @@ public class TwilioWebhookService {
         // Other option - Change response, if in checkin window checkin?
         // Something else - "Sorry I didn't understand your response"
 
-        final String memberPhone = request.getFrom();
+        final String memberPhone = request.getFrom().replaceFirst("^\\+1", "");
 
         final Signup signup = signupService.getCurrent();
         final List<? extends SignupOption> signupOptions = getSignupOptions(signup);
