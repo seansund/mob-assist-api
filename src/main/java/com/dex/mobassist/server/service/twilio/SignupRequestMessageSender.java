@@ -61,7 +61,7 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseMess
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 options.stream().
-                        sorted((a, b) -> b.getSortIndex() - a.getSortIndex())
+                        sorted((a, b) -> a.getSortIndex() - b.getSortIndex())
                         .map(SignupOption::getShortName)
                         .collect(Collectors.joining(", "))
         );
