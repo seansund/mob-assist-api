@@ -67,4 +67,13 @@ public class MemberServiceBase implements MemberService {
     public boolean removeRole(@NonNull String id) {
         return memberRoleRepository.deleteById(id);
     }
+
+    @Override
+    public void setPreferredContact(String memberPhone, String preferredContact) {
+        final Member member = findByPhone(memberPhone);
+
+        member.setPreferredContact(preferredContact);
+
+        this.addUpdate(member);
+    }
 }

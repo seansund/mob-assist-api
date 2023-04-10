@@ -37,7 +37,7 @@ public class CheckinRequestMessageSender extends AbstractMemberSignupResponseMes
             final String message = format(
                     "%s. %s",
                     buildAssignmentMessage(signup, loadSignupOption(response.getSelectedOption()), loadAssignments(response.getAssignments())),
-                    "Reply YES to checkin, NO if you are unable to serve");
+                    "Reply YES to checkin, NO if you are unable to serve or STOP to end messages.");
 
             return creator(
                     new PhoneNumber(response.getMember().getId()),
@@ -76,8 +76,17 @@ public class CheckinRequestMessageSender extends AbstractMemberSignupResponseMes
             return message.toString();
         };
 
+        if (assignmentList == null || assignmentList.isEmpty()) {
+            return format(
+                    "%s is %s. You are signed up for the %s service.",
+                    signup.getTitle(),
+                    format.format(signup.getDate()),
+                    selectedOption.getValue()
+            );
+        }
+
         return format(
-                "%s is %s. You are signed up for the %s service and assigned to %s",
+                "%s is %s. You are signed up for the %s service and assigned to section %s.",
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 selectedOption.getValue(),
