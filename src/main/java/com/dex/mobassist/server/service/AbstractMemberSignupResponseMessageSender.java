@@ -151,7 +151,8 @@ public abstract class AbstractMemberSignupResponseMessageSender<T extends Notifi
                 (Map<String, AssignmentGroupCargo> previous, @NonNull Assignment current) -> {
                     AssignmentGroupCargo group = previous.get(current.getGroup());
                     if (group == null) {
-                        group = previous.put(current.getGroup(), new AssignmentGroupCargo(current.getGroup()));
+                        group = new AssignmentGroupCargo(current.getGroup());
+                        previous.put(current.getGroup(), group);
                     }
 
                     group.addAssignment(current);
