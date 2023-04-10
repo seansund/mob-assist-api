@@ -25,6 +25,12 @@ public class CompositeNotificationService implements NotificationService {
     }
 
     @Override
+    public NotificationResult sendSignupRequestToNoResponse(String signupId) {
+        return emailService.sendSignupRequestToNoResponse(signupId)
+                .withResult(textService.sendSignupRequestToNoResponse(signupId));
+    }
+
+    @Override
     public NotificationResult sendAssignments(String signupId) {
         return emailService.sendAssignments(signupId)
                 .withResult(textService.sendAssignments(signupId));

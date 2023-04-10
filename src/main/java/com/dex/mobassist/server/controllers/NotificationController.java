@@ -23,6 +23,11 @@ public class NotificationController {
     }
 
     @MutationMapping
+    public NotificationResult sendSignupRequestToNoResponse(@Argument("id") String signupId) {
+        return service.sendSignupRequestToNoResponse(signupId);
+    }
+
+    @MutationMapping
     public NotificationResult sendSignupAssignments(@Argument("id") String signupId) {
         return service.sendAssignments(signupId);
     }

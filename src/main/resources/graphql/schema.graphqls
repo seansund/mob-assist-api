@@ -46,6 +46,7 @@ type Mutation {
     removeCheckIn(id: ID!): MemberSignupResponse
 
     sendSignupRequest(id: ID!): NotificationResult
+    sendSignupRequestToNoResponse(id: ID!): NotificationResult
     sendSignupAssignments(id: ID!): NotificationResult
     sendSignupCheckin(id: ID!): NotificationResult
 }
