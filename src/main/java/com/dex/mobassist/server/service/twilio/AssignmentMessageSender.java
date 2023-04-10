@@ -85,20 +85,26 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseMessage
         };
 
         return format(
-                "%s is %s. You are signed up for the %s service and assigned to %s",
+                "%s is %s. You are signed up for the %s service and assigned to section %s. %s",
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 selectedOption.getValue(),
-                assignmentString.apply(assignmentList)
+                assignmentString.apply(assignmentList),
+                getMessageSuffix()
         );
     }
 
     protected String buildNoAssignmentMessage(Signup signup, SignupOption selectedOption) {
         return format(
-                "%s is %s. You are signed up for the %s service",
+                "%s is %s. You are signed up for the %s service. %s",
                 signup.getTitle(),
                 format.format(signup.getDate()),
-                selectedOption.getValue()
+                selectedOption.getValue(),
+                getMessageSuffix()
         );
+    }
+
+    protected String getMessageSuffix() {
+        return "Reply STOP to end messages or HELP for more options.";
     }
 }

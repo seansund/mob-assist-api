@@ -45,25 +45,30 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseMess
         };
     }
 
+    protected String getMessageSuffix() {
+        return "Reply STOP to end messages or HELP for more options.";
+    }
+
     protected String buildSignupConfirmMessage(Signup signup, List<? extends SignupOption> options, SignupOption selectedOption) {
         return format(
-                "%s is %s. You are signed up for the %s service. Respond with %s to change",
+                "%s is %s. You are signed up for the %s service. %s",
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 selectedOption.getValue(),
-                options.stream().filter(val -> !val.getId().equals(selectedOption.getId())).map(SignupOption::getShortName).collect(Collectors.joining(", "))
+                getMessageSuffix()
         );
     }
 
     protected String buildSignupRequestMessage(Signup signup, List<? extends SignupOption> options) {
         return format(
-                "%s is %s. Sign up by responding with %s",
+                "%s is %s. Sign up by responding with %s. %s",
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 options.stream().
                         sorted((a, b) -> a.getSortIndex() - b.getSortIndex())
                         .map(SignupOption::getShortName)
-                        .collect(Collectors.joining(", "))
+                        .collect(Collectors.joining(", ")),
+                getMessageSuffix()
         );
     }
 }

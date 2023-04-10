@@ -16,4 +16,6 @@ public interface MemberService extends BaseService<Member> {
     MemberRole addUpdateMemberRole(MemberRole role);
 
     boolean removeRole(@NonNull String id);
+
+    void setPreferredContact(String memberPhone, String preferredContact);
 }
