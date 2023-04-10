@@ -60,7 +60,10 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseMess
                 "%s is %s. Sign up by responding with %s",
                 signup.getTitle(),
                 format.format(signup.getDate()),
-                options.stream().map(SignupOption::getShortName).collect(Collectors.joining(", "))
+                options.stream().
+                        sorted((a, b) -> b.getSortIndex() - a.getSortIndex())
+                        .map(SignupOption::getShortName)
+                        .collect(Collectors.joining(", "))
         );
     }
 }
