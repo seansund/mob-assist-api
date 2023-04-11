@@ -46,7 +46,7 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseMess
     }
 
     protected String getMessageSuffix() {
-        return "Reply STOP to end messages or HELP for more options.";
+        return "Reply STOP to unsubscribe or OPTIONS for more options.";
     }
 
     protected String buildSignupConfirmMessage(Signup signup, List<? extends SignupOption> options, SignupOption selectedOption) {

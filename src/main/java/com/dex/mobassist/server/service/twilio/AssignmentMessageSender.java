@@ -37,7 +37,8 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseMessage
 
     @Override
     protected Predicate<MemberSignupResponse> filterMessage() {
-        return (MemberSignupResponse response) -> !Boolean.TRUE.equals(loadSignupOption(response.getSelectedOption()).getDeclineOption());
+        return (MemberSignupResponse response) -> response.getSelectedOption() != null
+                && !Boolean.TRUE.equals(loadSignupOption(response.getSelectedOption()).getDeclineOption());
     }
 
     @Override
@@ -105,6 +106,6 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseMessage
     }
 
     protected String getMessageSuffix() {
-        return "Reply STOP to end messages or HELP for more options.";
+        return "Reply STOP to unsubscribe or OPTIONS for more options.";
     }
 }
