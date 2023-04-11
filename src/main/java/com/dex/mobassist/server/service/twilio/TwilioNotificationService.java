@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class TwilioNotificationService implements NotificationService {
 
     private final MemberSignupResponseMessageSender signupRequestSender;
+    private final MemberSignupResponseMessageSender signupRequestNoResponseSender;
     private final MemberSignupResponseMessageSender assignmentMessageSender;
     private final MemberSignupResponseMessageSender checkinRequestMessageSender;
 
@@ -25,6 +26,17 @@ public class TwilioNotificationService implements NotificationService {
             MemberService memberService
     ) {
         this.signupRequestSender = new SignupRequestMessageSender(
+                config,
+                service,
+                signupService,
+                signupOptionSetService,
+                signupOptionService,
+                assignmentSetService,
+                assignmentService,
+                memberService
+        );
+
+        this.signupRequestNoResponseSender = new SignupRequestNoResponseMessageSender(
                 config,
                 service,
                 signupService,
@@ -61,6 +73,11 @@ public class TwilioNotificationService implements NotificationService {
     @Override
     public NotificationResult sendSignupRequest(String signupId) {
         return signupRequestSender.sendMessages(signupId);
+    }
+
+    @Override
+    public NotificationResult sendSignupRequestToNoResponse(String signupId) {
+        return signupRequestNoResponseSender.sendMessages(signupId);
     }
 
     @Override

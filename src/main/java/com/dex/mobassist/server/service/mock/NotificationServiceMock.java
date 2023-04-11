@@ -15,6 +15,11 @@ public class NotificationServiceMock implements NotificationService {
     }
 
     @Override
+    public NotificationResult sendSignupRequestToNoResponse(String signupId) {
+        return new NotificationResultCargo("SignupRequestNoResponse");
+    }
+
+    @Override
     public NotificationResult sendAssignments(String signupId) {
         return new NotificationResultCargo("Assignment");
     }
