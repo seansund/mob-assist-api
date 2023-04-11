@@ -85,7 +85,7 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseMessage
         };
 
         return format(
-                "%s is %s. You are signed up for the %s service and assigned to section %s. %s",
+                "%s is %s. You are signed up for the %s service and assigned to %s. %s",
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 selectedOption.getValue(),

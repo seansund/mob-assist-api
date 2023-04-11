@@ -81,7 +81,7 @@ public class TwilioWebhookService {
 
             final String assignment = Collections.isNullOrEmpty(responseVal.getAssignments())
                     ? ""
-                    : String.format(" and have been assigned to section %s", getAssignmentList(responseVal.getAssignments()));
+                    : String.format(" and have been assigned to %s", getAssignmentList(responseVal.getAssignments()));
 
             body = String.format(
                     "The next %s is %s. You are signed up for %s%s.",
