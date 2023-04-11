@@ -86,7 +86,7 @@ public class CheckinRequestMessageSender extends AbstractMemberSignupResponseMes
         }
 
         return format(
-                "%s is %s. You are signed up for the %s service and assigned to section %s.",
+                "%s is %s. You are signed up for the %s service and assigned to %s.",
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 selectedOption.getValue(),
