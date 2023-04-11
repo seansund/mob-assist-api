@@ -67,7 +67,7 @@ public class TwilioWebhookService {
             memberService.setPreferredContact(memberPhone, "none");
 
             body = "Your preferred contact has been changed. You will receive no further texts.";
-        } else if (replyIsHelp(request)) {
+        } else if (replyIsOptions(request)) {
             body = buildHelpResponse(signupOptions);
         } else if (replyIsShow(request) && response.isEmpty()) {
             body = String.format(
@@ -91,7 +91,7 @@ public class TwilioWebhookService {
                     assignment
             );
         } else if (replyIsYes(request) && response.isEmpty()) {
-            body = "Thank you for your response. Which option? " + getOptionList(signupOptions);
+            body = "Thank you for your response. Which option? " + getOptionList(signupOptions, false);
         } else if (replyIsYes(request) && isEligibleForCheckin(signup, currentSelection)) {
             service.checkIn(response.get().getId());
 
@@ -126,10 +126,37 @@ public class TwilioWebhookService {
                 .build();
     }
 
+    protected Function<List<String>, String> joiningComma(@NonNull String lastSeparator) {
+
+        return list -> {
+            if (list.size() <= 1) {
+                return String.join("", list);
+            }
+
+            if (list.size() == 2) {
+                return String.join(String.format(" %s ", lastSeparator), list);
+            }
+
+            final int lastIndex = list.size() - 1;
+            return String.join(
+                    String.format(", %s ", lastSeparator),
+                    String.join(", ", list.subList(0, lastIndex)),
+                    list.get(lastIndex)
+            );
+        };
+    }
+
     protected String getOptionList(List<? extends SignupOption> signupOptions) {
+        return getOptionList(signupOptions, true);
+    }
+
+    protected String getOptionList(List<? extends SignupOption> signupOptions, boolean includeDecline) {
+
         return signupOptions.stream()
-                .filter(option -> !Boolean.TRUE.equals(option.getDeclineOption())).map(SignupOption::getShortName)
-                .collect(Collectors.joining(", "));
+                .filter(option -> includeDecline || !Boolean.TRUE.equals(option.getDeclineOption()))
+                .map(SignupOption::getShortName)
+                .map(String::toUpperCase)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), joiningComma("or")));
     }
 
     protected boolean isEligibleForCheckin(Signup signup, Optional<? extends SignupOption> selectedOption) {
@@ -149,8 +176,8 @@ public class TwilioWebhookService {
         return "show".equalsIgnoreCase(request.getBody().trim());
     }
 
-    protected boolean replyIsHelp(@NonNull TwilioWebhookRequest request) {
-        return "help".equalsIgnoreCase(request.getBody().trim());
+    protected boolean replyIsOptions(@NonNull TwilioWebhookRequest request) {
+        return "options".equalsIgnoreCase(request.getBody().trim()) || "option".equalsIgnoreCase(request.getBody().trim());
     }
 
     protected boolean replyIsStop(@NonNull TwilioWebhookRequest request) {
@@ -255,7 +282,7 @@ public class TwilioWebhookService {
 
     protected String buildHelpResponse(List<? extends SignupOption> signupOptions) {
         return String.format(
-                "Replies to change signup response are: %s. Reply SHOW to get your response for the current sign up. Reply YES or CHECKIN to check in the day of the event. Reply HELP to get more information. Reply STOP to end messages.",
+                "Replies to change signup response are: %s. Reply SHOW to get your response for the current sign up. Reply YES or CHECKIN to check in the day of the event. Reply OPTIONS to get more information. Reply STOP to unsubscribe.",
                 getOptionList(signupOptions)
         );
     }

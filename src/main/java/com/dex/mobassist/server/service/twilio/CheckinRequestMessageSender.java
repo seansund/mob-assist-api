@@ -28,7 +28,8 @@ public class CheckinRequestMessageSender extends AbstractMemberSignupResponseMes
 
     @Override
     protected Predicate<MemberSignupResponse> filterMessage() {
-        return (MemberSignupResponse response) -> !Boolean.TRUE.equals(loadSignupOption(response.getSelectedOption()).getDeclineOption());
+        return (MemberSignupResponse response) -> response.getSelectedOption() != null
+                && !Boolean.TRUE.equals(loadSignupOption(response.getSelectedOption()).getDeclineOption());
     }
 
     @Override
@@ -37,7 +38,7 @@ public class CheckinRequestMessageSender extends AbstractMemberSignupResponseMes
             final String message = format(
                     "%s. %s",
                     buildAssignmentMessage(signup, loadSignupOption(response.getSelectedOption()), loadAssignments(response.getAssignments())),
-                    "Reply YES to checkin, NO if you are unable to serve or STOP to end messages.");
+                    "Reply YES to checkin, NO if you are unable to serve or STOP to unsubscribe.");
 
             return creator(
                     new PhoneNumber(response.getMember().getId()),
