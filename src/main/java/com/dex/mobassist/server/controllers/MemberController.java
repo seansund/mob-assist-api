@@ -39,7 +39,7 @@ public class MemberController {
 
     @QueryMapping
     public Member getMemberByPhone(@Argument("phone") String phone) {
-        return service.getById(phone);
+        return service.findByPhone(phone);
     }
 
     @MutationMapping

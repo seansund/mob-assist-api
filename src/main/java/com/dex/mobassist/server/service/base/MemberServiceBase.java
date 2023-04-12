@@ -6,12 +6,14 @@ import com.dex.mobassist.server.model.Member;
 import com.dex.mobassist.server.model.MemberRole;
 import com.dex.mobassist.server.repository.MemberRepository;
 import com.dex.mobassist.server.repository.MemberRoleRepository;
+import com.dex.mobassist.server.repository.mongodb.domain.MongoDBMember;
 import com.dex.mobassist.server.service.MemberService;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service("MemberService")
 public class MemberServiceBase implements MemberService {
@@ -35,7 +37,14 @@ public class MemberServiceBase implements MemberService {
 
     @Override
     public Member addUpdate(@NonNull Member newMember) {
-        return repository.save(newMember);
+        final MongoDBMember member = repository
+                .findByPhone(newMember.getPhone())
+                .map(m -> (MongoDBMember)m)
+                .orElseGet(() -> new MongoDBMember(newMember.getId()));
+
+        member.updateWith(newMember);
+
+        return repository.save(member);
     }
 
     @Override
