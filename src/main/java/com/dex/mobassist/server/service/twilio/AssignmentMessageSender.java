@@ -85,14 +85,26 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseMessage
             return message.toString();
         };
 
+        final String assignmentDisplay = assignmentString.apply(assignmentList);
+
         return format(
-                "%s is %s. You are signed up for the %s service and assigned to %s. %s",
+                "%s is %s. You are signed up for the %s service and assigned to %s. %s %s",
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 selectedOption.getValue(),
-                assignmentString.apply(assignmentList),
+                assignmentDisplay,
+                buildAssignmentDiagramUrl(assignmentDisplay),
                 getMessageSuffix()
         );
+    }
+
+    protected String buildAssignmentDiagramUrl(String assignmentDisplay) {
+        final String urlAssignment = assignmentDisplay
+                .replaceAll(" ", "")
+                .replaceAll("-", "")
+                .toLowerCase();
+
+        return String.format("bit.ly/deacon-assn#%s", urlAssignment);
     }
 
     protected String buildNoAssignmentMessage(Signup signup, SignupOption selectedOption) {
