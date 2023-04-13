@@ -81,7 +81,7 @@ public class TwilioWebhookService {
 
             final String assignment = Collections.isNullOrEmpty(responseVal.getAssignments())
                     ? ""
-                    : String.format(" and have been assigned to %s", getAssignmentList(responseVal.getAssignments()));
+                    : String.format(" and assigned to %s", formatAssignment(responseVal.getAssignments()));
 
             body = String.format(
                     "The next %s is %s. You are signed up for %s%s.",
@@ -124,6 +124,17 @@ public class TwilioWebhookService {
                 .Builder()
                 .message(sms)
                 .build();
+    }
+
+    protected String formatAssignment(List<? extends AssignmentRef> refs) {
+        final String assignmentDisplay = AssignmentMessageSender.buildAssignmentDisplay(loadAssignments(refs));
+        final String assignmentUrl = AssignmentMessageSender.buildAssignmentDiagramUrl(assignmentDisplay);
+
+        return String.format(
+                "%s %s",
+                assignmentDisplay,
+                assignmentUrl
+        );
     }
 
     protected Function<List<String>, String> joiningComma(@NonNull String lastSeparator) {
@@ -226,58 +237,6 @@ public class TwilioWebhookService {
         }
 
         return assignmentService.findAllById(assignmentRefs.stream().map(ModelRef::getId).toList());
-    }
-
-    protected Collection<? extends AssignmentGroup> groupAssignments(List<? extends Assignment> assignments) {
-        Map<String, AssignmentGroupCargo> result = assignments.stream().reduce(
-                new LinkedHashMap<>(),
-                (Map<String, AssignmentGroupCargo> previous, @NonNull Assignment current) -> {
-                    AssignmentGroupCargo group = previous.get(current.getGroup());
-                    if (group == null) {
-                        group = new AssignmentGroupCargo(current.getGroup());
-                        previous.put(current.getGroup(), group);
-                    }
-
-                    group.addAssignment(current);
-
-                    return previous;
-                },
-                (Map<String, AssignmentGroupCargo> a, Map<String, AssignmentGroupCargo> b) -> a
-        );
-
-        return result.values();
-    }
-
-    protected String getAssignmentList(List<? extends AssignmentRef> assignmentRefs) {
-        final Function<List<? extends Assignment>, String> assignmentString = (assignments) -> {
-            Collection<? extends AssignmentGroup> groups = groupAssignments(assignments);
-
-            final StringBuffer message = groups.stream().reduce(
-                    new StringBuffer(100),
-                    (StringBuffer previous, AssignmentGroup current) -> {
-                        if (previous.length() == 0) {
-                            previous.append(current.getGroup()).append(" - ");
-                        } else {
-                            previous.append(", ");
-                        }
-
-                        final String val = current.getAssignments()
-                                .stream()
-                                .map(Assignment::getName)
-                                .collect(Collectors.joining(", "));
-
-                        previous.append(val);
-
-                        return previous;
-                    },
-                    (StringBuffer a, StringBuffer b) -> a
-            );
-
-            // TODO fix assignment print
-            return message.toString();
-        };
-
-        return assignmentString.apply(loadAssignments(assignmentRefs));
     }
 
     protected String buildHelpResponse(List<? extends SignupOption> signupOptions) {

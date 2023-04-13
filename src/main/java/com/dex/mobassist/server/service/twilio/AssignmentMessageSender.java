@@ -57,42 +57,55 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseMessage
     }
 
     protected String buildAssignmentMessage(Signup signup, SignupOption selectedOption, List<? extends Assignment> assignmentList) {
-        final Function<List<? extends Assignment>, String> assignmentString = (assignments) -> {
-            Collection<? extends AssignmentGroup> groups = groupAssignments(assignments);
 
-            final StringBuffer message = groups.stream().reduce(
-                    new StringBuffer(100),
-                    (StringBuffer previous, AssignmentGroup current) -> {
-                        if (previous.length() == 0) {
-                            previous.append(current.getGroup()).append(" - ");
-                        } else {
-                            previous.append(", ");
-                        }
-
-                        final String val = current.getAssignments()
-                                .stream()
-                                .map(Assignment::getName)
-                                .collect(Collectors.joining(", "));
-
-                        previous.append(val);
-
-                        return previous;
-                    },
-                    (StringBuffer a, StringBuffer b) -> a
-            );
-
-            // TODO fix assignment print
-            return message.toString();
-        };
+        final String assignmentDisplay = buildAssignmentDisplay(assignmentList);
 
         return format(
-                "%s is %s. You are signed up for the %s service and assigned to %s. %s",
+                "%s is %s. You are signed up for the %s service and assigned to %s. %s %s",
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 selectedOption.getValue(),
-                assignmentString.apply(assignmentList),
+                assignmentDisplay,
+                buildAssignmentDiagramUrl(assignmentDisplay),
                 getMessageSuffix()
         );
+    }
+
+    public static String buildAssignmentDisplay(List<? extends Assignment> assignments) {
+        Collection<? extends AssignmentGroup> groups = groupAssignments(assignments);
+
+        final StringBuffer message = groups.stream().reduce(
+                new StringBuffer(100),
+                (StringBuffer previous, AssignmentGroup current) -> {
+                    if (previous.length() == 0) {
+                        previous.append(current.getGroup()).append(" - ");
+                    } else {
+                        previous.append(", ");
+                    }
+
+                    final String val = current.getAssignments()
+                            .stream()
+                            .map(Assignment::getName)
+                            .collect(Collectors.joining(", "));
+
+                    previous.append(val);
+
+                    return previous;
+                },
+                (StringBuffer a, StringBuffer b) -> a
+        );
+
+        // TODO fix assignment print
+        return message.toString();
+    }
+
+    public static String buildAssignmentDiagramUrl(String assignmentDisplay) {
+        final String urlAssignment = assignmentDisplay
+                .replaceAll(" ", "")
+                .replaceAll("-", ",")
+                .toLowerCase();
+
+        return String.format("bit.ly/deacon-assn#%s", urlAssignment);
     }
 
     protected String buildNoAssignmentMessage(Signup signup, SignupOption selectedOption) {
