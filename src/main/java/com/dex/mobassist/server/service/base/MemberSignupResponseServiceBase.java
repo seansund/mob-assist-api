@@ -87,8 +87,12 @@ public class MemberSignupResponseServiceBase implements MemberSignupResponseServ
         return concat(memberResponses.stream(), memberNoResponse.stream()).toList();
     }
 
+    protected String buildNoResponseId(SignupRef signup, MemberRef member) {
+        return String.format("no-%s-%s", signup.getId(), member.getId());
+    }
+
     protected Function<SignupRef, MemberSignupResponse> createMemberNoResponse(MemberRef member) {
-        return (SignupRef signup) -> (MemberSignupResponse) new SimpleMemberSignupResponse(signup.getId() + "-" + member.getId())
+        return (SignupRef signup) -> (MemberSignupResponse) new SimpleMemberSignupResponse(buildNoResponseId(signup, member))
                 .withSignup(signup)
                 .withMember(member);
     }
@@ -130,7 +134,7 @@ public class MemberSignupResponseServiceBase implements MemberSignupResponseServ
     }
 
     protected Function<MemberRef, MemberSignupResponse> createSignupNoResponse(SignupRef signup) {
-        return (MemberRef member) -> (MemberSignupResponse) new SimpleMemberSignupResponse(signup.getId() + "-" + member.getId())
+        return (MemberRef member) -> (MemberSignupResponse) new SimpleMemberSignupResponse(buildNoResponseId(signup, member))
                 .withSignup(signup)
                 .withMember(member);
     }
