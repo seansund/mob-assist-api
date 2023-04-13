@@ -145,22 +145,35 @@ public abstract class AbstractMemberSignupResponseMessageSender<T extends Notifi
         return assignmentService.findAllById(refs.stream().map(ModelRef::getId).toList());
     }
 
-    protected Collection<? extends AssignmentGroup> groupAssignments(List<? extends Assignment> assignments) {
-        Map<String, AssignmentGroupCargo> result = assignments.stream().reduce(
-                new LinkedHashMap<>(),
-                (Map<String, AssignmentGroupCargo> previous, @NonNull Assignment current) -> {
-                    AssignmentGroupCargo group = previous.get(current.getGroup());
-                    if (group == null) {
-                        group = new AssignmentGroupCargo(current.getGroup());
-                        previous.put(current.getGroup(), group);
-                    }
+    public static Collection<? extends AssignmentGroup> groupAssignments(List<? extends Assignment> assignments) {
+        Map<String, AssignmentGroupCargo> result = assignments.stream()
+                .sorted((a, b) -> {
+                    final List<Integer> comparisons = List.of(
+                            a.getRow() - b.getRow(),
+                            a.getGroup().compareTo(b.getGroup()),
+                            a.getName().compareTo(b.getName())
+                    );
 
-                    group.addAssignment(current);
+                    return comparisons.stream()
+                            .filter(val -> val != 0)
+                            .findFirst()
+                            .orElse(0);
+                })
+                .reduce(
+                    new LinkedHashMap<>(),
+                    (Map<String, AssignmentGroupCargo> previous, @NonNull Assignment current) -> {
+                        AssignmentGroupCargo group = previous.get(current.getGroup());
+                        if (group == null) {
+                            group = new AssignmentGroupCargo(current.getGroup());
+                            previous.put(current.getGroup(), group);
+                        }
 
-                    return previous;
-                },
-                (Map<String, AssignmentGroupCargo> a, Map<String, AssignmentGroupCargo> b) -> a
-        );
+                        group.addAssignment(current);
+
+                        return previous;
+                    },
+                    (Map<String, AssignmentGroupCargo> a, Map<String, AssignmentGroupCargo> b) -> a
+                );
 
         return result.values();
     }
