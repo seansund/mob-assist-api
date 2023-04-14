@@ -69,6 +69,14 @@ public class SignupController {
         return list == null || list.isEmpty();
     }
 
+    protected SignupOption loadSignupOption(SignupOptionRef ref) {
+        if (ref instanceof SignupOption) {
+            return (SignupOption) ref;
+        }
+
+        return signupOptionService.getById(ref.getId());
+    }
+
     protected SignupOptionResponse createSignupOptionResponse(SignupOptionRef option) {
         return createSignupOptionResponse(option, 0, 0);
     }
@@ -86,6 +94,8 @@ public class SignupController {
 
         final List<? extends SignupOptionResponse> initialResponses = optionSet.getOptions()
                 .stream()
+                .map(this::loadSignupOption)
+                .sorted((a, b) -> a.getSortIndex() - b.getSortIndex())
                 .map(this::createSignupOptionResponse)
                 .toList();
 
