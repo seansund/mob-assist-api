@@ -8,6 +8,7 @@ import com.dex.mobassist.server.model.MemberRole;
 import com.dex.mobassist.server.model.MemberRoleRef;
 import com.dex.mobassist.server.model.SimpleResult;
 import com.dex.mobassist.server.service.MemberService;
+import com.dex.mobassist.server.util.Strings;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import org.springframework.graphql.data.method.annotation.*;
 import org.springframework.stereotype.Controller;
@@ -43,10 +44,12 @@ public class MemberController {
     }
 
     @MutationMapping
-    public Member addUpdateMember(@Argument("phone") String phone, @Argument("firstName") String firstName, @Argument("lastName") String lastName, @Argument("email") String email, @Argument("preferredContact") String preferredContact, @Argument("roleIds") String roleIds) {
+    public Member addUpdateMember(@Argument("phone") String phone, @Argument("firstName") String firstName, @Argument("lastName") String lastName, @Argument("email") String email, @Argument("preferredContact") String preferredContact, @Argument("roleIds") String roleIds, @Argument("password") String password) {
         final List<? extends MemberRoleRef> roles = roleIds == null
                 ? null
                 : Stream.of(roleIds.split(",")).map(MemberRoleRefCargo::new).toList();
+
+        final String hashedPassword = Strings.nonNullOrEmpty(password) ? Strings.hashString(password) : null;
 
         final Member member = new MemberCargo(phone)
                 .withPhone(phone)
@@ -54,7 +57,8 @@ public class MemberController {
                 .withLastName(lastName)
                 .withEmail(email)
                 .withPreferredContact(preferredContact)
-                .withRoles(roles);
+                .withRoles(roles)
+                .withPassword(hashedPassword);
 
         System.out.println("Updating member: " + member);
 
