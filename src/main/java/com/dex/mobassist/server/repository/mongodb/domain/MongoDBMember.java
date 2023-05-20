@@ -23,6 +23,7 @@ public class MongoDBMember extends MongoDBMemberRef implements Member {
     @NonNull private String preferredContact = "text";
     @DBRef
     private List<? extends MongoDBMemberRole> roles = new ArrayList<>();
+    @NonNull private String password = "";
 
     public MongoDBMember() {
         this(null);
@@ -114,6 +115,16 @@ public class MongoDBMember extends MongoDBMemberRef implements Member {
         this.roles = roles.stream().map(MongoDBMemberRole::createMemberRole).toList();
     }
 
+    @Override
+    public @NonNull String getPassword() {
+        return password;
+    }
+
+    @Override
+    public void setPassword(@NonNull String password) {
+        this.password = password;
+    }
+
     public MongoDBMember updateWith(Member member) {
         if (member == null) {
             return this;
@@ -125,6 +136,7 @@ public class MongoDBMember extends MongoDBMemberRef implements Member {
                 .withFirstName(member.getFirstName())
                 .withLastName(member.getLastName())
                 .withPreferredContact(member.getPreferredContact())
-                .withRoles(MongoDBMemberRole.createMemberRoles(member.getRoles()));
+                .withRoles(MongoDBMemberRole.createMemberRoles(member.getRoles()))
+                .withPassword(member.getPassword());
     }
 }

@@ -18,6 +18,7 @@ public class SimpleMember extends SimpleMemberRef implements Comparable<SimpleMe
     private String email = "";
     private String preferredContact = "text";
     private List<? extends MemberRoleRef> roles = List.of();
+    private String password = "";
 
     public SimpleMember() {
         this(null);

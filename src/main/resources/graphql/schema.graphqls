@@ -3,6 +3,8 @@ type Query {
     listMemberRoles: [MemberRole]
     getMemberByPhone(phone: ID!): Member
 
+    login(userId: String!, password: String!): Member
+
     listSignups(scope: String = "upcoming"): [Signup]
     getSignupById(id: ID!): Signup
 
@@ -18,7 +20,7 @@ type Query {
 }
 
 type Mutation {
-    addUpdateMember(phone: ID!, firstName: String, lastName: String, email: String, preferredContact: String, roleIds: String): Member
+    addUpdateMember(phone: ID!, firstName: String, lastName: String, email: String, preferredContact: String, roleIds: String, password: String): Member
     removeMember(phone: ID!): SimpleResult
 
     addUpdateMemberRole(id: ID, name: String): MemberRole

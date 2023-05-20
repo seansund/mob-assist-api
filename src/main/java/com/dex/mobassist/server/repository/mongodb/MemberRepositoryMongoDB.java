@@ -31,6 +31,15 @@ public class MemberRepositoryMongoDB extends AbstractRepositoryMongoDB<Member, M
     }
 
     @Override
+    public Optional<? extends Member> findByEmail(String email) {
+
+        return Optional.ofNullable(mongoTemplate().findOne(
+                query(where("email").is(email)),
+                MongoDBMember.class
+        ));
+    }
+
+    @Override
     protected <A extends Member> String getId(@NonNull A cargo) {
         return cargo.getId();
     }

@@ -17,6 +17,8 @@ public interface Member extends MemberRef {
 
     String getPreferredContact();
 
+    String getPassword();
+
     void setFirstName(String firstName);
 
     default <T extends Member> T withFirstName(String firstName) {
@@ -74,6 +76,16 @@ public interface Member extends MemberRef {
     default <T extends Member> T withRoles(List<? extends MemberRoleRef> roles) {
         if (Objects.nonNull(roles)) {
             setRoles(roles);
+        }
+
+        return (T) this;
+    }
+
+    void setPassword(String password);
+
+    default <T extends Member> T withPassword(String password) {
+        if (Objects.nonNull(password)) {
+            setPassword(password);
         }
 
         return (T) this;
