@@ -10,6 +10,7 @@ public class SimpleAssignment extends SimpleAssignmentRef implements Assignment 
     private String group = "";
     private String name = "";
     private Integer row = 0;
+    private String partnerId = "";
 
     public SimpleAssignment() {
         this(null);

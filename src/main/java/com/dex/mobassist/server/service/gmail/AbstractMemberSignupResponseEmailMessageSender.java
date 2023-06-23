@@ -1,6 +1,7 @@
 package com.dex.mobassist.server.service.gmail;
 
 import com.dex.mobassist.server.backend.EmailNotificationConfig;
+import com.dex.mobassist.server.backend.MessageCreator;
 import com.dex.mobassist.server.model.Member;
 import com.dex.mobassist.server.model.MemberRef;
 import com.dex.mobassist.server.model.Signup;
@@ -34,9 +35,10 @@ public abstract class AbstractMemberSignupResponseEmailMessageSender extends Abs
             SignupOptionService signupOptionService,
             AssignmentSetService assignmentSetService,
             AssignmentService assignmentService,
-            MemberService memberService
+            MemberService memberService,
+            MessageCreator messageCreator
     ) {
-        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService);
+        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService, messageCreator);
     }
 
     protected abstract String buildSubject(Signup signup);

@@ -23,7 +23,7 @@ public class AssignmentMessageSenderTest {
             void thenReturntable5j31j19() {
                 final String actualValue = AssignmentMessageSender.buildAssignmentDiagramUrl("Table 5 - J31, J19");
 
-                assertEquals("bit.ly/deacon-assn#table5,j31,j19", actualValue);
+                assertEquals("https://bit.ly/deacon-assn#table5,j31,j19", actualValue);
             }
         }
     }

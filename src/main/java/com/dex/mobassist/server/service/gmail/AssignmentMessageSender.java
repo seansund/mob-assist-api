@@ -1,6 +1,7 @@
 package com.dex.mobassist.server.service.gmail;
 
 import com.dex.mobassist.server.backend.EmailNotificationConfig;
+import com.dex.mobassist.server.backend.MessageCreator;
 import com.dex.mobassist.server.cargo.NotificationResultCargo;
 import com.dex.mobassist.server.model.*;
 import com.dex.mobassist.server.service.*;
@@ -23,9 +24,11 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseEmailMe
             SignupOptionService signupOptionService,
             AssignmentSetService assignmentSetService,
             AssignmentService assignmentService,
-            MemberService memberService
+            MemberService memberService,
+            MessageCreator messageCreator
+
     ) {
-        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService);
+        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService, messageCreator);
     }
 
     @Override
@@ -39,7 +42,7 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseEmailMe
     }
 
     @Override
-    protected Function<MemberSignupResponse, Message> sendMessage(Signup signup, List<? extends Member> members) {
+    protected Function<MemberSignupResponse, Message> sendMessage(Signup signup, List<? extends Member> members, List<? extends MemberSignupResponse> responses) {
         final String subject = buildSubject(signup);
 
         return (MemberSignupResponse response) -> {

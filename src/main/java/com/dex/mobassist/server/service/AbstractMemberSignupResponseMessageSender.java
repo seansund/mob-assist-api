@@ -1,5 +1,6 @@
 package com.dex.mobassist.server.service;
 
+import com.dex.mobassist.server.backend.MessageCreator;
 import com.dex.mobassist.server.backend.NotificationConfig;
 import com.dex.mobassist.server.cargo.AssignmentGroupCargo;
 import com.dex.mobassist.server.model.*;
@@ -23,6 +24,7 @@ public abstract class AbstractMemberSignupResponseMessageSender<T extends Notifi
     private final AssignmentSetService assignmentSetService;
     private final AssignmentService assignmentService;
     private final MemberService memberService;
+    protected final MessageCreator messageCreator;
 
     protected AbstractMemberSignupResponseMessageSender(
             T backend,
@@ -32,7 +34,8 @@ public abstract class AbstractMemberSignupResponseMessageSender<T extends Notifi
             SignupOptionService signupOptionService,
             AssignmentSetService assignmentSetService,
             AssignmentService assignmentService,
-            MemberService memberService
+            MemberService memberService,
+            MessageCreator messageCreator
     ) {
         this.config = backend;
 
@@ -43,6 +46,7 @@ public abstract class AbstractMemberSignupResponseMessageSender<T extends Notifi
         this.assignmentSetService = assignmentSetService;
         this.assignmentService = assignmentService;
         this.memberService = memberService;
+        this.messageCreator = messageCreator;
     }
 
     public NotificationResult sendMessages(String signupId) {
@@ -54,7 +58,7 @@ public abstract class AbstractMemberSignupResponseMessageSender<T extends Notifi
         final List<?> statuses = responses.stream()
                 .filter(filterByNotificationPreference(members))
                 .filter(filterMessage())
-                .map(sendMessage(signup, members))
+                .map(sendMessage(signup, members, responses))
                 .filter(Objects::nonNull)
                 .toList();
 
@@ -77,7 +81,7 @@ public abstract class AbstractMemberSignupResponseMessageSender<T extends Notifi
 
     protected abstract Predicate<MemberSignupResponse> filterMessage();
 
-    protected abstract Function<MemberSignupResponse, ?> sendMessage(Signup signup, List<? extends Member> members);
+    protected abstract Function<MemberSignupResponse, ?> sendMessage(Signup signup, List<? extends Member> members, List<? extends MemberSignupResponse> responses);
 
     protected List<? extends SignupOption> loadSignupOptions(SignupOptionSetRef optionSetRef) {
         final SignupOptionSet optionSet = loadSignupOptionSet(optionSetRef);

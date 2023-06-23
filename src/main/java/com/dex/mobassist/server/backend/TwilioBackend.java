@@ -1,11 +1,13 @@
 package com.dex.mobassist.server.backend;
 
 import com.twilio.Twilio;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Primary
+@Profile("sms-twilio")
 public class TwilioBackend implements TwilioConfig {
 
     final private TwilioConfigData config;
@@ -39,5 +41,11 @@ public class TwilioBackend implements TwilioConfig {
     @Override
     public String getChannel() {
         return config.getChannel();
+    }
+
+    @Bean
+    public MessageCreator messageCreator() {
+        System.out.println("############# Twilio message creator #############");
+        return new TwilioMessageCreator();
     }
 }

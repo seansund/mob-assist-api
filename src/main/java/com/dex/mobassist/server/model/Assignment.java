@@ -11,6 +11,8 @@ public interface Assignment extends AssignmentRef {
 
     Integer getRow();
 
+    String getPartnerId();
+
     void setGroup(String group);
 
     default <T extends Assignment> T withGroup(String group) {
@@ -36,6 +38,16 @@ public interface Assignment extends AssignmentRef {
     default <T extends Assignment> T withRow(Integer row) {
         if (Objects.nonNull(row)) {
             setRow(row);
+        }
+
+        return (T) this;
+    }
+
+    void setPartnerId(String partnerId);
+
+    default <T extends Assignment> T withPartnerId(String partnerId) {
+        if (Objects.nonNull(partnerId)) {
+            setPartnerId(partnerId);
         }
 
         return (T) this;

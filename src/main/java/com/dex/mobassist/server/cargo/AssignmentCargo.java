@@ -10,6 +10,7 @@ public class AssignmentCargo extends AssignmentRefCargo implements Assignment {
     private String group;
     private String name;
     private Integer row;
+    private String partnerId;
 
     public AssignmentCargo() {
         this(null);

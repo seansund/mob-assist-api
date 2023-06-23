@@ -1,13 +1,12 @@
 package com.dex.mobassist.server.service.twilio;
 
-import com.dex.mobassist.server.backend.TwilioBackend;
+import com.dex.mobassist.server.backend.MessageCreator;
+import com.dex.mobassist.server.backend.TwilioConfigData;
 import com.dex.mobassist.server.model.NotificationResult;
 import com.dex.mobassist.server.service.*;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service("SMSNotification")
-@Profile("sms-twilio")
 public class TwilioNotificationService implements NotificationService {
 
     private final MemberSignupResponseMessageSender signupRequestSender;
@@ -16,14 +15,15 @@ public class TwilioNotificationService implements NotificationService {
     private final MemberSignupResponseMessageSender checkinRequestMessageSender;
 
     public TwilioNotificationService(
-            TwilioBackend config,
+            TwilioConfigData config,
             MemberSignupResponseService service,
             SignupService signupService,
             SignupOptionSetService signupOptionSetService,
             SignupOptionService signupOptionService,
             AssignmentSetService assignmentSetService,
             AssignmentService assignmentService,
-            MemberService memberService
+            MemberService memberService,
+            MessageCreator messageCreator
     ) {
         this.signupRequestSender = new SignupRequestMessageSender(
                 config,
@@ -33,7 +33,8 @@ public class TwilioNotificationService implements NotificationService {
                 signupOptionService,
                 assignmentSetService,
                 assignmentService,
-                memberService
+                memberService,
+                messageCreator
         );
 
         this.signupRequestNoResponseSender = new SignupRequestNoResponseMessageSender(
@@ -44,7 +45,8 @@ public class TwilioNotificationService implements NotificationService {
                 signupOptionService,
                 assignmentSetService,
                 assignmentService,
-                memberService
+                memberService,
+                messageCreator
         );
 
         this.assignmentMessageSender = new AssignmentMessageSender(
@@ -55,7 +57,8 @@ public class TwilioNotificationService implements NotificationService {
                 signupOptionService,
                 assignmentSetService,
                 assignmentService,
-                memberService
+                memberService,
+                messageCreator
         );
 
         this.checkinRequestMessageSender = new CheckinRequestMessageSender(
@@ -66,7 +69,8 @@ public class TwilioNotificationService implements NotificationService {
                 signupOptionService,
                 assignmentSetService,
                 assignmentService,
-                memberService
+                memberService,
+                messageCreator
         );
     }
 
