@@ -1,6 +1,7 @@
 package com.dex.mobassist.server.service.gmail;
 
 import com.dex.mobassist.server.backend.EmailNotificationConfig;
+import com.dex.mobassist.server.backend.MessageCreator;
 import com.dex.mobassist.server.cargo.NotificationResultCargo;
 import com.dex.mobassist.server.model.*;
 import com.dex.mobassist.server.service.*;
@@ -13,8 +14,8 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 public class SignupRequestMessageSender extends AbstractMemberSignupResponseEmailMessageSender implements MemberSignupResponseMessageSender {
-    public SignupRequestMessageSender(EmailNotificationConfig config, MemberSignupResponseService service, SignupService signupService, SignupOptionSetService signupOptionSetService, SignupOptionService signupOptionService, AssignmentSetService assignmentSetService, AssignmentService assignmentService, MemberService memberService) {
-        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService);
+    public SignupRequestMessageSender(EmailNotificationConfig config, MemberSignupResponseService service, SignupService signupService, SignupOptionSetService signupOptionSetService, SignupOptionService signupOptionService, AssignmentSetService assignmentSetService, AssignmentService assignmentService, MemberService memberService, MessageCreator messageCreator) {
+        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService, messageCreator);
     }
 
     @Override
@@ -28,7 +29,7 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseEmai
     }
 
     @Override
-    protected Function<MemberSignupResponse, ?> sendMessage(Signup signup, List<? extends Member> members) {
+    protected Function<MemberSignupResponse, ?> sendMessage(Signup signup, List<? extends Member> members, List<? extends MemberSignupResponse> responses) {
         final String subject = buildSubject(signup);
 
         return (MemberSignupResponse response) -> {

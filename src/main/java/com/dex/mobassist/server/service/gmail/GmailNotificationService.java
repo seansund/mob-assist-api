@@ -1,6 +1,7 @@
 package com.dex.mobassist.server.service.gmail;
 
 import com.dex.mobassist.server.backend.EmailNotificationConfig;
+import com.dex.mobassist.server.backend.MessageCreator;
 import com.dex.mobassist.server.model.NotificationResult;
 import com.dex.mobassist.server.service.*;
 import org.springframework.context.annotation.Profile;
@@ -22,7 +23,8 @@ public class GmailNotificationService implements NotificationService {
             SignupOptionService signupOptionService,
             AssignmentSetService assignmentSetService,
             AssignmentService assignmentService,
-            MemberService memberService
+            MemberService memberService,
+            MessageCreator messageCreator
     ) {
         this.signupRequestSender = new SignupRequestMessageSender(
                 config,
@@ -32,7 +34,8 @@ public class GmailNotificationService implements NotificationService {
                 signupOptionService,
                 assignmentSetService,
                 assignmentService,
-                memberService
+                memberService,
+                messageCreator
         );
 
         this.signupRequestNoResponseSender = new SignupRequestNoResponseMessageSender(
@@ -43,7 +46,8 @@ public class GmailNotificationService implements NotificationService {
                 signupOptionService,
                 assignmentSetService,
                 assignmentService,
-                memberService
+                memberService,
+                messageCreator
         );
 
         this.assignmentMessageSender = new AssignmentMessageSender(
@@ -54,7 +58,8 @@ public class GmailNotificationService implements NotificationService {
                 signupOptionService,
                 assignmentSetService,
                 assignmentService,
-                memberService
+                memberService,
+                messageCreator
         );
 
         this.checkinRequestMessageSender = new CheckinRequestMessageSender(
@@ -65,7 +70,8 @@ public class GmailNotificationService implements NotificationService {
                 signupOptionService,
                 assignmentSetService,
                 assignmentService,
-                memberService
+                memberService,
+                messageCreator
         );
     }
 

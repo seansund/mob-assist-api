@@ -1,6 +1,7 @@
 package com.dex.mobassist.server.service.gmail;
 
 import com.dex.mobassist.server.backend.EmailNotificationConfig;
+import com.dex.mobassist.server.backend.MessageCreator;
 import com.dex.mobassist.server.cargo.NotificationResultCargo;
 import com.dex.mobassist.server.model.*;
 import com.dex.mobassist.server.service.*;
@@ -15,8 +16,8 @@ import static com.twilio.rest.api.v2010.account.Message.creator;
 import static java.lang.String.format;
 
 public class CheckinRequestMessageSender extends AbstractMemberSignupResponseEmailMessageSender implements MemberSignupResponseMessageSender {
-    public CheckinRequestMessageSender(EmailNotificationConfig config, MemberSignupResponseService service, SignupService signupService, SignupOptionSetService signupOptionSetService, SignupOptionService signupOptionService, AssignmentSetService assignmentSetService, AssignmentService assignmentService, MemberService memberService) {
-        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService);
+    public CheckinRequestMessageSender(EmailNotificationConfig config, MemberSignupResponseService service, SignupService signupService, SignupOptionSetService signupOptionSetService, SignupOptionService signupOptionService, AssignmentSetService assignmentSetService, AssignmentService assignmentService, MemberService memberService, MessageCreator messageCreator) {
+        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService, messageCreator);
     }
 
     @Override
@@ -30,7 +31,7 @@ public class CheckinRequestMessageSender extends AbstractMemberSignupResponseEma
     }
 
     @Override
-    protected Function<MemberSignupResponse, ?> sendMessage(Signup signup, List<? extends Member> members) {
+    protected Function<MemberSignupResponse, ?> sendMessage(Signup signup, List<? extends Member> members, List<? extends MemberSignupResponse> responses) {
         final String subject = buildSubject(signup);
 
         return (MemberSignupResponse response) -> {

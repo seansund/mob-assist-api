@@ -22,6 +22,7 @@ public class MongoDBAssignment extends MongoDBAssignmentRef implements Assignmen
     private String name = "";
     @NonNull
     private Integer row = 0;
+    private String partnerId = "";
 
     public MongoDBAssignment() {
         this(null);
@@ -65,6 +66,7 @@ public class MongoDBAssignment extends MongoDBAssignmentRef implements Assignmen
         return this
                 .withGroup(assignment.getGroup())
                 .withName(assignment.getName())
-                .withRow(assignment.getRow());
+                .withRow(assignment.getRow())
+                .withPartnerId(assignment.getPartnerId());
     }
 }

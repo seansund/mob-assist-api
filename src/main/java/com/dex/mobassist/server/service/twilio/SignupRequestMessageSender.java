@@ -1,6 +1,8 @@
 package com.dex.mobassist.server.service.twilio;
 
-import com.dex.mobassist.server.backend.TwilioBackend;
+import com.dex.mobassist.server.backend.MessageCreator;
+import com.dex.mobassist.server.backend.TwilioConfig;
+import com.dex.mobassist.server.backend.TwilioConfigData;
 import com.dex.mobassist.server.cargo.NotificationResultCargo;
 import com.dex.mobassist.server.model.*;
 import com.dex.mobassist.server.service.*;
@@ -12,12 +14,27 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.twilio.rest.api.v2010.account.Message.creator;
 import static java.lang.String.format;
 
-public class SignupRequestMessageSender extends AbstractMemberSignupResponseMessageSender<TwilioBackend> implements MemberSignupResponseMessageSender {
-    public SignupRequestMessageSender(TwilioBackend config, MemberSignupResponseService service, SignupService signupService, SignupOptionSetService signupOptionSetService, SignupOptionService signupOptionService, AssignmentSetService assignmentSetService, AssignmentService assignmentService, MemberService memberService) {
-        super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService);
+public class SignupRequestMessageSender extends AbstractMemberSignupResponseMessageSender<TwilioConfig> implements MemberSignupResponseMessageSender {
+    public SignupRequestMessageSender(TwilioConfigData config,
+                                      MemberSignupResponseService service,
+                                      SignupService signupService,
+                                      SignupOptionSetService signupOptionSetService,
+                                      SignupOptionService signupOptionService,
+                                      AssignmentSetService assignmentSetService,
+                                      AssignmentService assignmentService,
+                                      MemberService memberService,
+                                      MessageCreator messageCreator) {
+        super(config,
+                service,
+                signupService,
+                signupOptionSetService,
+                signupOptionService,
+                assignmentSetService,
+                assignmentService,
+                memberService,
+                messageCreator);
     }
 
     @Override
@@ -31,17 +48,17 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseMess
     }
 
     @Override
-    protected Function<MemberSignupResponse, Message> sendMessage(Signup signup, List<? extends Member> members) {
+    protected Function<MemberSignupResponse, Message> sendMessage(Signup signup, List<? extends Member> members, List<? extends MemberSignupResponse> responses) {
         return (MemberSignupResponse response) -> {
             final String message = response.getSelectedOption() != null
                     ? buildSignupConfirmMessage(signup, loadSignupOptions(signup.getOptions()), loadSignupOption(response.getSelectedOption()))
                     : buildSignupRequestMessage(signup, loadSignupOptions(signup.getOptions()));
 
-            return creator(
+            return messageCreator.createMessage(
                     new PhoneNumber(response.getMember().getId()),
                     new PhoneNumber(config.getPhoneNumber()),
                     message
-            ).create();
+            );
         };
     }
 

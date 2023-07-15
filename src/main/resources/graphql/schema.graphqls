@@ -91,6 +91,7 @@ type Assignment {
     group: String!
     name: String!
     row: Int!
+    partnerId: String
 }
 
 type SignupOptionSet {
