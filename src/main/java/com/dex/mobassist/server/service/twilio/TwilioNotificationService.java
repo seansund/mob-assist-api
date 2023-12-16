@@ -25,6 +25,8 @@ public class TwilioNotificationService implements NotificationService {
             MemberService memberService,
             MessageCreator messageCreator
     ) {
+        final String prefix = "FBG: ";
+
         this.signupRequestSender = new SignupRequestMessageSender(
                 config,
                 service,
@@ -34,7 +36,8 @@ public class TwilioNotificationService implements NotificationService {
                 assignmentSetService,
                 assignmentService,
                 memberService,
-                messageCreator
+                messageCreator,
+                prefix
         );
 
         this.signupRequestNoResponseSender = new SignupRequestNoResponseMessageSender(
@@ -46,7 +49,8 @@ public class TwilioNotificationService implements NotificationService {
                 assignmentSetService,
                 assignmentService,
                 memberService,
-                messageCreator
+                messageCreator,
+                prefix
         );
 
         this.assignmentMessageSender = new AssignmentMessageSender(
@@ -58,7 +62,8 @@ public class TwilioNotificationService implements NotificationService {
                 assignmentSetService,
                 assignmentService,
                 memberService,
-                messageCreator
+                messageCreator,
+                prefix
         );
 
         this.checkinRequestMessageSender = new CheckinRequestMessageSender(
@@ -70,7 +75,8 @@ public class TwilioNotificationService implements NotificationService {
                 assignmentSetService,
                 assignmentService,
                 memberService,
-                messageCreator
+                messageCreator,
+                prefix
         );
     }
 

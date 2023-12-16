@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 public class SignupRequestMessageSender extends AbstractMemberSignupResponseMessageSender<TwilioConfig> implements MemberSignupResponseMessageSender {
+    private String prefix;
+
     public SignupRequestMessageSender(TwilioConfigData config,
                                       MemberSignupResponseService service,
                                       SignupService signupService,
@@ -25,7 +27,8 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseMess
                                       AssignmentSetService assignmentSetService,
                                       AssignmentService assignmentService,
                                       MemberService memberService,
-                                      MessageCreator messageCreator) {
+                                      MessageCreator messageCreator,
+                                      String prefix) {
         super(config,
                 service,
                 signupService,
@@ -35,6 +38,8 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseMess
                 assignmentService,
                 memberService,
                 messageCreator);
+
+        this.prefix = prefix;
     }
 
     @Override
@@ -68,7 +73,8 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseMess
 
     protected String buildSignupConfirmMessage(Signup signup, List<? extends SignupOption> options, SignupOption selectedOption) {
         return format(
-                "%s is %s. You are signed up for the %s service. %s",
+                "%s%s is %s. You are signed up for the %s service. %s",
+                prefix,
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 selectedOption.getValue(),
@@ -78,7 +84,8 @@ public class SignupRequestMessageSender extends AbstractMemberSignupResponseMess
 
     protected String buildSignupRequestMessage(Signup signup, List<? extends SignupOption> options) {
         return format(
-                "%s is %s. Sign up by responding with %s. %s",
+                "%s%s is %s. Sign up by responding with %s. %s",
+                prefix,
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 options.stream().
