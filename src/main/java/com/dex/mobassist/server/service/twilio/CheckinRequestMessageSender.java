@@ -7,6 +7,8 @@ import com.dex.mobassist.server.model.NotificationResult;
 import com.dex.mobassist.server.service.*;
 
 public class CheckinRequestMessageSender extends AssignmentMessageSender implements MemberSignupResponseMessageSender {
+    private String prefix;
+
     public CheckinRequestMessageSender(TwilioConfigData config,
                                        MemberSignupResponseService service,
                                        SignupService signupService,
@@ -15,7 +17,8 @@ public class CheckinRequestMessageSender extends AssignmentMessageSender impleme
                                        AssignmentSetService assignmentSetService,
                                        AssignmentService assignmentService,
                                        MemberService memberService,
-                                       MessageCreator messageCreator) {
+                                       MessageCreator messageCreator,
+                                       String prefix) {
         super(config,
                 service,
                 signupService,
@@ -24,7 +27,8 @@ public class CheckinRequestMessageSender extends AssignmentMessageSender impleme
                 assignmentSetService,
                 assignmentService,
                 memberService,
-                messageCreator);
+                messageCreator,
+                prefix);
     }
 
     @Override

@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 public class AssignmentMessageSender extends AbstractMemberSignupResponseMessageSender<TwilioConfig> implements MemberSignupResponseMessageSender {
+    private String prefix;
+
     public AssignmentMessageSender(
             TwilioConfigData config,
             MemberSignupResponseService service,
@@ -27,9 +29,12 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseMessage
             AssignmentSetService assignmentSetService,
             AssignmentService assignmentService,
             MemberService memberService,
-            MessageCreator messageCreator
+            MessageCreator messageCreator,
+            String prefix
     ) {
         super(config, service, signupService, signupOptionSetService, signupOptionService, assignmentSetService, assignmentService, memberService, messageCreator);
+
+        this.prefix = prefix;
     }
 
     @Override
@@ -68,7 +73,8 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseMessage
         );
 
         return format(
-                "%s is %s. You are signed up for the %s service and assigned to %s. %s %s",
+                "%s%s is %s. You are signed up for the %s service and assigned to %s. %s %s",
+                prefix,
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 selectedOption.getValue(),
@@ -123,7 +129,8 @@ public class AssignmentMessageSender extends AbstractMemberSignupResponseMessage
 
     protected String buildNoAssignmentMessage(Signup signup, SignupOption selectedOption) {
         return format(
-                "%s is %s. You are signed up for the %s service. %s",
+                "%s%s is %s. You are signed up for the %s service. %s",
+                prefix,
                 signup.getTitle(),
                 format.format(signup.getDate()),
                 selectedOption.getValue(),
