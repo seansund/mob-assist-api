@@ -18,6 +18,7 @@ public class MemberCargo extends MemberRefCargo implements Member, Comparable {
     private String lastName;
     private String preferredContact;
     private List<? extends MemberRoleRef> roles;
+    private String password;
 
     public MemberCargo() {
         this(null);

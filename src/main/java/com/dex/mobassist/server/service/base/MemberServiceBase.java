@@ -1,5 +1,6 @@
 package com.dex.mobassist.server.service.base;
 
+import com.dex.mobassist.server.exceptions.IncorrectPassword;
 import com.dex.mobassist.server.exceptions.MemberNotFound;
 import com.dex.mobassist.server.exceptions.MemberPhoneNotFound;
 import com.dex.mobassist.server.model.Member;
@@ -8,6 +9,7 @@ import com.dex.mobassist.server.repository.MemberRepository;
 import com.dex.mobassist.server.repository.MemberRoleRepository;
 import com.dex.mobassist.server.repository.mongodb.domain.MongoDBMember;
 import com.dex.mobassist.server.service.MemberService;
+import com.dex.mobassist.server.util.Strings;
 import io.reactivex.rxjava3.core.Observable;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -84,5 +86,28 @@ public class MemberServiceBase implements MemberService {
         member.setPreferredContact(preferredContact);
 
         this.addUpdate(member);
+    }
+
+    @Override
+    public Member login(String userId, String password) {
+        final Member member = getMemberFromUserId(userId).orElseThrow(() -> new MemberNotFound(userId));
+
+        final String hashedPassword = Strings.hashString(password);
+
+        if (!hashedPassword.equals(member.getPassword())) {
+            throw new IncorrectPassword(userId);
+        }
+
+        return member;
+    }
+
+    protected Optional<? extends Member> getMemberFromUserId(String userId) {
+        Optional<? extends Member> member = repository.findByPhone(userId);
+        if (member.isPresent()) {
+            return member;
+        }
+
+        member = repository.findByEmail(userId);
+        return member;
     }
 }

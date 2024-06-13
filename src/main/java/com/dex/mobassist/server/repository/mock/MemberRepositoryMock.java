@@ -33,4 +33,12 @@ public class MemberRepositoryMock extends AbstractRepositoryMock<Member> impleme
                 .filter((member) -> phone.equals(member.getPhone()))
                 .findFirst();
     }
+
+    @Override
+    public Optional<? extends Member> findByEmail(String email) {
+        return findAll()
+                .stream()
+                .filter((member) -> email.equals(member.getEmail()))
+                .findFirst();
+    }
 }

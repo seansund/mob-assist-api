@@ -18,4 +18,6 @@ public interface MemberService extends BaseService<Member> {
     boolean removeRole(@NonNull String id);
 
     void setPreferredContact(String memberPhone, String preferredContact);
+
+    Member login(String userId, String password);
 }
