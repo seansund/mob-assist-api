@@ -1,8 +1,9 @@
 import {ModelRef} from "./base.model";
 import {GroupModel} from "./group.model";
-import {OptionSetModel} from "./option.model";
-import {AssignmentSetModel} from "./assignment.model";
+import {OptionModel, OptionSetModel} from './option.model';
+import {AssignmentModel, AssignmentSetModel} from './assignment.model';
 import {MemberSignupResponseModel} from "./member-signup-response.model";
+import {Sign} from 'node:crypto';
 
 export const validateDate = (date: string): boolean => {
   if (date.match(/^\d{4}-\d{2}-\d{2}$/) === null) {
@@ -28,6 +29,9 @@ export interface SignupDataModel {
   description?: string;
 }
 
+export interface SignupInputModel extends SignupDataModel, SignupRelationsIdsModel {
+}
+
 export interface BaseSignupModel extends Partial<ModelRef>, SignupDataModel {
 }
 
@@ -39,11 +43,16 @@ export interface SignupRelationsIdsModel {
 
 export interface SignupRelationsModel {
   group: GroupModel;
-  optionSet: OptionSetModel;
-  assignmentSet: AssignmentSetModel;
+  options: OptionModel[];
+  assignments: AssignmentModel[];
   responses?: MemberSignupResponseModel[];
 }
 
 export interface SignupModel extends BaseSignupModel, SignupRelationsModel {
 
+}
+
+export interface SignupFilterModel {
+  memberId?: string;
+  scope?: SignupScope;
 }

@@ -1,9 +1,13 @@
 import {Model, model, property} from '@loopback/repository';
 import {field, inputType} from '@loopback/graphql';
+import {
+  MemberSignupResponseInputModel,
+  MemberSignupResponseModel,
+} from '../datatypes';
 
 @inputType({description: 'Member signup response input'})
 @model()
-export class MemberSignupResponseInput extends Model {
+export class MemberSignupResponseInput extends Model implements MemberSignupResponseInputModel {
   @field(() => Boolean)
   @property({
     type: 'string',

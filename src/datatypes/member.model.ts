@@ -31,6 +31,13 @@ export interface MemberDataModel {
   roles?: MemberRoleModel[];
 }
 
+export const isMemberModel = (val: unknown): val is MemberModel => {
+  return !!val
+    && (val as MemberModel).id !== undefined
+    && (val as MemberModel).email !== undefined
+    && (val as MemberModel).lastName !== undefined;
+}
+
 export interface MemberModel extends Partial<ModelRef>, MemberDataModel {
 }
 

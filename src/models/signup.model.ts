@@ -6,6 +6,7 @@ import {
   property,
 } from '@loopback/repository';
 import {
+  AssignmentModel,
   AssignmentSetModel,
   GroupModel,
   MemberSignupResponseModel,
@@ -22,6 +23,7 @@ import {
 } from './assignment-set.model';
 import {MemberSignupResponse} from './member-signup-response.model';
 import {field, ID, objectType} from '@loopback/graphql';
+import {Assignment} from './assignment.model';
 
 @objectType({description: 'Signup'})
 @model()
@@ -75,6 +77,9 @@ export class Signup extends Entity implements SignupModel {
 
   @field(() => [Option])
   options: OptionModel[];
+
+  @field(() => [Assignment])
+  assignments: AssignmentModel[];
 
   @field(() => AssignmentSet)
   assignmentSet: AssignmentSetModel;

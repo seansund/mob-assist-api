@@ -3,7 +3,13 @@ import {field, ID, objectType} from '@loopback/graphql';
 
 import {Group} from './group.model';
 import {MemberRole} from './member-role.model';
-import {GroupModel, MemberModel, MemberRoleModel} from '../datatypes';
+import {
+  GroupModel,
+  MemberModel,
+  MemberRoleModel,
+  NotificationModel,
+} from '../datatypes';
+import {Notification} from './notification.model';
 
 @objectType({description: 'Member of the application'})
 @model()
@@ -59,6 +65,10 @@ export class Member extends Entity implements MemberModel {
   @field(() => [Group], {nullable: true})
   groups?: GroupModel[];
 
+  // @hasMany(() => Notification, {through: {model: () => MemberNotification}})
+  @field(() => [Notification], {nullable: true})
+  notifications?: NotificationModel[];
+
   constructor(data?: Partial<Member>) {
     super(data);
   }
@@ -67,6 +77,7 @@ export class Member extends Entity implements MemberModel {
 export interface MemberRelations {
   roles?: MemberRoleModel[];
   groups?: GroupModel[];
+  notifications?: NotificationModel[];
 }
 
 export type MemberWithRelations = Member & MemberRelations;

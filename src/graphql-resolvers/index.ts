@@ -5,3 +5,4 @@ export * from './member-role.resolver';
 export * from './member-signup-response.resolver';
 export * from './option-set.resolver';
 export * from './signup.resolver';
+export * from './notification.resolver';

@@ -10,3 +10,4 @@ export * from './option.repository';
 export * from './signup.repository';
 export * from './member-member-role.repository';
 export * from './member-role.repository';
+export * from './notification.repository';

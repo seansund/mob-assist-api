@@ -12,6 +12,8 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 
 import {MySequence} from './sequence';
+import {bindServices} from './services';
+import {bindConfig} from './config';
 
 export {ApplicationConfig};
 
@@ -31,6 +33,11 @@ export class MobAssistApplication extends BootMixin(
 
     // Set up the custom sequence
     this.sequence(MySequence);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    bindConfig(this as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    bindServices(this as any);
 
     // Set up default home page
     this.static('/', path.join(__dirname, '../public'));

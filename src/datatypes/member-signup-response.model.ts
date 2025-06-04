@@ -8,8 +8,23 @@ export interface MemberSignupResponseModel extends Partial<ModelRef> {
   signedUp: boolean;
   member: MemberModel;
   signup: SignupModel;
-  option: OptionModel;
+  option?: OptionModel;
   assignments?: AssignmentModel[];
   message?: string;
   checkedIn?: boolean;
+}
+
+export interface MemberSignupResponseInputModel {
+  signedUp: boolean;
+  memberId: string;
+  signupId: string;
+  optionId: string;
+  message?: string;
+  checkedIn?: boolean;
+}
+
+export interface MemberSignupResponseFilterModel {
+  memberId?: string;
+  signupId?: string;
+  optionId?: {inq: string[]};
 }

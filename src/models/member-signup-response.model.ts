@@ -71,7 +71,7 @@ export class MemberSignupResponse extends Entity implements MemberSignupResponse
   @field(type => Signup)
   signup: SignupModel;
 
-  @field(type => Option)
+  @field(type => Option, {nullable: true})
   option: OptionModel;
 
   constructor(data?: Partial<MemberSignupResponse>) {
@@ -86,3 +86,10 @@ export interface MemberSignupResponseRelations {
 }
 
 export type MemberSignupResponseWithRelations = MemberSignupResponse & MemberSignupResponseRelations;
+
+
+export const isMemberSignupResponse = (val: unknown): val is MemberSignupResponse => {
+  return !!val
+    && (val as MemberSignupResponse).memberId !== undefined
+    && (val as MemberSignupResponse).signupId !== undefined;
+}
