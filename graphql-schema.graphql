@@ -146,6 +146,7 @@ type Mutation {
   removeMembersFromGroup(groupId: ID!, memberIds: [ID!]!): [Member!]!
   removeOption(optionId: String!, optionSetId: ID!): OptionSet!
   removeRoleFromMember(memberId: ID!, memberRoleId: ID!): Member!
+  respondToSignup(data: MemberSignupResponseInput!): Signup
   sendSignupAssignments(signupId: ID!): NotificationResult!
   sendSignupCheckin(signupId: ID!): NotificationResult!
   sendSignupRequest(signupId: ID!): NotificationResult!
@@ -215,12 +216,19 @@ input OptionSetInput {
   options: [OptionInput!]!
 }
 
+type OptionSummary {
+  assignmentCount: Float!
+  count: Float!
+  option: Option
+}
+
 type Query {
   getAssignmentSet(assignmentSetId: String!): AssignmentSet
   getMember(memberId: MemberIdentityInput!): Member
   getOptionSet(optionSetId: ID!): OptionSet
   getResponse(id: ID!): MemberSignupResponse
   getSignup(signupId: ID!): Signup
+  listAllResponses(filter: MemberSignupResponseFilter): [MemberSignupResponse!]!
   listAssignmentSets: [AssignmentSet!]!
   listGroups: [Group!]!
   listMemberRoles: [MemberRole!]!
@@ -238,14 +246,16 @@ type Signup {
   description: String
   group: Group!
   id: ID!
+  members: [Member!]!
   optionSet: OptionSet!
   options: [Option!]!
+  responseSummaries: [OptionSummary!]!
   responses: [MemberSignupResponse!]
   title: String!
 }
 
 input SignupFilter {
-  memberId: String
+  memberId: MemberIdentityInput
   scope: SignupScope!
 }
 

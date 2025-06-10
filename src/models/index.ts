@@ -28,3 +28,4 @@ export * from './member-signup-response-input.model';
 export * from './member-signup-response-update-input.model';
 export * from './member-signup-response-filter.model';
 export * from './notification.model';
+export * from './option-summary.model';

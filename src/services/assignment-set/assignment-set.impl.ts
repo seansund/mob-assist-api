@@ -4,8 +4,14 @@ import {
   AssignmentRepository,
   AssignmentSetRepository,
 } from '../../repositories';
-import {AssignmentModel, AssignmentSetModel} from '../../datatypes';
-import {Assignment, AssignmentSet} from '../../models';
+import {
+  AssignmentDataModel,
+  AssignmentModel,
+  AssignmentSetInputModel,
+  AssignmentSetModel,
+} from '../../datatypes';
+import {AssignmentSet} from '../../models';
+import {entitiesToModels, entityToModel} from '../../util';
 
 export class AssignmentSetImpl implements AssignmentSetApi {
   constructor(
@@ -14,12 +20,14 @@ export class AssignmentSetImpl implements AssignmentSetApi {
   ) {
   }
 
-  async create(data: Omit<AssignmentSetModel, "id">): Promise<AssignmentSetModel> {
+  async create(data: AssignmentSetInputModel): Promise<AssignmentSetModel> {
     const assignmentSet = await this.repo.create({name: data.name});
 
-    const optionInputs = (data.assignments ?? []).map((assignment: AssignmentModel) => ({...assignment, assignmentSetId: assignmentSet.getId()}))
+    const optionInputs = (data.assignments ?? []).map((assignment: AssignmentDataModel) => ({...assignment, assignmentSetId: assignmentSet.getId()}))
 
-    const assignments: Assignment[] = await this.assignmentRepo.createAll(optionInputs);
+    const assignments: AssignmentModel[] = await this.assignmentRepo
+      .createAll(optionInputs)
+      .then(entitiesToModels);
 
     return {
       id: assignmentSet.getId(),
@@ -29,7 +37,9 @@ export class AssignmentSetImpl implements AssignmentSetApi {
   }
 
   async delete(id: string): Promise<AssignmentSetModel> {
-    const assignmentSet: AssignmentSetModel | null = await this.repo.findOne({where: {id}});
+    const assignmentSet: AssignmentSetModel | null = await this.repo
+      .findOne({where: {id}})
+      .then(entityToModel);
 
     if (!assignmentSet) {
       throw new Error('AssignmentSet not found: ' + id);
@@ -45,7 +55,9 @@ export class AssignmentSetImpl implements AssignmentSetApi {
   }
 
   async update(id: string, data: Partial<AssignmentSetModel>): Promise<AssignmentSetModel> {
-    const assignmentSet: AssignmentSetModel | null = await this.repo.findOne({where: {id}});
+    const assignmentSet: AssignmentSetModel | null = await this.repo
+      .findOne({where: {id}})
+      .then(entityToModel);
 
     if (!assignmentSet) {
       throw new Error('AssignmentSet not found: ' + id);
@@ -59,7 +71,7 @@ export class AssignmentSetImpl implements AssignmentSetApi {
   }
 
   async list(): Promise<AssignmentSetModel[]> {
-    return this.repo.find();
+    return this.repo.find().then(entitiesToModels);
   }
 
 
@@ -84,7 +96,7 @@ export class AssignmentSetImpl implements AssignmentSetApi {
       await this.assignmentRepo.deleteAll({id: assignmentId, assignmentSetId: assignmentSetId});
     }
 
-    return assignmentSet ?? undefined;
+    return entityToModel(assignmentSet);
   }
 
   async getAssignments(
@@ -99,7 +111,9 @@ export class AssignmentSetImpl implements AssignmentSetApi {
 
     const assignments = await context.assignments;
 
-    return assignments.filter(assignment => assignment.assignmentSetId === assignmentSet.id);
+    return assignments
+      .filter(assignment => assignment.assignmentSetId === assignmentSet.id)
+      .map(entityToModel);
   }
 
 }

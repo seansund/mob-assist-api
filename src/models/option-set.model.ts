@@ -2,10 +2,11 @@ import {Entity, hasMany, model, property} from '@loopback/repository';
 import {OptionModel, OptionSetModel} from '../datatypes';
 import {Option} from './option.model';
 import {field, ID, objectType} from '@loopback/graphql';
+import {Optional} from '../util';
 
 @objectType({description: 'Collection of options'})
 @model()
-export class OptionSet extends Entity implements OptionSetModel {
+export class OptionSet extends Entity implements Optional<OptionSetModel, 'id'> {
   @field(type => ID)
   @property({
     type: 'string',

@@ -4,14 +4,20 @@ import {SignupModel} from "./signup.model";
 import {OptionModel} from "./option.model";
 import {AssignmentModel} from "./assignment.model";
 
-export interface MemberSignupResponseModel extends Partial<ModelRef> {
+export interface MemberSignupResponseDataModel {
   signedUp: boolean;
   member: MemberModel;
+  memberId: string;
   signup: SignupModel;
+  signupId: string;
   option?: OptionModel;
+  optionId?: string;
   assignments?: AssignmentModel[];
   message?: string;
   checkedIn?: boolean;
+}
+
+export interface MemberSignupResponseModel extends ModelRef, MemberSignupResponseDataModel {
 }
 
 export interface MemberSignupResponseInputModel {
@@ -27,4 +33,5 @@ export interface MemberSignupResponseFilterModel {
   memberId?: string;
   signupId?: string;
   optionId?: {inq: string[]};
+  signedUp?: boolean;
 }

@@ -1,5 +1,9 @@
 import {BaseApi} from '../base.api';
-import {AssignmentModel, AssignmentSetModel} from '../../datatypes';
+import {
+  AssignmentModel,
+  AssignmentSetInputModel,
+  AssignmentSetModel,
+} from '../../datatypes';
 import {Assignment} from '../../models';
 
 export const ASSIGNMENT_SET_API = 'services.AssignmentSetApi';
@@ -10,7 +14,7 @@ export interface AssignmentSetContext {
   assignments?: Promise<Assignment[]>;
 }
 
-export abstract class AssignmentSetApi extends BaseApi<AssignmentSetModel> {
+export abstract class AssignmentSetApi extends BaseApi<AssignmentSetModel, AssignmentSetInputModel> {
 
   abstract addAssignment(id: string, assignment: Omit<AssignmentModel, 'id'>): Promise<AssignmentSetModel>;
   abstract deleteAssignment(id: string, assignmentId: string): Promise<AssignmentSetModel | undefined>;

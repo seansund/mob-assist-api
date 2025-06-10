@@ -1,9 +1,6 @@
 import {Model, model, property} from '@loopback/repository';
 import {field, inputType} from '@loopback/graphql';
-import {
-  MemberSignupResponseInputModel,
-  MemberSignupResponseModel,
-} from '../datatypes';
+import {MemberSignupResponseInputModel} from '../datatypes';
 
 @inputType({description: 'Member signup response input'})
 @model()

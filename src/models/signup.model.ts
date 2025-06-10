@@ -8,10 +8,10 @@ import {
 import {
   AssignmentModel,
   AssignmentSetModel,
-  GroupModel,
+  GroupModel, MemberModel,
   MemberSignupResponseModel,
   OptionModel,
-  OptionSetModel,
+  OptionSetModel, OptionSummaryModel,
   SignupModel,
 } from '../datatypes';
 import {Group, GroupWithRelations} from './group.model';
@@ -24,10 +24,13 @@ import {
 import {MemberSignupResponse} from './member-signup-response.model';
 import {field, ID, objectType} from '@loopback/graphql';
 import {Assignment} from './assignment.model';
+import {Optional} from '../util';
+import {OptionSummary} from './option-summary.model';
+import {Member} from './member.model';
 
 @objectType({description: 'Signup'})
 @model()
-export class Signup extends Entity implements SignupModel {
+export class Signup extends Entity implements Optional<SignupModel, 'id'> {
   @field(() => ID)
   @property({
     type: 'string',
@@ -83,6 +86,12 @@ export class Signup extends Entity implements SignupModel {
 
   @field(() => AssignmentSet)
   assignmentSet: AssignmentSetModel;
+
+  @field(() => [OptionSummary])
+  responseSummaries?: OptionSummaryModel[];
+
+  @field(() => [Member])
+  members?: MemberModel[];
 
   constructor(data?: Partial<Signup>) {
     super(data);

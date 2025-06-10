@@ -21,6 +21,7 @@ import {
   MemberMemberRole,
   MemberRole,
 } from '../../models';
+import {entitiesToModels, entityToModel} from '../../util';
 
 export class MemberImpl implements MemberApi {
 
@@ -43,7 +44,7 @@ export class MemberImpl implements MemberApi {
   }
 
   async createAll(data: Omit<MemberModel, "id">[]): Promise<MemberModel[]> {
-    return this.repo.createAll(data);
+    return this.repo.createAll(data).then(entityToModel);
   }
 
   async delete(where: MemberIdentifier): Promise<MemberModel | undefined> {
@@ -52,7 +53,8 @@ export class MemberImpl implements MemberApi {
       throw new Error('One of member id, email or phone must be provided');
     }
 
-    const member = await this.repo.findOne({where});
+    const member = await this.repo
+      .findOne({where});
 
     if (!member) {
       throw new Error('Member not found: ' + where);
@@ -60,7 +62,7 @@ export class MemberImpl implements MemberApi {
 
     await this.repo.deleteById(member.getId());
 
-    return member;
+    return entityToModel(member);
   }
 
   async get(where: MemberIdentifier): Promise<MemberModel | undefined> {
@@ -69,11 +71,12 @@ export class MemberImpl implements MemberApi {
       throw new Error('One of member id, email or phone must be provided');
     }
 
-    return this.repo.findOne({where}).then(result => result ?? undefined);
+    return this.repo.findOne({where})
+      .then(entityToModel);
   }
 
   async list(): Promise<MemberModel[]> {
-    return this.repo.find();
+    return this.repo.find().then(entitiesToModels);
   }
 
   async addUpdate(data: Omit<MemberModel, 'id'>): Promise<MemberModel> {
@@ -87,21 +90,24 @@ export class MemberImpl implements MemberApi {
     if (members.length > 1) {
       throw new Error('Multiple members found with same email or phone: ' + data.email + ' ' + data.phone);
     } else if (members.length === 0) {
-      return this.repo.create({...data});
+      return this.repo.create({...data}).then(entityToModel);
     }
 
     const updatedMember: Member = Object.assign(members[0], data);
 
     await this.repo.updateById(updatedMember.getId(), updatedMember);
 
-    return updatedMember;
+    return entityToModel(updatedMember);
   }
 
   async update(where: MemberIdentifier, data: Partial<MemberModel>): Promise<MemberModel> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const memberId = (where as any).id;
 
-    const member: MemberModel | null = await this.repo.findOne({where: {id: memberId}});
+    const member: MemberModel | null = await this.repo
+      .findOne({where: {id: memberId}})
+      .then(entityToModel);
+
     if (!member) {
       throw new Error('Member not found: ' + memberId);
     }
@@ -128,7 +134,9 @@ export class MemberImpl implements MemberApi {
 
     const memberIds = groupMembers.map(groupMember => groupMember.memberId);
 
-    return this.repo.find({where: {id: {inq: memberIds}}, order: ['lastName ASC', 'firstName ASC']});
+    return this.repo
+      .find({where: {id: {inq: memberIds}}, order: ['lastName ASC', 'firstName ASC']})
+      .then(entitiesToModels);
   }
 
   async getGroups(member: Member): Promise<Group[]> {
@@ -149,17 +157,26 @@ export class MemberImpl implements MemberApi {
 
   async addAllToGroup(memberIds: string[], groupId: string): Promise<MemberModel[]> {
 
-    const members: MemberModel[] = await this.repo.find({where: {id: {inq: memberIds}}});
+    const members: MemberModel[] = await this.repo
+      .find({where: {id: {inq: memberIds}}})
+      .then(entitiesToModels);
+
     if (members.length === 0) {
       throw new Error('Members not found: ' + memberIds);
     }
 
-    const group: GroupModel | null = await this.groupRepo.findOne({where: {id: groupId}});
+    const group: GroupModel | null = await this.groupRepo
+      .findOne({where: {id: groupId}})
+      .then(entityToModel);
+
     if (!group) {
       throw new Error('Group not found: ' + groupId);
     }
 
-    const existingGroupMembers: GroupMemberModel[] = await this.groupMemberRepo.find({where: {groupId, memberId: {inq: memberIds}}});
+    const existingGroupMembers: GroupMemberModel[] = await this.groupMemberRepo
+      .find({where: {groupId, memberId: {inq: memberIds}}})
+      .then(entitiesToModels);
+
     const existingMemberIds: string[] = existingGroupMembers
       .map(g => g.member?.id)
       .filter(id => !!id) as string[]
@@ -195,22 +212,31 @@ export class MemberImpl implements MemberApi {
 
     await this.memberMemberRoleRepo.create({memberId, memberRoleId});
 
-    return member;
+    return entityToModel(member);
   }
 
   async addToGroup(memberId: string, groupId: string): Promise<MemberModel> {
 
-    const member: MemberModel | null = await this.repo.findOne({where: {id: memberId}});
+    const member: MemberModel | null = await this.repo
+      .findOne({where: {id: memberId}})
+      .then(entityToModel);
+
     if (!member) {
       throw new Error('Member not found: ' + memberId);
     }
 
-    const group: GroupModel | null = await this.groupRepo.findOne({where: {id: groupId}});
+    const group: GroupModel | null = await this.groupRepo
+      .findOne({where: {id: groupId}})
+      .then(entityToModel);
+
     if (!group) {
       throw new Error('Group not found: ' + groupId);
     }
 
-    const groupMember: GroupMemberModel | null = await this.groupMemberRepo.findOne({where: {groupId, memberId}});
+    const groupMember: GroupMemberModel | null = await this.groupMemberRepo
+      .findOne({where: {groupId, memberId}})
+      .then(entityToModel);
+
     if (groupMember) {
       throw new Error('Member already in group: ' + memberId);
     }
@@ -222,12 +248,17 @@ export class MemberImpl implements MemberApi {
 
   async removeFromGroup(memberId: string, groupId: string): Promise<MemberModel> {
 
-    const member: MemberModel | null = await this.repo.findOne({where: {id: memberId}});
+    const member: MemberModel | null = await this.repo
+      .findOne({where: {id: memberId}})
+      .then(entityToModel);
+
     if (!member) {
       throw new Error('Member not found: ' + memberId);
     }
 
-    const groupMember: GroupMember | null = await this.groupMemberRepo.findOne({where: {groupId, memberId}});
+    const groupMember: GroupMember | null = await this.groupMemberRepo
+      .findOne({where: {groupId, memberId}});
+
     if (groupMember) {
       await this.groupMemberRepo.delete(groupMember.getId());
     }
@@ -246,11 +277,13 @@ export class MemberImpl implements MemberApi {
       await this.memberMemberRoleRepo.delete(memberMemberRole.getId());
     }
 
-    return member;
+    return entityToModel(member);
   }
 
   async removeAllFromGroup(memberIds: string[], groupId: string): Promise<MemberModel[]> {
-    const members: MemberModel[] = await this.repo.find({where: {id: {inq: memberIds}}});
+    const members: MemberModel[] = await this.repo
+      .find({where: {id: {inq: memberIds}}})
+      .then(entitiesToModels);
 
     await this.groupMemberRepo.deleteAll({groupId, memberId: {inq: memberIds}});
 

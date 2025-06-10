@@ -11,29 +11,37 @@ import {
 } from '@loopback/graphql';
 
 import {
-  GroupModel,
+  AssignmentModel,
+  GroupModel, MemberModel,
   MemberSignupResponseModel,
-  OptionModel,
+  OptionModel, OptionSummaryModel,
   SignupModel,
 } from '../datatypes';
 import {
   Assignment,
-  Group,
-  MemberSignupResponse,
-  Option,
+  Group, Member,
+  MemberSignupResponse, MemberSignupResponseInput,
+  Option, OptionSummary,
   Signup,
   SignupFilter,
   SignupInput,
   SignupUpdateModel,
 } from '../models';
-import {SIGNUP_API, SignupApi, SignupContext} from '../services';
+import {
+  MEMBER_SIGNUP_RESPONSE_API, MemberSignupResponseApi,
+  SIGNUP_API,
+  SignupApi,
+  SignupContext,
+} from '../services';
 import {inject} from '@loopback/core';
+import {entitiesToModels} from '../util';
 
 @resolver(() => Signup)
 export class SignupResolver implements ResolverInterface<Signup> {
 
   constructor(
     @inject(SIGNUP_API) protected service: SignupApi,
+    @inject(MEMBER_SIGNUP_RESPONSE_API) protected responseService: MemberSignupResponseApi,
   ) {}
 
   @mutation(() => Signup)
@@ -71,20 +79,28 @@ export class SignupResolver implements ResolverInterface<Signup> {
   ): Promise<SignupModel[]> {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: Signup[] = await this.service.list(filter) as any;
+    const result: Signup[] = await this.service.list(filter, context) as any;
 
-    context.memberId = filter?.memberId;
-    context.signupIds = unique(result.map(signup => signup.id as string).map(toString))
-    context.groupIds = unique(result.map(signup => signup.groupId as string).map(toString))
-    context.optionSetIds = unique(result.map(signup => signup.optionSetId as string).map(toString))
-    context.assignmentSetIds = unique(result.map(signup => signup.assignmentSetId as string).map(toString))
+    context.signups = Promise.resolve(result);
 
-    return result;
+    return entitiesToModels(result);
   }
 
   @mutation(() => Signup)
   async deleteSignup(@arg('signupId', () => ID) signupId: string): Promise<SignupModel | undefined> {
     return this.service.delete(signupId);
+  }
+
+  @mutation(() => Signup, {nullable: true})
+  async respondToSignup(
+    @arg('data') data: MemberSignupResponseInput
+  ): Promise<SignupModel | undefined> {
+
+    validateRespondToSignupInput(data);
+
+    await this.responseService.create(data);
+
+    return this.service.get(data.signupId);
   }
 
   @fieldResolver(() => [Option])
@@ -93,7 +109,7 @@ export class SignupResolver implements ResolverInterface<Signup> {
   }
 
   @fieldResolver(() => [Assignment])
-  async assignments(@root() signup: Signup, @Ctx() context: SignupContext): Promise<Assignment[]> {
+  async assignments(@root() signup: Signup, @Ctx() context: SignupContext): Promise<AssignmentModel[]> {
     return this.service.getAssignments(signup, context);
   }
 
@@ -105,6 +121,16 @@ export class SignupResolver implements ResolverInterface<Signup> {
   @fieldResolver(() => [MemberSignupResponse])
   async responses(@root() signup: Signup, @Ctx() context: SignupContext): Promise<MemberSignupResponseModel[]> {
     return this.service.getResponses(signup, context);
+  }
+
+  @fieldResolver(() => [OptionSummary])
+  async responseSummaries(@root() signup: Signup, @Ctx() context: SignupContext): Promise<OptionSummaryModel[]> {
+    return this.service.getResponseSummaries(signup, context);
+  }
+
+  @fieldResolver(() => [Member])
+  async members(@root() signup: Signup, @Ctx() context: SignupContext): Promise<MemberModel[]> {
+    return this.service.getMembers(signup, context);
   }
 }
 
@@ -124,4 +150,16 @@ const unique = <T>(list: T[]): T[] => {
 
 const toString = <T extends {toString: () => string}> (value: T): string => {
   return value.toString();
+}
+
+function validateRespondToSignupInput(data: MemberSignupResponseInput) {
+  if (!data.memberId) {
+    throw new Error('Member id is required in signup response')
+  }
+  if (!data.signupId) {
+    throw new Error('Signup id is required in signup response')
+  }
+  if (!data.optionId) {
+    throw new Error('Option id is required in signup response')
+  }
 }

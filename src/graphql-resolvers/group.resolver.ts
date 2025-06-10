@@ -8,7 +8,7 @@ import {
 } from '@loopback/graphql';
 import {repository} from '@loopback/repository';
 
-import {GroupModel} from '../datatypes';
+import {GroupModel, MemberModel} from '../datatypes';
 import {
   Group,
   GroupMember,
@@ -21,6 +21,7 @@ import {
   GroupRepository,
   MemberRepository,
 } from '../repositories';
+import {entitiesToModels} from '../util';
 
 
 @resolver(() => Group)
@@ -70,12 +71,12 @@ export class GroupResolver implements ResolverInterface<Group> {
   }
 
   @fieldResolver(() => [Member])
-  async members(@root() group: Group): Promise<Member[]> {
+  async members(@root() group: Group): Promise<MemberModel[]> {
 
     const groupMembers: GroupMemberWithRelations[] = await this.groupMemberRepo.find({where: {groupId: group.getId()}})
 
     const memberIds = groupMembers.map((groupMember: GroupMember) => groupMember.memberId);
 
-    return this.memberRepo.find({where: {id: {inq: memberIds}}});
+    return this.memberRepo.find({where: {id: {inq: memberIds}}}).then(entitiesToModels);
   }
 }

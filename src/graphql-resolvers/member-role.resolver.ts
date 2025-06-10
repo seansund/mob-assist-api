@@ -6,6 +6,7 @@ import {repository} from '@loopback/repository';
 import {MemberRoleModel} from '../datatypes';
 import {MemberRole} from '../models';
 import {arg, ID, mutation, query, resolver} from '@loopback/graphql';
+import {entitiesToModels, entityToModel} from '../util';
 
 
 @resolver(() => MemberRole)
@@ -18,7 +19,7 @@ export class MemberRoleResolver {
 
   @query(() => [MemberRole])
   async listMemberRoles(): Promise<MemberRoleModel[]> {
-    return this.repo.find();
+    return this.repo.find().then(entitiesToModels);
   }
 
   @mutation(() => MemberRole)
@@ -32,7 +33,7 @@ export class MemberRoleResolver {
       throw new Error('MemberRole already exists: ' + name);
     }
 
-    return this.repo.create({name});
+    return this.repo.create({name}).then(entityToModel);
   }
 
   @mutation(() => MemberRole)
@@ -48,6 +49,6 @@ export class MemberRoleResolver {
     await this.memberMemberRoleRepo.deleteAll({memberRoleId});
     await this.repo.deleteById(memberRoleId);
 
-    return memberRole;
+    return entityToModel(memberRole);
   }
 }

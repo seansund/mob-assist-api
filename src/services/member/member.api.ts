@@ -5,7 +5,7 @@ import {Group, Member, MemberRole} from '../../models';
 export const MEMBER_API = 'services.MemberApi';
 
 // eslint-disable-next-line
-export abstract class MemberApi extends BaseApi<MemberModel, Omit<MemberModel, 'id'>, any, MemberIdentifier> {
+export abstract class MemberApi extends BaseApi<MemberModel, Omit<MemberModel, 'id'>, any, unknown, MemberIdentifier> {
 
   abstract createAll(members: Omit<MemberModel, 'id'>[]): Promise<MemberModel[]>;
   abstract addUpdate(member: Omit<MemberModel, 'id'>): Promise<MemberModel>;

@@ -6,10 +6,11 @@ import {
   AssignmentSet,
   AssignmentSetWithRelations,
 } from './assignment-set.model';
+import {Optional} from '../util';
 
 @objectType({description: 'Assignment definitions'})
 @model({settings: {strict: false}})
-export class Assignment extends Entity implements AssignmentModel {
+export class Assignment extends Entity implements Optional<AssignmentModel, 'id'> {
   @field(type => ID)
   @property({
     type: 'string',

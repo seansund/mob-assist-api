@@ -2,10 +2,11 @@ import {belongsTo, Entity, model, property} from '@loopback/repository';
 import {OptionModel, OptionSetModel} from '../datatypes';
 import {OptionSet, OptionSetWithRelations} from './option-set.model';
 import {field, ID, objectType} from '@loopback/graphql';
+import {Optional} from '../util';
 
 @objectType({description: 'Signup option'})
 @model()
-export class Option extends Entity implements OptionModel {
+export class Option extends Entity implements Optional<OptionModel, 'id'> {
   @field(type => ID)
   @property({
     type: 'string',

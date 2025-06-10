@@ -5,8 +5,10 @@ import {bindNotificationApi} from './notification';
 import {bindSignupApi} from './signup';
 import {bindMemberApi} from './member';
 import {bindNotificationSenderApi} from './notification-sender';
+import {bindContextResolverApi} from './context-resolver';
 
 export const bindServices = (server: Context) => {
+  bindContextResolverApi(server);
   bindAssignmentSetApi(server);
   bindMemberApi(server);
   bindMemberSignupResponseApi(server);
@@ -16,6 +18,7 @@ export const bindServices = (server: Context) => {
 }
 
 export * from './assignment-set';
+export * from './context-resolver';
 export * from './member';
 export * from './member-signup-response';
 export * from './notification';

@@ -2,10 +2,11 @@ import {Entity, hasMany, model, property} from '@loopback/repository';
 import {AssignmentModel, AssignmentSetModel} from '../datatypes';
 import {Assignment} from './assignment.model';
 import {field, ID, objectType} from '@loopback/graphql';
+import {Optional} from '../util';
 
 @objectType({description: 'Collection of assignments'})
 @model()
-export class AssignmentSet extends Entity implements AssignmentSetModel {
+export class AssignmentSet extends Entity implements Optional<AssignmentSetModel, 'id'> {
   @field(type => ID)
   @property({
     type: 'string',

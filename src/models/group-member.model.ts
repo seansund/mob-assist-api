@@ -3,10 +3,11 @@ import {Group, GroupWithRelations} from './group.model';
 import {Member, MemberWithRelations} from './member.model';
 import {field, ID, objectType} from '@loopback/graphql';
 import {GroupMemberModel, GroupModel, MemberModel} from '../datatypes';
+import {Optional} from '../util';
 
 @objectType({description: 'Group membership'})
 @model()
-export class GroupMember extends Entity implements GroupMemberModel {
+export class GroupMember extends Entity implements Optional<GroupMemberModel, 'id'> {
   @field(type => ID)
   @property({
     type: 'string',

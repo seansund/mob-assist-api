@@ -1,14 +1,16 @@
 import {
   arg,
-  fieldResolver, ID,
+  fieldResolver,
+  ID,
   mutation,
   query,
-  resolver, ResolverInterface,
+  resolver,
+  ResolverInterface,
   root,
 } from '@loopback/graphql';
 import {repository} from '@loopback/repository';
 
-import {OptionSetModel} from '../datatypes';
+import {OptionModel, OptionSetModel} from '../datatypes';
 import {
   Option,
   OptionInput,
@@ -17,6 +19,7 @@ import {
   OptionSetWithRelations,
 } from '../models';
 import {OptionRepository, OptionSetRepository} from '../repositories';
+import {entitiesToModels, entityToModel} from '../util';
 
 @resolver(() => OptionSet)
 export class OptionSetResolver implements ResolverInterface<OptionSet> {
@@ -39,7 +42,7 @@ export class OptionSetResolver implements ResolverInterface<OptionSet> {
     return {
       id: optionSet.getId(),
       name: optionSet.name,
-      options
+      options: entitiesToModels(options)
     }
   }
 
@@ -48,7 +51,9 @@ export class OptionSetResolver implements ResolverInterface<OptionSet> {
     @arg('optionSetId', () => ID) optionSetId: string,
     @arg('name') name: string,
   ): Promise<OptionSetModel> {
-    const optionSet: OptionSetModel | null = await this.repo.findOne({where: {id: optionSetId}});
+    const optionSet: OptionSetModel | null = await this.repo
+      .findOne({where: {id: optionSetId}})
+      .then(entityToModel);
 
     if (!optionSet) {
       throw new Error('OptionSet not found: ' + optionSetId);
@@ -64,17 +69,21 @@ export class OptionSetResolver implements ResolverInterface<OptionSet> {
   @query(() => [OptionSet])
   async listOptionSets(): Promise<OptionSetModel[]> {
     console.log('listOptionSets');
-    return this.repo.find();
+    return this.repo.find().then(entitiesToModels);
   }
 
   @query(() => OptionSet, {nullable: true})
   async getOptionSet(@arg('optionSetId', () => ID) optionSetId: string): Promise<OptionSetModel | null> {
-    return this.repo.findOne({where: {id: optionSetId}});
+    return this.repo
+      .findOne({where: {id: optionSetId}})
+      .then(entityToModel);
   }
 
   @mutation(() => OptionSet)
   async deleteOptionSet(@arg('optionSetId', () => ID) optionSetId: string): Promise<OptionSetModel> {
-    const optionSet: OptionSetModel | null = await this.repo.findOne({where: {id: optionSetId}});
+    const optionSet: OptionSetModel | null = await this.repo
+      .findOne({where: {id: optionSetId}})
+      .then(entityToModel);
 
     if (!optionSet) {
       throw new Error('OptionSet not found: ' + optionSetId);
@@ -101,7 +110,7 @@ export class OptionSetResolver implements ResolverInterface<OptionSet> {
     return {
       id: optionSet.getId(),
       name: optionSet.name,
-      options: [...(optionSet.options ?? []), option]
+      options: entitiesToModels([...(optionSet.options ?? []), option]),
     }
   }
 
@@ -112,11 +121,13 @@ export class OptionSetResolver implements ResolverInterface<OptionSet> {
   ): Promise<OptionSetModel | null> {
     await this.optionRepo.deleteById(optionId);
 
-    return this.repo.findOne({where: {id: optionSetId}});
+    return this.repo.findOne({where: {id: optionSetId}}).then(entityToModel);
   }
 
   @fieldResolver(() => [Option])
-  async options(@root() optionSet: OptionSet): Promise<Option[]> {
-    return this.optionRepo.find({where: {optionSetId: optionSet.getId()}});
+  async options(@root() optionSet: OptionSet): Promise<OptionModel[]> {
+    return this.optionRepo
+      .find({where: {optionSetId: optionSet.getId()}})
+      .then(entitiesToModels);
   }
 }

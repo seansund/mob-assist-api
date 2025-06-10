@@ -9,7 +9,12 @@ import {
   ResolverInterface,
   root,
 } from '@loopback/graphql';
-import {MemberIdentifier, MemberModel} from '../datatypes';
+import {
+  GroupModel,
+  MemberIdentifier,
+  MemberModel,
+  MemberRoleModel,
+} from '../datatypes';
 import {
   Group,
   Member,
@@ -19,6 +24,7 @@ import {
   MemberUpdateInput,
 } from '../models';
 import {MEMBER_API, MemberApi} from '../services/member';
+import {entitiesToModels} from '../util';
 
 @resolver(() => Member)
 export class MemberResolver implements ResolverInterface<Member> {
@@ -125,12 +131,12 @@ export class MemberResolver implements ResolverInterface<Member> {
 
 
   @fieldResolver(() => [MemberRole])
-  async roles(@root() member: Member): Promise<MemberRole[]> {
-    return this.service.getRoles(member);
+  async roles(@root() member: Member): Promise<MemberRoleModel[]> {
+    return this.service.getRoles(member).then(entitiesToModels);
   }
 
   @fieldResolver(() => [Group])
-  async groups(@root() member: Member): Promise<Group[]> {
-    return this.service.getGroups(member);
+  async groups(@root() member: Member): Promise<GroupModel[]> {
+    return this.service.getGroups(member).then(entitiesToModels);
   }
 }

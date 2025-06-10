@@ -10,10 +10,11 @@ import {
   NotificationModel,
 } from '../datatypes';
 import {Notification} from './notification.model';
+import {Optional} from '../util';
 
 @objectType({description: 'Member of the application'})
 @model()
-export class Member extends Entity implements MemberModel {
+export class Member extends Entity implements Optional<MemberModel, 'id'> {
   @field(() => ID)
   @property({
     type: 'string',

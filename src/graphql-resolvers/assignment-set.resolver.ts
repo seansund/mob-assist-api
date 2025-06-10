@@ -18,6 +18,7 @@ import {
   AssignmentSetInput,
 } from '../models';
 import {ASSIGNMENT_SET_API, AssignmentSetApi} from '../services';
+import {entityToModel} from '../util';
 
 @resolver(() => AssignmentSet)
 export class AssignmentSetResolver implements ResolverInterface<AssignmentSet> {
@@ -77,6 +78,6 @@ export class AssignmentSetResolver implements ResolverInterface<AssignmentSet> {
   async assignments(
     @root() assignmentSet: AssignmentSet
   ): Promise<AssignmentModel[]> {
-    return this.service.getAssignments(assignmentSet);
+    return this.service.getAssignments(entityToModel(assignmentSet));
   }
 }

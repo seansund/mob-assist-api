@@ -1,9 +1,9 @@
-import {ModelRef} from "./base.model";
-import {GroupModel} from "./group.model";
-import {OptionModel, OptionSetModel} from './option.model';
-import {AssignmentModel, AssignmentSetModel} from './assignment.model';
-import {MemberSignupResponseModel} from "./member-signup-response.model";
-import {Sign} from 'node:crypto';
+import {AssignmentModel} from './assignment.model';
+import {ModelRef} from './base.model';
+import {GroupModel} from './group.model';
+import {MemberIdentifier, MemberModel} from './member.model';
+import {MemberSignupResponseModel} from './member-signup-response.model';
+import {OptionModel, OptionSummaryModel} from './option.model';
 
 export const validateDate = (date: string): boolean => {
   if (date.match(/^\d{4}-\d{2}-\d{2}$/) === null) {
@@ -20,7 +20,24 @@ export const formatDate = (date: Date): string => {
 export enum SignupScope {
   UPCOMING = 'UPCOMING',
   FUTURE = 'FUTURE',
-  ALL = 'all',
+  ALL = 'ALL'
+}
+
+export const lookupSignupScope = (value: string): SignupScope => {
+  switch (value) {
+    case SignupScope.UPCOMING: {
+      return SignupScope.UPCOMING
+    }
+    case SignupScope.FUTURE: {
+      return SignupScope.FUTURE
+    }
+    case SignupScope.ALL: {
+      return SignupScope.ALL
+    }
+    default: {
+      throw new Error('Unable to find SignupScope: ' + value)
+    }
+  }
 }
 
 export interface SignupDataModel {
@@ -46,13 +63,27 @@ export interface SignupRelationsModel {
   options: OptionModel[];
   assignments: AssignmentModel[];
   responses?: MemberSignupResponseModel[];
+  responseSummaries?: OptionSummaryModel[];
+  members?: MemberModel[];
 }
 
-export interface SignupModel extends BaseSignupModel, SignupRelationsModel {
+export interface SignupModel extends ModelRef, SignupDataModel, SignupRelationsModel {
+}
 
+export interface SignupModelEntity extends BaseSignupModel, SignupRelationsModel {
 }
 
 export interface SignupFilterModel {
-  memberId?: string;
+  memberId?: MemberIdentifier;
   scope?: SignupScope;
+}
+
+export const createEmptySignupInput = (): SignupInputModel => {
+  return {
+    title: '',
+    date: '',
+    groupId: '',
+    assignmentSetId: '',
+    optionSetId: '',
+  }
 }

@@ -1,7 +1,8 @@
 import {Model, model, property} from '@loopback/repository';
 import {field, inputType, registerEnumType} from '@loopback/graphql';
 
-import {SignupFilterModel, SignupScope} from '../datatypes';
+import {MemberIdentifier, SignupFilterModel, SignupScope} from '../datatypes';
+import {MemberIdentityInput} from './member-identity-input.model';
 
 registerEnumType(SignupScope, {
   name: 'SignupScope',
@@ -16,11 +17,11 @@ export class SignupFilter extends Model implements SignupFilterModel {
   })
   scope?: SignupScope;
 
-  @field({nullable: true})
+  @field(() => MemberIdentityInput, {nullable: true})
   @property({
-    type: 'string',
+    type: 'object',
   })
-  memberId?: string;
+  memberId?: MemberIdentifier;
 
   constructor(data?: Partial<SignupFilter>) {
     super(data);

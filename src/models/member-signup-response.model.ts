@@ -7,7 +7,8 @@ import {
 } from '@loopback/repository';
 import {
   AssignmentModel,
-  MemberModel, MemberSignupResponseModel,
+  MemberModel,
+  MemberSignupResponseModel,
   OptionModel,
   SignupModel,
 } from '../datatypes';
@@ -16,13 +17,14 @@ import {Signup} from './signup.model';
 import {Option} from './option.model';
 import {Assignment} from './assignment.model';
 import {
-  MemberSignupResponseAssignment
+  MemberSignupResponseAssignment,
 } from './member-signup-response-assignment.model';
 import {field, ID, objectType} from '@loopback/graphql';
+import {Optional} from '../util';
 
 @objectType({description: 'Member response to signup'})
 @model()
-export class MemberSignupResponse extends Entity implements MemberSignupResponseModel {
+export class MemberSignupResponse extends Entity implements Optional<MemberSignupResponseModel, 'id'> {
   @field(type => ID)
   @property({
     type: 'string',
