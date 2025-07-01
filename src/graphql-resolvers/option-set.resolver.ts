@@ -8,17 +8,28 @@ import {
   ResolverInterface,
   root,
 } from '@loopback/graphql';
-import {repository} from '@loopback/repository';
+import {Count, repository} from '@loopback/repository';
 
-import {OptionModel, OptionSetModel} from '../datatypes';
+import {
+  OptionDataModel,
+  OptionInputModel,
+  OptionModel,
+  OptionSetModel,
+  OptionSetSummaryModel,
+} from '../datatypes';
 import {
   Option,
   OptionInput,
   OptionSet,
   OptionSetInput,
+  OptionSetSummary,
   OptionSetWithRelations,
 } from '../models';
-import {OptionRepository, OptionSetRepository} from '../repositories';
+import {
+  OptionRepository,
+  OptionSetRepository,
+  SignupRepository,
+} from '../repositories';
 import {entitiesToModels, entityToModel} from '../util';
 
 @resolver(() => OptionSet)
@@ -27,6 +38,7 @@ export class OptionSetResolver implements ResolverInterface<OptionSet> {
   constructor(
     @repository('OptionSetRepository') protected repo: OptionSetRepository,
     @repository('OptionRepository') protected optionRepo: OptionRepository,
+    @repository('SignupRepository') protected signupRepo: SignupRepository,
   ) {}
 
   @mutation(() => OptionSet)
@@ -35,7 +47,7 @@ export class OptionSetResolver implements ResolverInterface<OptionSet> {
   ): Promise<OptionSetModel> {
     const optionSet = await this.repo.create({name: data.name});
 
-    const optionInputs = data.options.map((option: OptionInput) => ({...option, optionSetId: optionSet.getId()}))
+    const optionInputs: OptionInputModel[] = data.options.map((option: OptionDataModel) => ({...option, optionSetId: optionSet.getId()}))
 
     const options: Option[] = await this.optionRepo.createAll(optionInputs);
 
@@ -68,7 +80,6 @@ export class OptionSetResolver implements ResolverInterface<OptionSet> {
 
   @query(() => [OptionSet])
   async listOptionSets(): Promise<OptionSetModel[]> {
-    console.log('listOptionSets');
     return this.repo.find().then(entitiesToModels);
   }
 
@@ -99,7 +110,7 @@ export class OptionSetResolver implements ResolverInterface<OptionSet> {
     @arg('optionSetId', () => ID) optionSetId: string,
     @arg('option') data: OptionInput,
   ): Promise<OptionSetModel> {
-    const optionSet: OptionSetWithRelations | null = await this.repo.findOne({where: {id: optionSetId}});
+    const optionSet: OptionSetWithRelations | null = await this.repo.findById(optionSetId);
 
     if (!optionSet) {
       throw new Error('OptionSet not found: ' + optionSetId);
@@ -114,20 +125,43 @@ export class OptionSetResolver implements ResolverInterface<OptionSet> {
     }
   }
 
+
+  @mutation(() => OptionSet)
+  async updateOption(
+    @arg('optionSetId', () => ID) optionSetId: string,
+    @arg('optionId', () => ID) optionId: string,
+    @arg('option') data: OptionInput,
+  ): Promise<OptionSetModel> {
+    const optionSet: OptionSetWithRelations = await this.repo.findById(optionSetId);
+
+    await this.optionRepo.updateById(optionId, {...data, optionSetId: optionSetId});
+
+    return entityToModel(optionSet);
+  }
+
   @mutation(() => OptionSet)
   async removeOption(
     @arg('optionSetId', () => ID) optionSetId: string,
-    @arg('optionId') optionId: string,
+    @arg('optionId', () => ID) optionId: string,
   ): Promise<OptionSetModel | null> {
     await this.optionRepo.deleteById(optionId);
 
-    return this.repo.findOne({where: {id: optionSetId}}).then(entityToModel);
+    return this.repo.findById(optionSetId).then(entityToModel);
   }
 
   @fieldResolver(() => [Option])
   async options(@root() optionSet: OptionSet): Promise<OptionModel[]> {
     return this.optionRepo
-      .find({where: {optionSetId: optionSet.getId()}})
+      .find({where: {optionSetId: optionSet.getId()}, order: ['sortIndex ASC']})
       .then(entitiesToModels);
+  }
+
+  @fieldResolver(() => OptionSetSummary)
+  async summary(@root() optionSet: OptionSet): Promise<OptionSetSummaryModel> {
+    const result: Count = await this.signupRepo.count({optionSetId: optionSet.getId()})
+
+    return {
+      signupCount: result.count,
+    }
   }
 }

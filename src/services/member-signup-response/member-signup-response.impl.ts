@@ -6,32 +6,43 @@ import {
 } from './member-signup-response.api';
 import {
   AssignmentModel,
-  MemberModel,
+  MemberModel, MemberSignupResponseAssignmentDataModel,
   MemberSignupResponseFilterModel,
   MemberSignupResponseInputModel,
-  MemberSignupResponseModel, OptionModel, SignupModel,
+  MemberSignupResponseModel,
+  OptionModel,
+  SignupModel,
 } from '../../datatypes';
 import {
-  AssignmentRepository,
-  MemberRepository, MemberSignupResponseAssignmentRepository,
-  MemberSignupResponseRepository, OptionRepository, SignupRepository,
+  MemberRepository,
+  MemberSignupResponseAssignmentRepository,
+  MemberSignupResponseRepository,
+  OptionRepository,
+  SignupRepository,
 } from '../../repositories';
-import {Member, MemberSignupResponse, Option, Signup} from '../../models';
+import {
+  Member,
+  MemberSignupResponse,
+  MemberSignupResponseAssignment,
+  Option,
+  Signup,
+} from '../../models';
 import {MEMBER_API, MemberApi} from '../member';
 import {SIGNUP_API, SignupApi} from '../signup';
 import {entitiesToModels, entityToModel} from '../../util';
+import {CONTEXT_RESOLVER_API, ContextResolverApi} from '../context-resolver';
 
 export class MemberSignupResponseImpl implements MemberSignupResponseApi {
 
   constructor(
     @repository('MemberSignupResponseRepository') protected repo: MemberSignupResponseRepository,
+    @repository('MemberSignupResponseAssignmentRepository') protected responseAssignmentRepo: MemberSignupResponseAssignmentRepository,
     @repository('MemberRepository') protected memberRepo: MemberRepository,
     @repository('OptionRepository') protected optionRepo: OptionRepository,
     @repository('SignupRepository') protected signupRepo: SignupRepository,
-    @repository('AssignmentRepository') protected assignmentRepo: AssignmentRepository,
-    @repository('MemberSignupResponseAssignmentRepository') protected responseAssignmentRepo: MemberSignupResponseAssignmentRepository,
     @inject(MEMBER_API) protected memberApi: MemberApi,
     @inject(SIGNUP_API) protected signupApi: SignupApi,
+    @inject(CONTEXT_RESOLVER_API) protected resolver: ContextResolverApi,
   ) {}
 
   async create(data: MemberSignupResponseInputModel): Promise<MemberSignupResponseModel> {
@@ -227,26 +238,36 @@ export class MemberSignupResponseImpl implements MemberSignupResponseApi {
     return entityToModel(updatedMemberSignupResponse);
   }
 
-  async getMember(response: MemberSignupResponse, context: MemberSignupResponseContext = buildDefaultMemberSignupResponseContext(response)): Promise<MemberModel> {
+  async setAssignments(memberSignupResponseId: string, updateAssignmentIds: string[]): Promise<MemberSignupResponseModel> {
 
-    if (!context.members) {
-      context.members = new Promise<Member[]>((resolve, reject) => {
-        context.memberIds
-          .then(memberIds => this.memberRepo
-            .find({where: {id: {inq: memberIds || [response.memberId.toString()]}}})
-          )
-          .then(resolve)
-          .catch(reject)
-      })
+    const currentAssignments: MemberSignupResponseAssignment[] = await this.responseAssignmentRepo
+      .find({where: {memberSignupResponseId}});
+
+    const {newAssignments, deleteAssignments} = handleAssignments(memberSignupResponseId, updateAssignmentIds, currentAssignments);
+
+    if (newAssignments.length > 0) {
+      await this.responseAssignmentRepo.createAll(newAssignments)
     }
 
-    const members = await context.members
+    if (deleteAssignments.length > 0) {
+      const deleteIds: string[] = deleteAssignments.map(assignment => assignment.getId())
 
-    const matchingMembers: MemberModel[] = members
-      .filter(matchResponseMember(response))
+      await this.responseAssignmentRepo.deleteAll({id: {inq: deleteIds}})
+    }
+
+    return this.repo.findById(memberSignupResponseId)
+      .then(entityToModel);
+  }
+
+  async getMember(response: MemberSignupResponse, context: MemberSignupResponseContext = buildDefaultContext(response)): Promise<MemberModel> {
+
+    const members = await this.resolver.populateMembersContext(context)
+
+    const matchingMember: MemberModel | undefined = members
       .map(entityToModel)
+      .find(matchResponseMember(response))
 
-    if (matchingMembers.length === 0) {
+    if (!matchingMember) {
       console.log('Member is empty!!!')
       return {
         id: '1',
@@ -255,30 +276,16 @@ export class MemberSignupResponseImpl implements MemberSignupResponseApi {
       } as any
     }
 
-    return matchingMembers[0]
+    return matchingMember
   }
 
-  async getOption(response: MemberSignupResponse, context: MemberSignupResponseContext = buildDefaultMemberSignupResponseContext(response)): Promise<OptionModel | undefined> {
+  async getOption(response: MemberSignupResponse, context: MemberSignupResponseContext = buildDefaultContext(response)): Promise<OptionModel | undefined> {
 
     if (!response.optionId) {
       return undefined;
     }
 
-    if (!context.options) {
-      context.options = new Promise<Option[]>((resolve, reject) => {
-        context.optionIds
-          .then(optionIds => this.optionRepo
-            .find({
-              where: {id: {inq: optionIds || [response.optionId.toString()]}},
-              order: ['sortIndex ASC'],
-            })
-          )
-          .then(resolve)
-          .catch(reject)
-      })
-    }
-
-    const options = await context.options
+    const options = await this.resolver.populateOptionsContext(context);
 
     const matchingOption: OptionModel | undefined = options
       .map(entityToModel)
@@ -291,23 +298,10 @@ export class MemberSignupResponseImpl implements MemberSignupResponseApi {
     return matchingOption
   }
 
-  async getAssignments(response: MemberSignupResponse, context: MemberSignupResponseContext): Promise<AssignmentModel[]> {
+  async getAssignments(response: MemberSignupResponse, context: MemberSignupResponseContext = buildDefaultContext(response)): Promise<AssignmentModel[]> {
 
-    if (!context.responseAssignments) {
-      context.responseAssignments = this.responseAssignmentRepo
-        .find({
-          where: {
-            memberSignupResponseId: {inq: context.responseIds || [response.getId().toString()]}
-          }
-        })
-    }
-
-    if (!context.assignments) {
-      context.assignments = this.assignmentRepo.find()
-    }
-
-    const responseAssignments = await context.responseAssignments
-    const assignments = await context.assignments
+    const responseAssignments = await this.resolver.populateResponseAssignmentsContext(context);
+    const assignments = await this.resolver.populateAssignmentsContext(context);
 
     return responseAssignments
       .filter(ra => ra.memberSignupResponseId.toString() === response.getId().toString())
@@ -315,13 +309,9 @@ export class MemberSignupResponseImpl implements MemberSignupResponseApi {
       .map(entityToModel)
   }
 
-  async getSignup(response: MemberSignupResponse, context: MemberSignupResponseContext): Promise<SignupModel> {
+  async getSignup(response: MemberSignupResponse, context: MemberSignupResponseContext = buildDefaultContext(response)): Promise<SignupModel> {
 
-    if (!context.signups) {
-      context.signups = this.signupRepo.find({where: {id: {inq: context.signupIds || [response.signupId.toString()]}}})
-    }
-
-    const signups = await context.signups;
+    const signups = await this.resolver.populateSignupsContext(context);
 
     const signup: Signup | undefined = signups.find(s => s.getId().toString() === response.signupId.toString())
 
@@ -343,12 +333,9 @@ const createEmptyResponse = (member: MemberModel, signup: SignupModel): MemberSi
   signupId: signup.id,
 });
 
-const buildDefaultMemberSignupResponseContext = (response: MemberSignupResponse): MemberSignupResponseContext => {
+const buildDefaultContext = (response: MemberSignupResponse): MemberSignupResponseContext => {
   return {
-    memberIds: Promise.resolve([response.memberId.toString()]),
-    optionIds: Promise.resolve([response.optionId.toString()]),
-    responseIds: [response.getId().toString()],
-    signupIds: [response.signupId.toString()],
+    responses: Promise.resolve(entitiesToModels([response]))
   }
 }
 
@@ -366,4 +353,23 @@ const matchResponseOption = (response: MemberSignupResponse) => {
 
 const isMatchingOption = (data: {optionId: string}, declineOption: Option): boolean => {
   return (data.optionId ?? '').toString() === declineOption.getId().toString();
+}
+
+interface HandleAssignmentResult {
+  newAssignments: MemberSignupResponseAssignmentDataModel[];
+  deleteAssignments: MemberSignupResponseAssignment[];
+}
+
+const handleAssignments = (memberSignupResponseId: string, updateAssignmentIds: string[], currentAssignments: MemberSignupResponseAssignment[]): HandleAssignmentResult => {
+
+  const currentAssignmentIds: string[] = currentAssignments.map(assignment => assignment.assignmentId.toString());
+
+  const newAssignments: MemberSignupResponseAssignmentDataModel[] = updateAssignmentIds
+    .filter(assignmentId => !currentAssignmentIds.includes(assignmentId))
+    .map(assignmentId => ({memberSignupResponseId, assignmentId}));
+
+  const deleteAssignments: MemberSignupResponseAssignment[] = currentAssignments
+    .filter(assignment => !updateAssignmentIds.includes(assignment.getId()));
+
+  return {newAssignments, deleteAssignments};
 }

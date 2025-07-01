@@ -25,7 +25,7 @@ import {
   Signup,
   SignupFilter,
   SignupInput,
-  SignupUpdateModel,
+  SignupUpdate,
 } from '../models';
 import {
   MEMBER_SIGNUP_RESPONSE_API, MemberSignupResponseApi,
@@ -62,13 +62,15 @@ export class SignupResolver implements ResolverInterface<Signup> {
   @mutation(() => Signup)
   async updateSignup(
     @arg('signupId', () => ID) signupId: string,
-    @arg('data') data: SignupUpdateModel,
+    @arg('data') data: SignupUpdate,
   ): Promise<SignupModel> {
     return this.service.update(signupId, data);
   }
 
   @query(() => Signup, {nullable: true})
-  async getSignup(@arg('signupId', () => ID) signupId: string): Promise<SignupModel | undefined> {
+  async getSignup(
+    @arg('signupId', () => ID) signupId: string
+  ): Promise<SignupModel | undefined> {
     return this.service.get(signupId);
   }
 
@@ -81,13 +83,15 @@ export class SignupResolver implements ResolverInterface<Signup> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result: Signup[] = await this.service.list(filter, context) as any;
 
-    context.signups = Promise.resolve(result);
+    initializeContext(context, ...result);
 
     return entitiesToModels(result);
   }
 
   @mutation(() => Signup)
-  async deleteSignup(@arg('signupId', () => ID) signupId: string): Promise<SignupModel | undefined> {
+  async deleteSignup(
+    @arg('signupId', () => ID) signupId: string
+  ): Promise<SignupModel | undefined> {
     return this.service.delete(signupId);
   }
 
@@ -105,51 +109,45 @@ export class SignupResolver implements ResolverInterface<Signup> {
 
   @fieldResolver(() => [Option])
   async options(@root() signup: Signup, @Ctx() context: SignupContext): Promise<OptionModel[]> {
+    initializeContext(context, signup);
+
     return this.service.getOptions(signup, context);
   }
 
   @fieldResolver(() => [Assignment])
   async assignments(@root() signup: Signup, @Ctx() context: SignupContext): Promise<AssignmentModel[]> {
+    initializeContext(context, signup);
+
     return this.service.getAssignments(signup, context);
   }
 
   @fieldResolver(() => Group)
   async group(@root() signup: Signup, @Ctx() context: SignupContext): Promise<GroupModel> {
+    initializeContext(context, signup);
+
     return this.service.getGroup(signup, context);
   }
 
   @fieldResolver(() => [MemberSignupResponse])
   async responses(@root() signup: Signup, @Ctx() context: SignupContext): Promise<MemberSignupResponseModel[]> {
+    initializeContext(context, signup);
+
     return this.service.getResponses(signup, context);
   }
 
   @fieldResolver(() => [OptionSummary])
   async responseSummaries(@root() signup: Signup, @Ctx() context: SignupContext): Promise<OptionSummaryModel[]> {
+    initializeContext(context, signup);
+
     return this.service.getResponseSummaries(signup, context);
   }
 
   @fieldResolver(() => [Member])
   async members(@root() signup: Signup, @Ctx() context: SignupContext): Promise<MemberModel[]> {
+    initializeContext(context, signup);
+
     return this.service.getMembers(signup, context);
   }
-}
-
-const unique = <T>(list: T[]): T[] => {
-
-  const val = list.reduce((partialResult: T[], current: T) => {
-
-    if (!partialResult.includes(current)) {
-      partialResult.push(current);
-    }
-
-    return partialResult;
-  }, [])
-
-  return val;
-}
-
-const toString = <T extends {toString: () => string}> (value: T): string => {
-  return value.toString();
 }
 
 function validateRespondToSignupInput(data: MemberSignupResponseInput) {
@@ -161,5 +159,11 @@ function validateRespondToSignupInput(data: MemberSignupResponseInput) {
   }
   if (!data.optionId) {
     throw new Error('Option id is required in signup response')
+  }
+}
+
+const initializeContext = (context: Partial<SignupContext>, ...signups: Signup[]) => {
+  if (!context.signups) {
+    context.signups = Promise.resolve(signups)
   }
 }

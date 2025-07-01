@@ -46,6 +46,12 @@ export class Assignment extends Entity implements Optional<AssignmentModel, 'id'
   })
   partnerId?: string;
 
+  @field(() => Boolean, {nullable: true})
+  @property({
+    type: 'boolean',
+  })
+  hidden?: boolean;
+
   @belongsTo(() => AssignmentSet)
   assignmentSetId: string;
 

@@ -1,8 +1,10 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
-import {GroupModel, MemberModel} from '../datatypes';
-import {GroupMember} from './group-member.model';
-import {Member} from './member.model';
 import {field, ID, objectType} from '@loopback/graphql';
+
+import {GroupMember} from './group-member.model';
+import {GroupSummary} from './group-summary.model';
+import {Member} from './member.model';
+import {GroupModel, GroupSummaryModel, MemberModel} from '../datatypes';
 import {Optional} from '../util';
 
 @objectType({description: 'Group of members'})
@@ -23,6 +25,9 @@ export class Group extends Entity implements Optional<GroupModel, 'id'> {
   })
   name: string;
 
+  @field(() => GroupSummary, {nullable: true})
+  summary?: GroupSummaryModel;
+
   @field(type => [Member], {nullable: true})
   @hasMany(() => Member, {through: {model: () => GroupMember}})
   members: MemberModel[];
@@ -33,7 +38,8 @@ export class Group extends Entity implements Optional<GroupModel, 'id'> {
 }
 
 export interface GroupRelations {
-  // describe navigational properties here
+  summary?: GroupSummaryModel;
+  members: MemberModel[];
 }
 
 export type GroupWithRelations = Group & GroupRelations;

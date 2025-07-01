@@ -4,17 +4,22 @@ import {
   AssignmentSet,
   Group,
   GroupMember,
-  Member, MemberSignupResponse, Option, Signup,
+  Member, MemberSignupResponse, MemberSignupResponseAssignment, Option, Signup,
 } from '../../models';
 import {repository, Where} from '@loopback/repository';
 import {
   AssignmentRepository,
-  AssignmentSetRepository, GroupMemberRepository,
+  AssignmentSetRepository,
+  GroupMemberRepository,
   GroupRepository,
-  MemberRepository, MemberSignupResponseRepository, OptionRepository,
+  MemberRepository,
+  MemberSignupResponseAssignmentRepository,
+  MemberSignupResponseRepository,
+  OptionRepository,
   SignupRepository,
 } from '../../repositories';
-import {unique} from '../../util';
+import {entitiesToModels, unique} from '../../util';
+import {MemberSignupResponseModel} from '../../datatypes';
 
 export class ContextResolverImpl implements ContextResolverApi {
 
@@ -27,6 +32,7 @@ export class ContextResolverImpl implements ContextResolverApi {
     @repository('OptionRepository') protected optionRepo: OptionRepository,
     @repository('GroupMemberRepository') protected groupMemberRepo: GroupMemberRepository,
     @repository('MemberSignupResponseRepository') protected responseRepo: MemberSignupResponseRepository,
+    @repository('MemberSignupResponseAssignmentRepository') protected responseAssignmentRepo: MemberSignupResponseAssignmentRepository,
   ) {}
 
   async populateSignupsContext(context: DomainContext): Promise<Signup[]> {
@@ -59,7 +65,9 @@ export class ContextResolverImpl implements ContextResolverApi {
       context.assignmentSets = new Promise<AssignmentSet[]>((resolve, reject) => {
         this.populateSignupsContext(context)
           .then(signups => {
-            const assignmentSetIds = signups.map(s => s.assignmentSetId.toString())
+            const assignmentSetIds = signups
+              .map(s => (s.assignmentSetId ?? '').toString())
+              .filter(id => !!id)
 
             this.assignmentSetRepo.find({where: {id: {inq: assignmentSetIds}}})
               .then(resolve)
@@ -176,25 +184,26 @@ export class ContextResolverImpl implements ContextResolverApi {
     return context.options
   }
 
-  async populateResponsesContext(context: DomainContext): Promise<MemberSignupResponse[]> {
+  async populateResponsesContext(context: DomainContext): Promise<MemberSignupResponseModel[]> {
     const where: Where<MemberSignupResponse> = context.memberId
       ? {memberId: context.memberId}
       : {}
 
     if (!context.responses) {
       if (!context.signups) {
-        context.responses = Promise.reject(new Error('Signups and MemberSignupResponses are missing'))
+        context.responses = Promise.reject(new Error('MemberSignupResponses and Signups are missing'))
 
         return context.responses;
       }
 
-      context.responses = new Promise<MemberSignupResponse[]>((resolve, reject) => {
+      context.responses = new Promise<MemberSignupResponseModel[]>((resolve, reject) => {
         this.populateSignupsContext(context)
           .then(signups => {
             const signupIds: string[] = signups.map(s => s.getId().toString())
 
             this.responseRepo
               .find({where: {...where, signupId: {inq: signupIds}}})
+              .then(entitiesToModels)
               .then(resolve)
               .catch(reject)
           })
@@ -203,6 +212,25 @@ export class ContextResolverImpl implements ContextResolverApi {
     }
 
     return context.responses
+  }
+
+  async populateResponseAssignmentsContext(context: DomainContext): Promise<MemberSignupResponseAssignment[]> {
+    if (!context.responseAssignments) {
+      context.responseAssignments = new Promise<MemberSignupResponseAssignment[]>((resolve, reject) => {
+        this.populateResponsesContext(context)
+          .then(responses => {
+            const responseIds = responses.map(response => response.id.toString())
+
+            this.responseAssignmentRepo
+              .find({where: {memberSignupResponseId: {inq: responseIds}}})
+              .then(resolve)
+              .catch(reject)
+          })
+          .catch(reject)
+      })
+    }
+
+    return context.responseAssignments
   }
 
 }

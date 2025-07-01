@@ -5,7 +5,7 @@ import {SignupRelationsIdsModel} from '../datatypes';
 
 @inputType({description: 'Signup update model'})
 @model()
-export class SignupUpdateModel extends Model implements Partial<SignupUpdateModel>, Partial<SignupRelationsIdsModel> {
+export class SignupUpdate extends Model implements Partial<SignupUpdate>, Partial<SignupRelationsIdsModel> {
   @field({nullable: true})
   @property({
     type: 'string',
@@ -43,7 +43,7 @@ export class SignupUpdateModel extends Model implements Partial<SignupUpdateMode
   assignmentSetId?: string;
 
 
-  constructor(data?: Partial<SignupUpdateModel>) {
+  constructor(data?: Partial<SignupUpdate>) {
     super(data);
   }
 }

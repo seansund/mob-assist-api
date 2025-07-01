@@ -42,6 +42,7 @@ export class Option extends Entity implements Optional<OptionModel, 'id'> {
   })
   declineOption?: boolean;
 
+  @field()
   @belongsTo(() => OptionSet)
   optionSetId: string;
 

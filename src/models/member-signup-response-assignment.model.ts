@@ -6,11 +6,15 @@ import {
   MemberSignupResponseWithRelations,
 } from './member-signup-response.model';
 import {Assignment, AssignmentWithRelations} from './assignment.model';
-import {AssignmentModel, MemberSignupResponseModel} from '../datatypes';
+import {
+  AssignmentModel,
+  MemberSignupResponseAssignmentDataModel, MemberSignupResponseAssignmentEntity,
+  MemberSignupResponseModel,
+} from '../datatypes';
 
 @objectType({description: 'Assignment for member signup response'})
 @model()
-export class MemberSignupResponseAssignment extends Entity {
+export class MemberSignupResponseAssignment extends Entity implements MemberSignupResponseAssignmentEntity {
   @field(type => ID)
   @property({
     type: 'string',

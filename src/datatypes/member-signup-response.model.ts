@@ -35,3 +35,12 @@ export interface MemberSignupResponseFilterModel {
   optionId?: {inq: string[]};
   signedUp?: boolean;
 }
+
+export interface MemberSignupResponseAssignmentDataModel {
+  memberSignupResponseId: string;
+  assignmentId: string;
+}
+
+export interface MemberSignupResponseAssignmentModel extends ModelRef, MemberSignupResponseAssignmentDataModel {}
+
+export interface MemberSignupResponseAssignmentEntity extends Partial<ModelRef>, MemberSignupResponseAssignmentDataModel {}

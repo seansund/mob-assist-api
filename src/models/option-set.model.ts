@@ -1,5 +1,5 @@
-import {Entity, hasMany, model, property} from '@loopback/repository';
-import {OptionModel, OptionSetModel} from '../datatypes';
+import {Entity, hasMany, Model, model, property} from '@loopback/repository';
+import {OptionModel, OptionSetModel, OptionSetSummaryModel} from '../datatypes';
 import {Option} from './option.model';
 import {field, ID, objectType} from '@loopback/graphql';
 import {Optional} from '../util';
@@ -26,6 +26,9 @@ export class OptionSet extends Entity implements Optional<OptionSetModel, 'id'> 
   @hasMany(() => Option, {keyTo: 'optionSetId'})
   options?: OptionModel[];
 
+  @field(type => OptionSetSummary, {nullable: true})
+  summary?: OptionSetSummaryModel;
+
 
   constructor(data?: Partial<OptionSet>) {
     super(data);
@@ -37,3 +40,10 @@ export interface OptionSetRelations {
 }
 
 export type OptionSetWithRelations = OptionSet & OptionSetRelations;
+
+@objectType({description: 'Summary of an option set'})
+@model()
+export class OptionSetSummary extends Model implements OptionSetSummaryModel {
+  @field(() => Number)
+  signupCount: number;
+}

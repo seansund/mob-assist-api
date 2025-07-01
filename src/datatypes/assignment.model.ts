@@ -11,6 +11,7 @@ export interface AssignmentDataModel {
   name: string;
   row: number;
   partnerId?: string;
+  hidden?: boolean;
 }
 
 export interface AssignmentModel extends ModelRef, AssignmentDataModel {

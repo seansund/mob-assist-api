@@ -197,7 +197,7 @@ const buildAssignmentMessage = (signup: SignupModel, option: OptionModel, assign
   const assignmentDisplay: string = buildAssignmentDisplay(assignments);
   const assignmentDisplayWithPartner = buildAssignmentDisplayWithPartner(
     assignmentDisplay,
-    lookupPartner(option, signup.assignments, signupMembers, signupResponses)
+    lookupPartner(option, signup.assignments ?? [], signupMembers, signupResponses)
   )
   const assignmentDiagramUrl = buildAssignmentDiagramUrl(assignmentDisplay)
 

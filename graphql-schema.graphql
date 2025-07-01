@@ -7,6 +7,7 @@ schema {
 type Assignment {
   assignmentSet: AssignmentSet
   group: String!
+  hidden: Boolean
   id: ID!
   name: String!
   partnerId: String
@@ -39,6 +40,16 @@ type Group {
   id: ID!
   members: [Member!]
   name: String!
+  summary: GroupSummary
+}
+
+"""Group update"""
+input GroupInput {
+  name: String
+}
+
+type GroupSummary {
+  memberCount: Float!
 }
 
 """Member of the application"""
@@ -123,8 +134,8 @@ input MemberUpdateInput {
 type Mutation {
   addAssignment(assignment: AssignmentInput!, assignmentSetId: ID!): AssignmentSet!
   addMemberRole(name: String!): MemberRole!
-  addMemberToGroup(groupId: ID!, memberId: ID!): Member!
-  addMembersToGroup(groupId: ID!, memberIds: [ID!]!): [Member!]!
+  addMemberToGroup(groupId: ID!, memberId: ID!): Group
+  addMembersToGroup(groupId: ID!, memberIds: [ID!]!): Group
   addOption(option: OptionInput!, optionSetId: ID!): OptionSet!
   addRoleToMember(memberId: ID!, memberRoleId: ID!): Member!
   addUpdateMember(member: MemberInput!): Member!
@@ -142,21 +153,24 @@ type Mutation {
   deleteOptionSet(optionSetId: ID!): OptionSet!
   deleteSignup(signupId: ID!): Signup!
   duplicateSignup(date: String!, fromSignupId: ID!): Signup!
-  removeMemberFromGroup(groupId: ID!, memberId: ID!): Member!
+  removeMemberFromGroup(groupId: ID!, memberId: ID!): Group
   removeMembersFromGroup(groupId: ID!, memberIds: [ID!]!): [Member!]!
-  removeOption(optionId: String!, optionSetId: ID!): OptionSet!
+  removeOption(optionId: ID!, optionSetId: ID!): OptionSet!
   removeRoleFromMember(memberId: ID!, memberRoleId: ID!): Member!
   respondToSignup(data: MemberSignupResponseInput!): Signup
   sendSignupAssignments(signupId: ID!): NotificationResult!
   sendSignupCheckin(signupId: ID!): NotificationResult!
   sendSignupRequest(signupId: ID!): NotificationResult!
   sendSignupRequestToNoResponse(signupId: ID!): NotificationResult!
+  setResponseAssignments(assignmentIds: [String!]!, id: ID!): MemberSignupResponse!
   signup(data: MemberSignupResponseInput!): MemberSignupResponse!
   updateAssignmentSet(assignmentSetId: ID!, name: String!): AssignmentSet!
+  updateGroup(data: GroupInput!, groupId: ID!): Group
   updateMember(member: MemberUpdateInput!, memberId: ID!): Member!
   updateMemberSignupResponse(data: MemberSignupResponseUpdateInput!, id: ID!): MemberSignupResponse!
+  updateOption(option: OptionInput!, optionId: ID!, optionSetId: ID!): OptionSet!
   updateOptionSet(name: String!, optionSetId: ID!): OptionSet!
-  updateSignup(data: SignupUpdateModel!, signupId: ID!): Signup!
+  updateSignup(data: SignupUpdate!, signupId: ID!): Signup!
 }
 
 """Notification"""
@@ -190,6 +204,7 @@ type Option {
   declineOption: Boolean
   id: ID!
   optionSet: OptionSet
+  optionSetId: String!
   shortName: String!
   sortIndex: Float!
   value: String!
@@ -198,6 +213,7 @@ type Option {
 """Option input"""
 input OptionInput {
   declineOption: Boolean
+  optionSetId: String!
   shortName: String!
   sortIndex: Float!
   value: String!
@@ -208,12 +224,18 @@ type OptionSet {
   id: ID!
   name: String!
   options: [Option!]
+  summary: OptionSetSummary
 }
 
 """Option set input"""
 input OptionSetInput {
   name: String!
   options: [OptionInput!]!
+}
+
+"""Summary of an option set"""
+type OptionSetSummary {
+  signupCount: Float!
 }
 
 type OptionSummary {
@@ -224,6 +246,7 @@ type OptionSummary {
 
 type Query {
   getAssignmentSet(assignmentSetId: String!): AssignmentSet
+  getGroup(groupId: ID!): Group!
   getMember(memberId: MemberIdentityInput!): Member
   getOptionSet(optionSetId: ID!): OptionSet
   getResponse(id: ID!): MemberSignupResponse
@@ -240,14 +263,17 @@ type Query {
 
 """Signup"""
 type Signup {
-  assignmentSet: AssignmentSet!
+  assignmentSet: AssignmentSet
+  assignmentSetId: ID
   assignments: [Assignment!]!
   date: String!
   description: String
   group: Group!
+  groupId: ID!
   id: ID!
   members: [Member!]!
   optionSet: OptionSet!
+  optionSetId: ID!
   options: [Option!]!
   responseSummaries: [OptionSummary!]!
   responses: [MemberSignupResponse!]
@@ -276,7 +302,7 @@ enum SignupScope {
 }
 
 """Signup update model"""
-input SignupUpdateModel {
+input SignupUpdate {
   assignmentSetId: String
   date: String
   description: String

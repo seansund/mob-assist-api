@@ -76,7 +76,9 @@ export class MemberImpl implements MemberApi {
   }
 
   async list(): Promise<MemberModel[]> {
-    return this.repo.find().then(entitiesToModels);
+    return this.repo
+      .find({order: ['lastName ASC', 'firstName ASC']})
+      .then(entitiesToModels);
   }
 
   async addUpdate(data: Omit<MemberModel, 'id'>): Promise<MemberModel> {

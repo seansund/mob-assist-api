@@ -4,32 +4,22 @@ import {
   MemberModel,
   MemberSignupResponseFilterModel,
   MemberSignupResponseInputModel,
-  MemberSignupResponseModel, OptionModel, SignupModel,
+  MemberSignupResponseModel,
+  OptionModel,
+  SignupModel,
 } from '../../datatypes';
-import {
-  Assignment,
-  Member,
-  MemberSignupResponse,
-  MemberSignupResponseAssignment,
-  Option, Signup,
-} from '../../models';
+import {DomainContext} from '../context-resolver';
+import {RequireOne} from '../../util';
 
 export const MEMBER_SIGNUP_RESPONSE_API = 'services.MemberSignupResponseApi';
 
-export interface MemberSignupResponseContext {
-
-  responses: Promise<MemberSignupResponse[]>;
-
-  signups?: Promise<Signup[]>;
-  members?: Promise<Member[]>;
-  options?: Promise<Option[]>;
-  assignments?: Promise<Assignment[]>;
-  responseAssignments?: Promise<MemberSignupResponseAssignment[]>;
-}
+export type MemberSignupResponseContext = RequireOne<DomainContext, 'responses'>;
 
 export abstract class MemberSignupResponseApi extends BaseApi<MemberSignupResponseModel, MemberSignupResponseInputModel, MemberSignupResponseFilterModel> {
 
   abstract listWithFillers(filter?: MemberSignupResponseFilterModel, fillersOnly?: boolean): Promise<MemberSignupResponseModel[]>;
+
+  abstract setAssignments(id: string, assignmentIds: string[]): Promise<MemberSignupResponseModel>;
 
   abstract getAssignments(response: Omit<MemberSignupResponseModel, 'id'>, context: MemberSignupResponseContext): Promise<AssignmentModel[]>;
   abstract getMember(response: Omit<MemberSignupResponseModel, 'id'>, context?: MemberSignupResponseContext): Promise<MemberModel>;

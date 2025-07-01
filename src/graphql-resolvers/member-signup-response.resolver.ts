@@ -10,7 +10,7 @@ import {
 
 import {
   AssignmentModel,
-  MemberModel,
+  MemberModel, MemberSignupResponseInputModel,
   MemberSignupResponseModel,
   OptionModel, SignupModel,
 } from '../datatypes';
@@ -41,12 +41,10 @@ export class MemberSignupResponseResolver {
     @Ctx() context: MemberSignupResponseContext,
     @arg('filter', () => MemberSignupResponseFilter, {nullable: true}) filters?: MemberSignupResponseFilter
   ): Promise<MemberSignupResponseModel[]> {
-    const responses: MemberSignupResponseModel[] = await this.service.list(filters);
+    // eslint-disable-next-line
+    const responses: MemberSignupResponse[] = await this.service.list(filters) as any;
 
-    context.responseIds = responses.map(response => (response.id ?? '').toString()).filter(v => !!v)
-    context.signupIds = responses.map(response => response.signupId.toString())
-    context.memberIds = Promise.resolve(responses.map(response => (response.memberId ?? '').toString()).filter(v => !!v))
-    context.optionIds = Promise.resolve(responses.map(response => (response.optionId ?? '').toString()).filter(v => !!v))
+    initializeContext(context, ...responses);
 
     return entitiesToModels(responses);
   }
@@ -56,12 +54,10 @@ export class MemberSignupResponseResolver {
     @Ctx() context: MemberSignupResponseContext,
     @arg('filter', () => MemberSignupResponseFilter, {nullable: true}) filters?: MemberSignupResponseFilter
   ): Promise<MemberSignupResponseModel[]> {
-    const responses: MemberSignupResponseModel[] = await this.service.listWithFillers(filters);
+    // eslint-disable-next-line
+    const responses: MemberSignupResponse[] = await this.service.listWithFillers(filters) as any;
 
-    context.responseIds = responses.map(response => (response.id ?? '').toString()).filter(v => !!v)
-    context.signupIds = responses.map(response => response.signupId.toString())
-    context.memberIds = Promise.resolve(responses.map(response => (response.memberId ?? '').toString()).filter(v => !!v))
-    context.optionIds = Promise.resolve(responses.map(response => (response.optionId ?? '').toString()).filter(v => !!v))
+    initializeContext(context, ...responses);
 
     return entitiesToModels(responses);
   }
@@ -88,23 +84,45 @@ export class MemberSignupResponseResolver {
     return this.service.update(id, data);
   }
 
+  @mutation(() => MemberSignupResponse)
+  async setResponseAssignments(
+    @arg('id', () => ID) id: string,
+    @arg('assignmentIds', () => [String]) assignmentIds: string[],
+  ): Promise<MemberSignupResponseModel> {
+    return this.service.setAssignments(id, assignmentIds);
+  }
+
   @fieldResolver(() => Member)
   async member(@root() response: MemberSignupResponse, @Ctx() context: MemberSignupResponseContext): Promise<MemberModel> {
+    initializeContext(context, response);
+
     return this.service.getMember(response, context);
   }
 
   @fieldResolver(() => Option, {nullable: true})
   async option(@root() response: MemberSignupResponse, @Ctx() context: MemberSignupResponseContext): Promise<OptionModel | undefined> {
+    initializeContext(context, response);
+
     return this.service.getOption(response, context);
   }
 
   @fieldResolver(() => Signup, {name: 'signup'})
   async resolveSignup(@root() response: MemberSignupResponse, @Ctx() context: MemberSignupResponseContext): Promise<SignupModel> {
+    initializeContext(context, response);
+
     return this.service.getSignup(response, context);
   }
 
   @fieldResolver(() => Assignment, {nullable: true})
   async assignments(@root() response: MemberSignupResponse, @Ctx() context: MemberSignupResponseContext): Promise<AssignmentModel[]> {
+    initializeContext(context, response);
+
     return this.service.getAssignments(response, context);
+  }
+}
+
+const initializeContext = (context: Partial<MemberSignupResponseContext>, ...responses: MemberSignupResponse[]) => {
+  if (!context.responses) {
+    context.responses = Promise.resolve(entitiesToModels(responses))
   }
 }

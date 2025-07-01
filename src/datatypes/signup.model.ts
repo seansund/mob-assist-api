@@ -13,7 +13,7 @@ export const validateDate = (date: string): boolean => {
   return true;
 }
 
-export const formatDate = (date: Date): string => {
+export const formatDate = (date: Date = new Date()): string => {
   return date.toISOString().split('T')[0];
 }
 
@@ -55,7 +55,7 @@ export interface BaseSignupModel extends Partial<ModelRef>, SignupDataModel {
 export interface SignupRelationsIdsModel {
   groupId: string;
   optionSetId: string;
-  assignmentSetId: string;
+  assignmentSetId?: string;
 }
 
 export interface SignupRelationsModel {
@@ -67,7 +67,7 @@ export interface SignupRelationsModel {
   members?: MemberModel[];
 }
 
-export interface SignupModel extends ModelRef, SignupDataModel, SignupRelationsModel {
+export interface SignupModel extends ModelRef, SignupDataModel, SignupRelationsIdsModel, SignupRelationsModel {
 }
 
 export interface SignupModelEntity extends BaseSignupModel, SignupRelationsModel {
@@ -83,7 +83,6 @@ export const createEmptySignupInput = (): SignupInputModel => {
     title: '',
     date: '',
     groupId: '',
-    assignmentSetId: '',
     optionSetId: '',
   }
 }

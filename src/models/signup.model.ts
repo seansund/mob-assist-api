@@ -59,14 +59,17 @@ export class Signup extends Entity implements Optional<SignupModel, 'id'> {
   })
   description?: string;
 
+  @field(() => ID)
   @belongsTo(() => Group)
   groupId: string;
 
+  @field(() => ID)
   @belongsTo(() => OptionSet)
   optionSetId: string;
 
+  @field(() => ID, {nullable: true})
   @belongsTo(() => AssignmentSet)
-  assignmentSetId: string;
+  assignmentSetId?: string;
 
   @field(() => [MemberSignupResponse], {nullable: true})
   @hasMany(() => MemberSignupResponse, {keyTo: 'signupId'})
@@ -84,8 +87,8 @@ export class Signup extends Entity implements Optional<SignupModel, 'id'> {
   @field(() => [Assignment])
   assignments: AssignmentModel[];
 
-  @field(() => AssignmentSet)
-  assignmentSet: AssignmentSetModel;
+  @field(() => AssignmentSet, {nullable: true})
+  assignmentSet?: AssignmentSetModel;
 
   @field(() => [OptionSummary])
   responseSummaries?: OptionSummaryModel[];

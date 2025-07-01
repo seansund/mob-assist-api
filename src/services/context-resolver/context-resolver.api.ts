@@ -10,6 +10,7 @@ import {
   OptionSet,
   Signup,
 } from '../../models';
+import {MemberSignupResponseModel} from '../../datatypes';
 
 export interface DomainContext {
   memberId?: string;
@@ -22,7 +23,7 @@ export interface DomainContext {
   assignments?: Promise<Assignment[]>;
   members?: Promise<Member[]>;
   groupMembers?: Promise<GroupMember[]>;
-  responses?: Promise<MemberSignupResponse[]>;
+  responses?: Promise<MemberSignupResponseModel[]>;
   responseAssignments?: Promise<MemberSignupResponseAssignment[]>;
 }
 
@@ -35,8 +36,9 @@ export abstract class ContextResolverApi {
   abstract populateGroupMembersContext(context: DomainContext): Promise<GroupMember[]>;
   abstract populateGroupsContext(context: DomainContext): Promise<Group[]>;
   abstract populateOptionsContext(context: DomainContext): Promise<Option[]>;
-  abstract populateResponsesContext(context: DomainContext): Promise<MemberSignupResponse[]>;
   abstract populateAssignmentsContext(context: DomainContext): Promise<Assignment[]>;
   abstract populateAssignmentSetsContext(context: DomainContext): Promise<AssignmentSet[]>;
   abstract populateMemberIdContext(context: DomainContext): Promise<string[]>;
+  abstract populateResponsesContext(context: DomainContext): Promise<MemberSignupResponseModel[]>;
+  abstract populateResponseAssignmentsContext(context: DomainContext): Promise<MemberSignupResponseAssignment[]>;
 }

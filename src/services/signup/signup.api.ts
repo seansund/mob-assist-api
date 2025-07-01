@@ -16,25 +16,13 @@ import {
   MemberSignupResponse, MemberSignupResponseAssignment,
   Option, OptionSet, Signup,
 } from '../../models';
-import {Optional} from '../../util';
+import {Optional, RequireOne} from '../../util';
+import {DomainContext} from '../context-resolver';
 
 export const SIGNUP_API = 'services.SignupApi';
 
 
-export interface SignupContext {
-  signups: Promise<Signup[]>
-  memberId?: string;
-
-  groups?: Promise<Group[]>;
-  optionSets?: Promise<OptionSet[]>;
-  options?: Promise<Option[]>;
-  assignmentSets?: Promise<AssignmentSet[]>;
-  assignments?: Promise<Assignment[]>;
-  members?: Promise<Member[]>;
-  groupMembers?: Promise<GroupMember[]>;
-  responses?: Promise<MemberSignupResponse[]>;
-  responseAssignments?: Promise<MemberSignupResponseAssignment[]>;
-}
+export type SignupContext = RequireOne<DomainContext, 'signups'>;
 
 export abstract class SignupApi extends BaseApi<SignupModel, SignupInputModel, SignupFilterModel, SignupContext> {
 
