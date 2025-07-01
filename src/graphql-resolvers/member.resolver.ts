@@ -101,16 +101,18 @@ export class MemberResolver implements ResolverInterface<Member> {
   async addMemberToGroup(
     @arg('memberId', () => ID) memberId: string,
     @arg('groupId', () => ID) groupId: string,
+    @arg('roleId', () => ID, {nullable: true}) roleId?: string,
   ): Promise<MemberModel> {
-    return this.service.addToGroup(memberId, groupId);
+    return this.service.addToGroup(memberId, groupId, roleId);
   }
 
   @mutation(() => [Member])
   async addMembersToGroup(
     @arg('memberIds', () => [ID]) memberIds: string[],
     @arg('groupId', () => ID) groupId: string,
+    @arg('roleId', () => ID, {nullable: true}) roleId?: string,
   ): Promise<MemberModel[]> {
-    return this.service.addAllToGroup(memberIds, groupId);
+    return this.service.addAllToGroup(memberIds, groupId, roleId);
   }
 
   @mutation(() => Member)

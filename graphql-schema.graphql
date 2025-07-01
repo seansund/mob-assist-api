@@ -134,8 +134,8 @@ input MemberUpdateInput {
 type Mutation {
   addAssignment(assignment: AssignmentInput!, assignmentSetId: ID!): AssignmentSet!
   addMemberRole(name: String!): MemberRole!
-  addMemberToGroup(groupId: ID!, memberId: ID!): Group
-  addMembersToGroup(groupId: ID!, memberIds: [ID!]!): Group
+  addMemberToGroup(groupId: ID!, memberId: ID!, roleId: ID): Group
+  addMembersToGroup(groupId: ID!, memberIds: [ID!]!, roleId: ID): Group
   addOption(option: OptionInput!, optionSetId: ID!): OptionSet!
   addRoleToMember(memberId: ID!, memberRoleId: ID!): Member!
   addUpdateMember(member: MemberInput!): Member!

@@ -7,7 +7,7 @@ import {
   isMemberId,
   isMemberPhone,
   MemberIdentifier,
-  MemberModel,
+  MemberModel, MemberRoleModel,
 } from '../../datatypes';
 import {
   GroupMemberRepository, GroupRepository, MemberMemberRoleRepository,
@@ -157,7 +157,7 @@ export class MemberImpl implements MemberApi {
     return this.memberRoleRepo.find({where: {id: {inq: memberRoleIds}}});
   }
 
-  async addAllToGroup(memberIds: string[], groupId: string): Promise<MemberModel[]> {
+  async addAllToGroup(memberIds: string[], groupId: string, roleId?: string): Promise<MemberModel[]> {
 
     const members: MemberModel[] = await this.repo
       .find({where: {id: {inq: memberIds}}})
@@ -189,7 +189,7 @@ export class MemberImpl implements MemberApi {
     }
 
     const groupMembers: {groupId: string, memberId: string}[] = missingMemberIds
-      .map(memberId => ({groupId, memberId}));
+      .map(memberId => ({groupId, memberId, roleId}));
 
     await this.groupMemberRepo.createAll(groupMembers);
 
@@ -217,33 +217,24 @@ export class MemberImpl implements MemberApi {
     return entityToModel(member);
   }
 
-  async addToGroup(memberId: string, groupId: string): Promise<MemberModel> {
+  async addToGroup(memberId: string, groupId: string, roleId?: string): Promise<MemberModel> {
 
-    const member: MemberModel | null = await this.repo
-      .findOne({where: {id: memberId}})
+    const member: MemberModel = await this.repo
+      .findById(memberId)
       .then(entityToModel);
 
-    if (!member) {
-      throw new Error('Member not found: ' + memberId);
-    }
-
-    const group: GroupModel | null = await this.groupRepo
-      .findOne({where: {id: groupId}})
+    await this.groupRepo
+      .findById(groupId)
       .then(entityToModel);
 
-    if (!group) {
-      throw new Error('Group not found: ' + groupId);
-    }
-
-    const groupMember: GroupMemberModel | null = await this.groupMemberRepo
+    const groupMember: GroupMember | null = await this.groupMemberRepo
       .findOne({where: {groupId, memberId}})
-      .then(entityToModel);
 
     if (groupMember) {
-      throw new Error('Member already in group: ' + memberId);
+      await this.groupMemberRepo.updateById(groupMember.getId(), {...groupMember, roleId});
+    } else {
+      await this.groupMemberRepo.create({groupId, memberId, roleId});
     }
-
-    await this.groupMemberRepo.create({groupId, memberId});
 
     return member;
   }

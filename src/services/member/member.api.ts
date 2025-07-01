@@ -1,4 +1,4 @@
-import {MemberIdentifier, MemberModel} from '../../datatypes';
+import {MemberIdentifier, MemberModel, MemberRoleModel} from '../../datatypes';
 import {BaseApi} from '../base.api';
 import {Group, Member, MemberRole} from '../../models';
 
@@ -12,8 +12,8 @@ export abstract class MemberApi extends BaseApi<MemberModel, Omit<MemberModel, '
   abstract listForSignup(signupId: string): Promise<MemberModel[]>;
   abstract addRole(memberId: string, roleId: string): Promise<MemberModel>;
   abstract removeRole(memberId: string, roleId: string): Promise<MemberModel>;
-  abstract addToGroup(memberId: string, groupId: string): Promise<MemberModel>;
-  abstract addAllToGroup(memberIds: string[], groupId: string): Promise<MemberModel[]>;
+  abstract addToGroup(memberId: string, groupId: string, roleId?: string): Promise<MemberModel>;
+  abstract addAllToGroup(memberIds: string[], groupId: string, roleId?: string): Promise<MemberModel[]>;
   abstract removeFromGroup(memberId: string, groupId: string): Promise<MemberModel>;
   abstract removeAllFromGroup(memberIds: string[], groupId: string): Promise<MemberModel[]>;
 
