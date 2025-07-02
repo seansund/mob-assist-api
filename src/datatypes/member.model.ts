@@ -1,4 +1,5 @@
-import {ModelRef} from "./base.model";
+import {ModelRef} from './base.model';
+import {MemberGroupModel} from './group-member.model';
 
 export const isMemberId = (val: unknown): val is ModelRef => {
   return !!val && (val as ModelRef).id !== undefined;
@@ -39,6 +40,7 @@ export const isMemberModel = (val: unknown): val is MemberModel => {
 }
 
 export interface MemberModel extends ModelRef, MemberDataModel {
+  groups?: MemberGroupModel[];
 }
 
 export interface MemberModelEntity extends Partial<ModelRef>, MemberDataModel {

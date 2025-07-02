@@ -10,14 +10,14 @@ import {
   root,
 } from '@loopback/graphql';
 import {
-  GroupModel,
+  MemberGroupModel,
   MemberIdentifier,
   MemberModel,
   MemberRoleModel,
 } from '../datatypes';
 import {
-  Group,
   Member,
+  MemberGroup,
   MemberIdentityInput,
   MemberInput,
   MemberRole,
@@ -137,8 +137,8 @@ export class MemberResolver implements ResolverInterface<Member> {
     return this.service.getRoles(member).then(entitiesToModels);
   }
 
-  @fieldResolver(() => [Group])
-  async groups(@root() member: Member): Promise<GroupModel[]> {
+  @fieldResolver(() => [MemberGroup])
+  async groups(@root() member: Member): Promise<MemberGroupModel[]> {
     return this.service.getGroups(member).then(entitiesToModels);
   }
 }

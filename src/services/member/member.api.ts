@@ -1,6 +1,6 @@
-import {MemberIdentifier, MemberModel, MemberRoleModel} from '../../datatypes';
+import {MemberIdentifier, MemberModel} from '../../datatypes';
 import {BaseApi} from '../base.api';
-import {Group, Member, MemberRole} from '../../models';
+import {Member, MemberGroup, MemberRole} from '../../models';
 
 export const MEMBER_API = 'services.MemberApi';
 
@@ -18,5 +18,5 @@ export abstract class MemberApi extends BaseApi<MemberModel, Omit<MemberModel, '
   abstract removeAllFromGroup(memberIds: string[], groupId: string): Promise<MemberModel[]>;
 
   abstract getRoles(member: Member): Promise<MemberRole[]>;
-  abstract getGroups(member: Member): Promise<Group[]>;
+  abstract getGroups(member: Member): Promise<MemberGroup[]>;
 }

@@ -1,20 +1,29 @@
 import {
   arg,
-  fieldResolver, ID,
+  fieldResolver,
+  ID,
   mutation,
   query,
-  resolver, ResolverInterface,
+  resolver,
+  ResolverInterface,
   root,
 } from '@loopback/graphql';
 import {Count, repository} from '@loopback/repository';
 
-import {GroupModel, GroupSummaryModel, MemberModel} from '../datatypes';
 import {
-  Group, GroupInput,
+  GroupModel,
+  GroupSummaryModel,
+  MemberModel,
+  MemberOfGroupModel,
+} from '../datatypes';
+import {
+  Group,
+  GroupInput,
   GroupMember,
-  GroupMemberWithRelations, GroupSummary,
+  GroupMemberWithRelations,
+  GroupSummary,
   GroupWithRelations,
-  Member,
+  MemberOfGroup,
 } from '../models';
 import {
   GroupMemberRepository,
@@ -91,6 +100,7 @@ export class GroupResolver implements ResolverInterface<Group> {
   async addMemberToGroup(
     @arg('groupId', () => ID) groupId: string,
     @arg('memberId', () => ID) memberId: string,
+    @arg('roleId', () => ID, {nullable: true}) roleId?: string,
   ): Promise<GroupModel | undefined> {
     const group = await this.repo.findById(groupId);
 
@@ -100,10 +110,10 @@ export class GroupResolver implements ResolverInterface<Group> {
 
     const groupMember = await this.groupMemberRepo.findOne({where: {groupId, memberId}});
 
-    if (!groupMember) {
-      await this.groupMemberRepo.create({groupId, memberId});
+    if (groupMember) {
+      await this.groupMemberRepo.updateById(groupMember.getId(), {groupId, memberId, roleId});
     } else {
-      console.log('Already member of group: ', {groupId, memberId});
+      await this.groupMemberRepo.create({groupId, memberId, roleId});
     }
 
     return entityToModel(group);
@@ -113,6 +123,7 @@ export class GroupResolver implements ResolverInterface<Group> {
   async addMembersToGroup(
     @arg('groupId', () => ID) groupId: string,
     @arg('memberIds', () => [ID]) memberIds: string[],
+    @arg('roleId', () => ID, {nullable: true}) roleId?: string,
   ): Promise<GroupModel | undefined> {
     const group = await this.repo.findById(groupId);
 
@@ -128,7 +139,7 @@ export class GroupResolver implements ResolverInterface<Group> {
     const newMemberIds: string[] = memberIds.filter(id => !existingMemberIds.includes(id))
 
     if (newMemberIds.length > 0) {
-      await this.groupMemberRepo.createAll(newMemberIds.map(memberId => ({groupId, memberId})));
+      await this.groupMemberRepo.createAll(newMemberIds.map(memberId => ({groupId, memberId, roleId})));
     } else {
       console.log('Already member(s) of group: ', {groupId, memberIds});
     }
@@ -158,14 +169,27 @@ export class GroupResolver implements ResolverInterface<Group> {
     return entityToModel(group);
   }
 
-  @fieldResolver(() => [Member])
-  async members(@root() group: Group): Promise<MemberModel[]> {
+  @fieldResolver(() => [MemberOfGroup])
+  async members(@root() group: Group): Promise<MemberOfGroupModel[]> {
 
     const groupMembers: GroupMemberWithRelations[] = await this.groupMemberRepo.find({where: {groupId: group.getId()}})
 
     const memberIds = groupMembers.map((groupMember: GroupMember) => groupMember.memberId);
 
-    return this.memberRepo.find({where: {id: {inq: memberIds}}, order: ['lastName ASC', 'firstName ASC']}).then(entitiesToModels);
+    const members: MemberModel[] = await this.memberRepo
+      .find({where: {id: {inq: memberIds}}, order: ['lastName ASC', 'firstName ASC']})
+      .then(entitiesToModels);
+
+    return members
+      .map(member => {
+        const groupMember = groupMembers
+          .find(g => g.memberId.toString() === member.id.toString());
+
+        return {
+          ...member,
+          roleId: groupMember?.roleId,
+        }
+      });
   }
 
   @fieldResolver(() => [GroupSummary])

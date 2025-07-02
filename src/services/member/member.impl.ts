@@ -7,17 +7,20 @@ import {
   isMemberId,
   isMemberPhone,
   MemberIdentifier,
-  MemberModel, MemberRoleModel,
+  MemberModel,
 } from '../../datatypes';
 import {
-  GroupMemberRepository, GroupRepository, MemberMemberRoleRepository,
-  MemberRepository, MemberRoleRepository,
+  GroupMemberRepository,
+  GroupRepository,
+  MemberMemberRoleRepository,
+  MemberRepository,
+  MemberRoleRepository,
   SignupRepository,
 } from '../../repositories';
 import {
-  Group,
   GroupMember,
   Member,
+  MemberGroup,
   MemberMemberRole,
   MemberRole,
 } from '../../models';
@@ -141,12 +144,25 @@ export class MemberImpl implements MemberApi {
       .then(entitiesToModels);
   }
 
-  async getGroups(member: Member): Promise<Group[]> {
-    const groupMember: GroupMember[] = await this.groupMemberRepo.find({where: {memberId: member.getId()}});
+  async getGroups(member: Member): Promise<MemberGroup[]> {
+    const groupMembers: GroupMember[] = await this.groupMemberRepo.find({where: {memberId: member.getId()}});
 
-    const groupIds = groupMember.map((m: GroupMember) => m.groupId);
+    const groupIds = groupMembers.map((m: GroupMember) => m.groupId);
 
-    return this.groupRepo.find({where: {id: {inq: groupIds}}});
+    const groups: GroupModel[] = await this.groupRepo
+      .find({where: {id: {inq: groupIds}}})
+      .then(entitiesToModels);
+
+    return groups
+      .map(group => {
+        const groupMember = groupMembers
+          .find(g => g.groupId.toString() === group.id.toString())
+
+        return {
+          ...group,
+          roleId: groupMember?.roleId,
+        } as MemberGroup;
+      })
   }
 
   async getRoles(member: Member): Promise<MemberRole[]> {

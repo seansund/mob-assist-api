@@ -7,3 +7,11 @@ export interface GroupMemberModel extends ModelRef {
   member: MemberModel;
   role?: MemberRoleModel;
 }
+
+export interface MemberOfGroupModel extends MemberModel {
+  roleId?: string;
+}
+
+export interface MemberGroupModel extends GroupModel {
+  roleId?: string;
+}

@@ -4,8 +4,14 @@ import {field, ID, objectType} from '@loopback/graphql';
 import {GroupMember} from './group-member.model';
 import {GroupSummary} from './group-summary.model';
 import {Member} from './member.model';
-import {GroupModel, GroupSummaryModel, MemberModel} from '../datatypes';
+import {
+  GroupModel,
+  GroupSummaryModel,
+  MemberModel,
+  MemberOfGroupModel,
+} from '../datatypes';
 import {Optional} from '../util';
+import {MemberOfGroup} from './member-of-group.model';
 
 @objectType({description: 'Group of members'})
 @model()
@@ -28,9 +34,9 @@ export class Group extends Entity implements Optional<GroupModel, 'id'> {
   @field(() => GroupSummary, {nullable: true})
   summary?: GroupSummaryModel;
 
-  @field(type => [Member], {nullable: true})
+  @field(type => [MemberOfGroup], {nullable: true})
   @hasMany(() => Member, {through: {model: () => GroupMember}})
-  members: MemberModel[];
+  members: MemberOfGroupModel[];
 
   constructor(data?: Partial<Group>) {
     super(data);

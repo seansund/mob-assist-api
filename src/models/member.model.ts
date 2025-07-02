@@ -1,16 +1,16 @@
 import {Entity, model, property} from '@loopback/repository';
 import {field, ID, objectType} from '@loopback/graphql';
-
-import {Group} from './group.model';
 import {MemberRole} from './member-role.model';
 import {
   GroupModel,
+  MemberGroupModel,
   MemberModel,
   MemberRoleModel,
   NotificationModel,
 } from '../datatypes';
 import {Notification} from './notification.model';
 import {Optional} from '../util';
+import {MemberGroup} from './member-group.model';
 
 @objectType({description: 'Member of the application'})
 @model()
@@ -63,8 +63,8 @@ export class Member extends Entity implements Optional<MemberModel, 'id'> {
   roles?: MemberRoleModel[];
 
   // @hasMany(() => Group, {through: {model: () => GroupMember}})
-  @field(() => [Group], {nullable: true})
-  groups?: GroupModel[];
+  @field(() => [MemberGroup], {nullable: true})
+  groups?: MemberGroupModel[];
 
   // @hasMany(() => Notification, {through: {model: () => MemberNotification}})
   @field(() => [Notification], {nullable: true})
