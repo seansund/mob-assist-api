@@ -1,28 +1,32 @@
 # Check out https://hub.docker.com/_/node to select a new base image
-FROM docker.io/library/node:18-slim
+FROM registry.access.redhat.com/ubi10/nodejs-22-minimal:10.0-1750857232 as base
+FROM base as builder
 
-# Set to a non-root built-in user `node`
-USER node
-
-# Create app directory (with user `node`)
-RUN mkdir -p /home/node/app
-
-WORKDIR /home/node/app
+USER 1001
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
-COPY --chown=node package*.json ./
+COPY --chown=1001:0 package*.json ./
 
-RUN npm install
+RUN npm ci
 
 # Bundle app source code
-COPY --chown=node . .
+COPY --chown=1001:0 . .
 
 RUN npm run build
 
+FROM base as runtime
+
+USER 1001
+
+COPY --chown=1001:0 --from=builder /opt/app-root/src/dist dist
+COPY --chown=1001:0 --from=builder /opt/app-root/src/package*.json ./
+
+RUN npm ci --omit=dev
+
 # Bind to all network interfaces so that it can be mapped to the host OS
-ENV HOST=0.0.0.0 PORT=3000
+ENV HOST=0.0.0.0 PORT=8080
 
 EXPOSE ${PORT}
 CMD [ "node", "." ]
