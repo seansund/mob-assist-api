@@ -46,7 +46,12 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add chart
           git add package.json
-          git commit -m "Update version to ${TAG_NAME} in package.json and charts"
+          
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "no change"
+          else
+            git commit -m "Update version to ${TAG_NAME} in package.json and charts"
+          fi
 
       - name: Push changes
         uses: ad-m/github-push-action@master
