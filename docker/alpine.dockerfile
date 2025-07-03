@@ -31,12 +31,11 @@ RUN \
 FROM base as runner
 
 ENV NODE_ENV=production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN adduser --system --uid 1001 -G root runner
+RUN mkdir /app
+RUN chown runner:root /app
 
-RUN mkdir /app & chown runner:root /app
 WORKDIR /app
 
 COPY --chown=runner:root --from=builder /app/dist dist

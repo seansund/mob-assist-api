@@ -67,3 +67,4 @@ server/config.local.js
 \#*#
 .env
 .idea/
+*.iml
