@@ -26,13 +26,13 @@ appVersion: "1.0.0"
 dependencies:
   - name: mongodb-binding
     version: "1.0.0"
-    repository: "https://seansund.github.io/mob-assist-api/"
+    repository: "https://seansund.github.io/helm-charts/"
     condition: mongodb-binding.enabled
   - name: sendgrid-binding
     version: "1.0.0"
-    repository: "https://seansund.github.io/mob-assist-api/"
+    repository: "https://seansund.github.io/helm-charts/"
     condition: sendgrid-binding.enabled
   - name: twilio-binding
     version: "1.0.0"
-    repository: "https://seansund.github.io/mob-assist-api/"
+    repository: "https://seansund.github.io/helm-charts/"
     condition: twilio-binding.enabled
