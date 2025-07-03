@@ -1,0 +1,10 @@
+
+nameOverride: ""
+fullnameOverride: ""
+
+connectString: ""
+host: ""
+port: ""
+username: ""
+password: ""
+database: ""

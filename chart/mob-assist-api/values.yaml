@@ -83,4 +83,16 @@ tolerations: []
 affinity: {}
 
 route:
-  enabled: true
+  enabled: false
+
+mongodb-binding:
+  enabled: false
+  fullnameOverride: "mongodb-binding"
+
+sendgrid-binding:
+  enabled: false
+  fullnameOverride: "sendgrid-binding"
+
+twilio-binding:
+  enabled: false
+  fullnameOverride: "twilio-binding"
