@@ -33,30 +33,12 @@ jobs:
           TAG_NAME=$(echo "${{ steps.create-release.outputs.tag_name }}" | sed "s/v//g")
           cat chart/mob-assist-api/Chart.yaml | \
             sed "s/appVersion:.*/appVersion: \"${TAG_NAME}\"/g" | \
-            sed "s/version:.*/version: \"${TAG_NAME}\"/g" \
+            sed "s/^version:.*/version: \"${TAG_NAME}\"/g" \
             > /tmp/Chart.yaml
           cp /tmp/Chart.yaml chart/mob-assist-api/Chart.yaml
           
-          cat chart/mongodb-binding/Chart.yaml | \
-            sed "s/appVersion:.*/appVersion: \"${TAG_NAME}\"/g" | \
-            sed "s/version:.*/version: \"${TAG_NAME}\"/g" \
-            > /tmp/Chart.yaml
-          cp /tmp/Chart.yaml chart/mongodb-binding/Chart.yaml
-          
-          cat chart/sendgrid-binding/Chart.yaml | \
-            sed "s/appVersion:.*/appVersion: \"${TAG_NAME}\"/g" | \
-            sed "s/version:.*/version: \"${TAG_NAME}\"/g" \
-            > /tmp/Chart.yaml
-          cp /tmp/Chart.yaml chart/sendgrid-binding/Chart.yaml
-          
-          cat chart/twilio-binding/Chart.yaml | \
-            sed "s/appVersion:.*/appVersion: \"${TAG_NAME}\"/g" | \
-            sed "s/version:.*/version: \"${TAG_NAME}\"/g" \
-            > /tmp/Chart.yaml
-          cp /tmp/Chart.yaml chart/twilio-binding/Chart.yaml
-          
           cat package.json | \
-            sed "s/\"version\":.*/\version\": \"${TAG_NAME}\",/g" \
+            sed "s/\"version\":.*/\"version\": \"${TAG_NAME}\",/g" \
             > /tmp/package.json
           cp /tmp/package.json package.json
           

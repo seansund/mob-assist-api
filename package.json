@@ -1,6 +1,6 @@
 {
   "name": "mob-assist-api",
-  ersion": "1.0.0",
+  "version": "1.0.0",
   "description": "mob assist",
   "keywords": [
     "loopback-application",
