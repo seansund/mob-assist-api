@@ -22,3 +22,17 @@ version: "0.7.2"
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "0.7.2"
+
+dependencies:
+  - name: mongodb-binding
+    version: "0.7.2"
+    repository: "https://seansund.github.io/mob-assist-api/"
+    condition: mongodb-binding.enabled
+  - name: sendgrid-binding
+    version: "0.7.2"
+    repository: "https://seansund.github.io/mob-assist-api/"
+    condition: sendgrid-binding.enabled
+  - name: twilio-binding
+    version: "0.7.2"
+    repository: "https://seansund.github.io/mob-assist-api/"
+    condition: twilio-binding.enabled

@@ -33,6 +33,16 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - secretRef:
+                name: mongodb-binding
+              prefix: MONGODB_
+            - secretRef:
+                name: twilio-binding
+              prefix: TWILIO_
+            - secretRef:
+                name: sendgrid-binding
+              prefix: SENDGRID_
           env:
             - name: MONGODB_URI
               valueFrom:

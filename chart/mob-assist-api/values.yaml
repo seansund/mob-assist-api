@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: quay.io/seansund/mob-assist-api
   pullPolicy: IfNotPresent
-  port: 8080
+  port: 3000
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
@@ -83,4 +83,16 @@ tolerations: []
 affinity: {}
 
 route:
-  enabled: true
+  enabled: false
+
+mongodb-binding:
+  enabled: false
+  fullnameOverride: "mongodb-binding"
+
+sendgrid-binding:
+  enabled: false
+  fullnameOverride: "sendgrid-binding"
+
+twilio-binding:
+  enabled: false
+  fullnameOverride: "twilio-binding"
