@@ -2,6 +2,29 @@ apiVersion: v1
 entries:
   mob-assist-api:
   - apiVersion: v2
+    appVersion: 1.0.1
+    created: "2025-07-04T12:54:22.402125486Z"
+    dependencies:
+    - condition: mongodb-binding.enabled
+      name: mongodb-binding
+      repository: https://seansund.github.io/helm-charts/
+      version: 1.0.0
+    - condition: sendgrid-binding.enabled
+      name: sendgrid-binding
+      repository: https://seansund.github.io/helm-charts/
+      version: 1.0.0
+    - condition: twilio-binding.enabled
+      name: twilio-binding
+      repository: https://seansund.github.io/helm-charts/
+      version: 1.0.0
+    description: A Helm chart for Kubernetes
+    digest: c6bbcb591bfa0e22d0400950e683421286d2a5bf8f560d61a7264c657cdd6f11
+    name: mob-assist-api
+    type: application
+    urls:
+    - https://github.com/seansund/mob-assist-api/releases/download/v1.0.1/mob-assist-api-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
     appVersion: 1.0.0
     created: "2025-07-03T23:45:06.921793211Z"
     dependencies:
@@ -274,4 +297,4 @@ entries:
     urls:
     - https://github.com/seansund/mob-assist-api/releases/download/v0.1.2/mob-assist-api-0.1.2.tgz
     version: 0.1.2
-generated: "2025-07-03T23:45:06.920905522Z"
+generated: "2025-07-04T12:54:22.401034914Z"
