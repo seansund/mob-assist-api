@@ -43,58 +43,17 @@ spec:
             - secretRef:
                 name: sendgrid-binding
               prefix: SENDGRID_
-          env:
-            - name: MONGODB_URI
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-config
-                  key: uri
-            - name: MONGODB_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-config
-                  key: name
-            - name: MONGODB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-config
-                  key: username
-            - name: MONGODB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-config
-                  key: password
-            - name: MONGODB_CACERT_BASE64
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-config
-                  key: certificate_base64
-            - name: TWILIO_ACCOUNT_SID
-              valueFrom:
-                secretKeyRef:
-                  name: twilio-config
-                  key: account-sid
-            - name: TWILIO_AUTH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: twilio-config
-                  key: auth-token
-            - name: TWILIO_PHONE
-              valueFrom:
-                secretKeyRef:
-                  name: twilio-config
-                  key: phone
           ports:
             - name: http
               containerPort: {{ .Values.image.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /actuator/info
+              path: /
               port: http
           readinessProbe:
             httpGet:
-              path: /actuator/info
+              path: /
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

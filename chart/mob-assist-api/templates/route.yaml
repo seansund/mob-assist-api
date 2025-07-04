@@ -4,7 +4,7 @@ kind: Route
 metadata:
   name: {{ include "mob-assist-api.name" . }}
   labels:
-    {{ include "mob-assist-api.labels" . | nindent 4 }}
+    {{- include "mob-assist-api.labels" . | nindent 4 }}
 spec:
   port:
     targetPort: http
